@@ -10,7 +10,8 @@
     "sourceMap": true,
     "outDir": "./dist",
     "experimentalDecorators": true,
-    "baseUrl": ".",
+    // "impo"
+    "baseUrl": "./",
     "paths": {
       "*": ["node_modules/*"]
     }
