@@ -1,4 +1,5 @@
 import { batch, useDispatch, useSelector } from "react-redux";
+import { useMatchMedia } from "../../../hooks/matchMedia";
 import { RootState } from "../../../store/rootReducer";
 import { TDemographics } from "../../../ts";
 import {
@@ -18,11 +19,16 @@ const BoundingBox = ({ id, idx, bounding_box }: TBoundingBoxProps) => {
   const hoverActive = useSelector(
     (state: RootState) => state.demographics.hoverActive
   )!;
+  const mqlRef = useMatchMedia();
   // , onToggleBoundingBoxHighlight from redux
   const onMouseEnter = () => {
     batch(() => {
       dispatch(
-        setDemoItemHoverActive({ id, active: true, scrollIntoView: true })
+        setDemoItemHoverActive({
+          id,
+          active: true,
+          scrollIntoView: mqlRef.current!.matches ? true : false,
+        })
       );
       dispatch(setHoverActive({ active: true }));
     });

@@ -16,7 +16,7 @@ const initialState: TImageResultState = {
   demographics: [],
   demographicsDisplay: [],
   hoverActive: false,
-  imageHeight: 0,
+  imageHeight: null,
 };
 
 const demographicsSlice = createSlice({
@@ -51,6 +51,7 @@ const demographicsSlice = createSlice({
 
       const item = state.demographicsDisplay.find((demo) => demo.id === id)!;
       item.hoverActive = active;
+
       if (scrollIntoView != null) {
         item.scrollIntoView = scrollIntoView;
       }

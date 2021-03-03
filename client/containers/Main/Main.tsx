@@ -1,12 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
 import LogoText from "../../components/Logo/LogoText";
 import { appHeight } from "../../constants";
 import FaceDetectionResult from "../FaceDetectionResult/FaceDetectionResult";
 import Landing from "../Landing/Landing";
+import { THeadInnerSentinel } from "../Table/Sentinel";
 import UploadImageForm from "../UploadImageForm/UploadImageForm";
 
 const Main = () => {
-  // 15 + 45 +10
   return (
     <>
       <div className="hidden-cover">
@@ -22,6 +22,7 @@ const Main = () => {
         {`
           main {
           }
+
           .hidden-cover {
             position: fixed;
             top: 0;

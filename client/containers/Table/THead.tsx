@@ -1,6 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/rootReducer";
+import { THeadInnerSentinel } from "./Sentinel";
 
 type THeadProps = {
   mobile?: boolean;
@@ -9,32 +10,39 @@ const THead = ({ mobile }: THeadProps) => {
   const showStickyTHead = useSelector(
     (state: RootState) => state.table.showStickyTHead
   );
-  const imageHeight = useSelector(
-    (state: RootState) => state.demographics.imageHeight
-  );
 
   const thead = ["Face", "Age", "Gender", "Multicultural"];
   return (
-    <div className="container">
-      <div className="thead-container">
-        {thead.map((item, idx) => {
-          return (
-            <div className={idx === 0 ? "thead-image" : ""} key={idx}>
-              {idx === 0 ? <span className="bg"></span> : null}
-              <span>{item}</span>
-            </div>
-          );
-        })}
+    <div
+      className={`${
+        mobile ? "thead-sticky-mobile" : "thead-sticky-desktop"
+      } container`}
+    >
+      {!mobile ? <THeadInnerSentinel></THeadInnerSentinel> : null}
+      <div className="container-inner">
+        <div className="thead-container">
+          {thead.map((item, idx) => {
+            return (
+              <div className={idx === 0 ? "thead-image" : ""} key={idx}>
+                {idx === 0 ? <span className="bg"></span> : null}
+                <span>{item}</span>
+              </div>
+            );
+          })}
+        </div>
       </div>
       <style jsx>
         {`
           .container {
             position: sticky;
-            top: 0;
+            top: 28px;
             left: 0;
             height: 45px;
-            margin-bottom: -35px;
+            margin-bottom: -45px;
             z-index: 5;
+          }
+
+          .container-inner {
             overflow: hidden;
           }
 
@@ -82,9 +90,7 @@ const THead = ({ mobile }: THeadProps) => {
         {`
           .container {
             display: ${!mobile ? "none" : "block"};
-            top: ${imageHeight && mobile
-              ? `${imageHeight + 45 + 15}px`
-              : "0px"};
+            top: ${!mobile ? "0px" : "28px"};
           }
 
           .thead-container {
