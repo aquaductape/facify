@@ -1,7 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/rootReducer";
-import { THeadInnerSentinel } from "./Sentinel";
 
 type THeadProps = {
   mobile?: boolean;
@@ -18,32 +17,27 @@ const THead = ({ mobile }: THeadProps) => {
         mobile ? "thead-sticky-mobile" : "thead-sticky-desktop"
       } container`}
     >
-      {!mobile ? <THeadInnerSentinel></THeadInnerSentinel> : null}
-      <div className="container-inner">
-        <div className="thead-container">
-          {thead.map((item, idx) => {
-            return (
-              <div className={idx === 0 ? "thead-image" : ""} key={idx}>
-                {idx === 0 ? <span className="bg"></span> : null}
-                <span>{item}</span>
-              </div>
-            );
-          })}
-        </div>
+      <div className="thead-container">
+        {thead.map((item, idx) => {
+          return (
+            <div className={idx === 0 ? "thead-image" : ""} key={idx}>
+              {idx === 0 ? <span className="bg"></span> : null}
+              <span>{item}</span>
+            </div>
+          );
+        })}
       </div>
+
       <style jsx>
         {`
           .container {
             position: sticky;
-            top: 28px;
+            top: 0;
             left: 0;
             height: 45px;
             margin-bottom: -45px;
-            z-index: 5;
-          }
-
-          .container-inner {
             overflow: hidden;
+            z-index: 5;
           }
 
           .thead-container {
@@ -90,7 +84,7 @@ const THead = ({ mobile }: THeadProps) => {
         {`
           .container {
             display: ${!mobile ? "none" : "block"};
-            top: ${!mobile ? "0px" : "28px"};
+            top: ${!mobile ? "60px" : "28px"};
           }
 
           .thead-container {

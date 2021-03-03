@@ -14,7 +14,6 @@ const Table = () => {
 
   return (
     <div className="table-container">
-      <THead mobile={false}></THead>
       <ScrollShadow></ScrollShadow>
       <div className="table-scroll-container">
         <THead mobile={true}></THead>

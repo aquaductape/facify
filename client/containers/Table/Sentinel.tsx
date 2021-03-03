@@ -50,11 +50,11 @@ type TCreateObserverProps = {
   matchOnDesktop?: boolean;
   mql: MediaQueryList;
   observerCallback: IntersectionObserverCallback;
-  onScroll: () => number;
   mqlCallback?: (
     e: MediaQueryListEvent,
     observer: IntersectionObserver
   ) => void;
+  observerRoot?: null | HTMLElement;
 };
 //
 let observer: IntersectionObserver | null = null;
@@ -68,6 +68,7 @@ const useCreateObserver = ({
   observerCallback,
   mql,
   mqlCallback,
+  observerRoot = null,
 }: TCreateObserverProps) => {
   useEffect(() => {
     if (imageHeight == null || hasInit.current) return;
@@ -98,7 +99,7 @@ const useCreateObserver = ({
 
       mqlCallback && mqlCallback(e, observer);
 
-      if (!e.matches || matchOnDesktop) {
+      if (!e.matches) {
         window.addEventListener("scroll", onScroll, { passive: true });
       } else {
         window.removeEventListener("scroll", onScroll);
@@ -112,6 +113,8 @@ const useCreateObserver = ({
       mql.addEventListener("change", onMediaQueryListEvent);
     }
     observer.observe(sentinelInnerScrollRef.current!);
+
+    console.log({ imageHeight });
 
     let prevScrollY = Math.ceil(
       sentinelInnerScrollRef.current!.getBoundingClientRect().top -
@@ -132,7 +135,7 @@ const useCreateObserver = ({
       theadEl.style.transform = `translateY(${position}px)`;
     };
 
-    if (!mql.matches || matchOnDesktop) {
+    if (!mql.matches) {
       window.addEventListener("scroll", onScroll, { passive: true });
     }
 
@@ -171,19 +174,6 @@ const THeadSentinel = () => {
     });
   };
 
-  const onScroll = () => {
-    const inputHeight = 45;
-    const topPadding = 15;
-
-    return Math.ceil(
-      sentinelInnerScrollRef.current!.getBoundingClientRect().top -
-        imageHeightRef.current! -
-        inputHeight -
-        topPadding +
-        window.scrollY
-    );
-  };
-
   useEffect(() => {
     if (imageHeight == null) return;
 
@@ -198,7 +188,6 @@ const THeadSentinel = () => {
     observerCallback,
     sentinelInnerScrollRef,
     theadStickyVisibleRef,
-    onScroll,
   });
 
   return (
@@ -218,7 +207,7 @@ const THeadSentinel = () => {
   );
 };
 
-const THeadInnerSentinel = () => {
+const InfoResultSentinel = () => {
   const dispatch = useDispatch();
   const imageHeight = useSelector(
     (state: RootState) => state.demographics.imageHeight
@@ -245,18 +234,6 @@ const THeadInnerSentinel = () => {
     });
   };
 
-  const onScroll = () => {
-    const inputHeight = 45;
-    const topPadding = 15;
-
-    return Math.ceil(
-      sentinelInnerScrollRef.current!.getBoundingClientRect().top -
-        inputHeight -
-        topPadding +
-        window.scrollY
-    );
-  };
-
   const mqlCallback = (
     e: MediaQueryListEvent,
     observer: IntersectionObserver
@@ -275,7 +252,6 @@ const THeadInnerSentinel = () => {
   }, [imageHeight]);
 
   useCreateObserver({
-    matchOnDesktop: true,
     hasInit,
     imageHeight,
     imageHeightRef,
@@ -284,7 +260,6 @@ const THeadInnerSentinel = () => {
     sentinelInnerScrollRef,
     theadStickyVisibleRef,
     mqlCallback,
-    onScroll,
   });
 
   return (
@@ -293,7 +268,7 @@ const THeadInnerSentinel = () => {
         {`
           .sentinel {
             position: absolute;
-            top: -60px;
+            top: 0px;
             left: 0;
             width: 100%;
             height: 0px;
@@ -304,4 +279,4 @@ const THeadInnerSentinel = () => {
   );
 };
 
-export { HorizontalSentinel, THeadSentinel, THeadInnerSentinel };
+export { HorizontalSentinel, THeadSentinel, InfoResultSentinel };

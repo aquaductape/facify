@@ -59,7 +59,11 @@ const BoundingCroppedImage = ({
 
   useEffect(() => {
     if (!demographic.hoverActive || !demographic.scrollIntoView) return;
-    imgElRef.current?.scrollIntoView(false);
+    imgElRef.current?.scrollIntoView({
+      behavior: "auto",
+      block: "nearest",
+      inline: "start",
+    });
   }, [demographic.scrollIntoView]);
 
   return renderImage ? (

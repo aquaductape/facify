@@ -3,7 +3,6 @@ import LogoText from "../../components/Logo/LogoText";
 import { appHeight } from "../../constants";
 import FaceDetectionResult from "../FaceDetectionResult/FaceDetectionResult";
 import Landing from "../Landing/Landing";
-import { THeadInnerSentinel } from "../Table/Sentinel";
 import UploadImageForm from "../UploadImageForm/UploadImageForm";
 
 const Main = () => {
