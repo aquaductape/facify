@@ -3,6 +3,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { useMatchMedia } from "../../hooks/matchMedia";
 import { RootState } from "../../store/rootReducer";
 import { setScrollShadow, setShowStickyTHead } from "./tableSlice";
+import useCreateObserver, {
+  TMqlCallback,
+  TObserverCallback,
+} from "./useCreateObserver";
 
 const HorizontalSentinel = () => {
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -41,157 +45,89 @@ const HorizontalSentinel = () => {
   );
 };
 
-type TCreateObserverProps = {
-  imageHeight: number | null;
-  imageHeightRef: React.MutableRefObject<number | null>;
-  sentinelInnerScrollRef: React.MutableRefObject<HTMLDivElement | null>;
-  hasInit: React.MutableRefObject<boolean>;
-  theadStickyVisibleRef: React.MutableRefObject<boolean>;
-  matchOnDesktop?: boolean;
-  mql: MediaQueryList;
-  observerCallback: IntersectionObserverCallback;
-  mqlCallback?: (
-    e: MediaQueryListEvent,
-    observer: IntersectionObserver
-  ) => void;
-  observerRoot?: null | HTMLElement;
-};
-//
-let observer: IntersectionObserver | null = null;
-const useCreateObserver = ({
-  matchOnDesktop,
-  hasInit,
-  theadStickyVisibleRef,
-  sentinelInnerScrollRef,
-  imageHeightRef,
-  imageHeight,
-  observerCallback,
-  mql,
-  mqlCallback,
-  observerRoot = null,
-}: TCreateObserverProps) => {
-  useEffect(() => {
-    if (imageHeight == null || hasInit.current) return;
-    hasInit.current = true;
-
-    const theadEl = document.querySelector(
-      `.thead-sticky-${matchOnDesktop ? "desktop" : "mobile"}`
-    ) as HTMLDivElement;
-    const inputHeight = 45;
-    const topPadding = 15;
-
-    const createObserver = (mediaMatches: boolean) => {
-      const positionTop = mediaMatches
-        ? imageHeightRef.current! + topPadding + inputHeight
-        : 0;
-      console.log(imageHeightRef.current);
-      return new IntersectionObserver(observerCallback, {
-        threshold: [0, 1],
-        rootMargin: `-${positionTop}px 0px 0px 0px`,
-      });
-    };
-
-    const onMediaQueryListEvent = (e: MediaQueryListEvent) => {
-      console.log("change!!");
-      observer!.disconnect();
-      observer = createObserver(!e.matches);
-      observer.observe(sentinelInnerScrollRef.current!);
-
-      mqlCallback && mqlCallback(e, observer);
-
-      if (!e.matches) {
-        window.addEventListener("scroll", onScroll, { passive: true });
-      } else {
-        window.removeEventListener("scroll", onScroll);
-      }
-    };
-
-    console.log("createObserver");
-    if (!observer) {
-      observer = createObserver(!mql.matches);
-
-      mql.addEventListener("change", onMediaQueryListEvent);
-    }
-    observer.observe(sentinelInnerScrollRef.current!);
-
-    console.log({ imageHeight });
-
-    let prevScrollY = Math.ceil(
-      sentinelInnerScrollRef.current!.getBoundingClientRect().top -
-        imageHeight -
-        inputHeight -
-        topPadding +
-        window.scrollY
-    );
-    console.log({ prevScrollY }, sentinelInnerScrollRef.current);
-    const onScroll = () => {
-      if (!theadStickyVisibleRef.current) return;
-
-      const scrollY = window.scrollY;
-      const position = scrollY - prevScrollY;
-
-      console.log({ position, scrollY, prevScrollY });
-
-      theadEl.style.transform = `translateY(${position}px)`;
-    };
-
-    if (!mql.matches) {
-      window.addEventListener("scroll", onScroll, { passive: true });
-    }
-
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      observer!.unobserve(sentinelInnerScrollRef.current!);
-      // mql.removeEventListener('change', mediaQueryListCb)
-    };
-  }, [imageHeight]);
-};
-
+let timestampStickyVisible = 0;
 const THeadSentinel = () => {
+  const id = "THeadSentinel";
   const dispatch = useDispatch();
   const imageHeight = useSelector(
     (state: RootState) => state.demographics.imageHeight
   );
 
-  const sentinelInnerScrollRef = useRef<HTMLDivElement | null>(null);
+  const theadEl = document.querySelector(
+    `.thead-sticky-mobile`
+  ) as HTMLDivElement;
+  const sentinelElRef = useRef<HTMLDivElement | null>(null);
   const imageHeightRef = useRef<number | null>(null);
   const theadStickyVisibleRef = useRef(false);
   const hasInit = useRef(false);
+  const prevScrollYRef = useRef(0);
   const mqlRef = useMatchMedia();
+  const inputHeight = 45;
+  const topPadding = 15;
 
-  const observerCallback: IntersectionObserverCallback = (
-    entries,
-    observer
-  ) => {
-    entries.forEach((entry) => {
-      let isVisible = false;
-      if (entry.intersectionRatio > 0) {
-        isVisible = true;
-      }
-      console.log(entry.target, { isVisible });
+  const onScroll = () => {
+    if (!theadStickyVisibleRef.current) return;
+
+    const scrollY = window.scrollY;
+    const position = scrollY - prevScrollYRef.current;
+
+    theadEl.style.transform = `translateY(${position}px)`;
+  };
+
+  const observerCallback: TObserverCallback = (entry) => {
+    let isVisible = false;
+    if (entry.intersectionRatio > 0) {
+      isVisible = true;
+    }
+    console.log(entry.target, { isVisible });
+
+    window.clearTimeout(timestampStickyVisible);
+
+    if (isVisible) {
+      timestampStickyVisible = window.setTimeout(() => {
+        theadStickyVisibleRef.current = !isVisible;
+      }, 300);
+    } else {
       theadStickyVisibleRef.current = !isVisible;
-      dispatch(setShowStickyTHead(!isVisible));
-    });
+    }
+    dispatch(setShowStickyTHead({ active: !isVisible, triggeredBy: id }));
+  };
+
+  const mqlCallback: TMqlCallback = ({ observer }) => {
+    console.log("cb ", id);
+    observer.observe(sentinelElRef.current!);
   };
 
   useEffect(() => {
     if (imageHeight == null) return;
 
+    console.log({ imageHeight });
     imageHeightRef.current = imageHeight;
+
+    prevScrollYRef.current = Math.ceil(
+      sentinelElRef.current!.getBoundingClientRect().top -
+        imageHeight! -
+        inputHeight -
+        topPadding +
+        window.scrollY
+    );
   }, [imageHeight]);
 
   useCreateObserver({
+    id,
     hasInit,
     imageHeight,
     imageHeightRef,
     mql: mqlRef.current!,
     observerCallback,
-    sentinelInnerScrollRef,
+    sentinelElRef,
     theadStickyVisibleRef,
+    mqlCallback,
+    scrollCallback: onScroll,
   });
 
   return (
-    <div className="sentinel" ref={sentinelInnerScrollRef}>
+    <div data-observer-id={id} className="sentinel" ref={sentinelElRef}>
       <style jsx>
         {`
           .sentinel {
@@ -208,40 +144,36 @@ const THeadSentinel = () => {
 };
 
 const InfoResultSentinel = () => {
+  const id = "infoResultSentinel";
   const dispatch = useDispatch();
   const imageHeight = useSelector(
     (state: RootState) => state.demographics.imageHeight
   );
 
-  const sentinelInnerScrollRef = useRef<HTMLDivElement | null>(null);
+  const sentinelElRef = useRef<HTMLDivElement | null>(null);
   const imageHeightRef = useRef<number | null>(null);
   const theadStickyVisibleRef = useRef(false);
   const hasInit = useRef(false);
   const mqlRef = useMatchMedia();
 
-  const observerCallback: IntersectionObserverCallback = (
-    entries,
-    observer
-  ) => {
-    entries.forEach((entry) => {
-      let isVisible = false;
-      if (entry.intersectionRatio > 0) {
-        isVisible = true;
-      }
-      console.log(entry.target, { isVisible });
-      theadStickyVisibleRef.current = !isVisible;
-      dispatch(setShowStickyTHead(!isVisible));
-    });
+  const observerCallback: TObserverCallback = (entry, observer) => {
+    console.log("InfoResultSentinel");
+    let isVisible = false;
+    if (entry.intersectionRatio > 0) {
+      isVisible = true;
+    }
+    console.log(entry.target, { isVisible });
+    theadStickyVisibleRef.current = !isVisible;
+    dispatch(setShowStickyTHead({ active: !isVisible, triggeredBy: id }));
   };
 
-  const mqlCallback = (
-    e: MediaQueryListEvent,
-    observer: IntersectionObserver
-  ) => {
+  const mqlCallback: TMqlCallback = ({ e, observer }) => {
     if (e.matches) {
-      observer.unobserve(sentinelInnerScrollRef.current!);
+      console.log("reobserve: ", id);
+      observer.observe(sentinelElRef.current!);
     } else {
-      observer.observe(sentinelInnerScrollRef.current!);
+      console.log("unobserve: ", id);
+      observer.unobserve(sentinelElRef.current!);
     }
   };
 
@@ -252,18 +184,20 @@ const InfoResultSentinel = () => {
   }, [imageHeight]);
 
   useCreateObserver({
+    id,
+    desktop: true,
     hasInit,
     imageHeight,
     imageHeightRef,
     mql: mqlRef.current!,
     observerCallback,
-    sentinelInnerScrollRef,
+    sentinelElRef,
     theadStickyVisibleRef,
     mqlCallback,
   });
 
   return (
-    <div className="sentinel" ref={sentinelInnerScrollRef}>
+    <div data-observer-id={id} className="sentinel" ref={sentinelElRef}>
       <style jsx>
         {`
           .sentinel {

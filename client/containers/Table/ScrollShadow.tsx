@@ -1,4 +1,3 @@
-import { useReducer } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/rootReducer";
 
@@ -26,7 +25,7 @@ const ScrollShadow = () => {
               #0000002e,
               transparent 24px
             );
-            z-index: 5;
+            z-index: 10;
             pointer-events: none;
             transition: opacity 250ms;
           }

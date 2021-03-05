@@ -1,11 +1,17 @@
 import React, { useEffect } from "react";
 import LogoText from "../../components/Logo/LogoText";
 import { appHeight } from "../../constants";
+import getScrollbarWidth from "../../utils/getScrollWidth";
 import FaceDetectionResult from "../FaceDetectionResult/FaceDetectionResult";
 import Landing from "../Landing/Landing";
 import UploadImageForm from "../UploadImageForm/UploadImageForm";
 
 const Main = () => {
+  useEffect(() => {
+    const result = getScrollbarWidth();
+    console.log(result);
+  }, []);
+
   return (
     <>
       <div className="hidden-cover">

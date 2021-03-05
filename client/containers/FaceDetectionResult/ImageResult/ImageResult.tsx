@@ -4,6 +4,7 @@ import { batch, useDispatch, useSelector } from "react-redux";
 import { appHeight } from "../../../constants";
 import { RootState } from "../../../store/rootReducer";
 import { parseConcept } from "../../../utils/parseConcept";
+import { reflow } from "../../../utils/reflow";
 import {
   saveImageDimensions,
   setElOnLoadStatus,
@@ -30,9 +31,11 @@ const ImageResult = () => {
       console.log("fire");
       const containerWidth = imageContainerRef.current!.clientWidth;
       const imgWidth = imgRef.current!.clientWidth;
-      const imgHeight = imgRef.current!.clientHeight;
+      let imgHeight = imgRef.current!.clientHeight;
       const diff = containerWidth / imgWidth;
       imgRef.current!.style.height = `${imgHeight * diff}px`;
+      reflow();
+      imgHeight = imgRef.current!.clientHeight;
 
       dispatch(setImageHeight(imgHeight));
     }, 150)
