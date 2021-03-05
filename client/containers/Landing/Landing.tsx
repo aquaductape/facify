@@ -5,11 +5,11 @@ import LogoIcon from "../../components/Logo/svg/LogoIcon";
 import { RootState } from "../../store/rootReducer";
 
 const Landing = () => {
-  const { error, imageStatus, uri } = useSelector(
-    (state: RootState) => state.imageUrl
+  const imageLoaded = useSelector(
+    (state: RootState) => state.imageUrl.imageLoaded
   );
 
-  if (imageStatus === "DONE") {
+  if (imageLoaded) {
     return null;
   }
 

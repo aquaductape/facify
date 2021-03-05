@@ -1,6 +1,6 @@
 import { debounce } from "lodash";
 import { useEffect, useRef, useState } from "react";
-import { batch, useDispatch, useSelector } from "react-redux";
+import { batch, useDispatch, useSelector, shallowEqual } from "react-redux";
 import { appHeight } from "../../../constants";
 import { RootState } from "../../../store/rootReducer";
 import { parseConcept } from "../../../utils/parseConcept";
@@ -8,18 +8,23 @@ import { reflow } from "../../../utils/reflow";
 import {
   saveImageDimensions,
   setElOnLoadStatus,
+  TImageItem,
 } from "../../UploadImageForm/imageUrlSlice";
 import BoundingBox from "../BoundingBox/BoundingBox";
 import { setImageHeight } from "./demographicsSlice";
 
-const ImageResult = () => {
+type TImageResultProps = Pick<
+  TImageItem,
+  "id" | "error" | "imageStatus" | "uri"
+>;
+const ImageResult = ({ id, error, imageStatus, uri }: TImageResultProps) => {
   const dispatch = useDispatch();
   const [renderBoundingBox, setRenderBoundingBox] = useState(false);
-  const { error, imageStatus, uri } = useSelector(
-    (state: RootState) => state.imageUrl
-  );
   const demographics = useSelector(
-    (state: RootState) => state.demographics.demographics
+    (state: RootState) =>
+      state.demographics.demographics.find((item) => {
+        return item.id === id;
+      })!.data
   );
 
   const renderBoundingBoxRef = useRef(false);
@@ -31,13 +36,14 @@ const ImageResult = () => {
       console.log("fire");
       const containerWidth = imageContainerRef.current!.clientWidth;
       const imgWidth = imgRef.current!.clientWidth;
-      let imgHeight = imgRef.current!.clientHeight;
+      let imageHeight = imgRef.current!.clientHeight;
       const diff = containerWidth / imgWidth;
-      imgRef.current!.style.height = `${imgHeight * diff}px`;
+      imgRef.current!.style.height = `${imageHeight * diff}px`;
       reflow();
-      imgHeight = imgRef.current!.clientHeight;
+      imageHeight = imgRef.current!.clientHeight;
+      if (imageHeight < 200) imageHeight = 200;
 
-      dispatch(setImageHeight(imgHeight));
+      dispatch(setImageHeight({ id, imageHeight }));
     }, 150)
   );
 
@@ -47,8 +53,8 @@ const ImageResult = () => {
     const img = e.target as HTMLImageElement;
     const { naturalHeight, naturalWidth } = img;
     batch(() => {
-      dispatch(saveImageDimensions({ naturalHeight, naturalWidth }));
-      dispatch(setElOnLoadStatus("DONE"));
+      dispatch(saveImageDimensions({ id, naturalHeight, naturalWidth }));
+      dispatch(setElOnLoadStatus({ id, elOnLoadStatus: "DONE" }));
     });
     // creates cropped image url
     console.log("loaded!!");
@@ -65,12 +71,12 @@ const ImageResult = () => {
   if (error) return <div>{error}</div>;
 
   const demographicsList = renderBoundingBox
-    ? demographics.map(({ id, bounding_box }, idx) => (
+    ? demographics.map(({ id: demographicId, bounding_box }) => (
         <BoundingBox
           id={id}
+          demographicId={demographicId}
           bounding_box={bounding_box}
-          idx={idx}
-          key={id}
+          key={demographicId}
         ></BoundingBox>
       ))
     : null;
@@ -127,6 +133,7 @@ const ImageResult = () => {
             justify-content: center;
             align-items: center;
             background: #000;
+            min-height: 200px;
             max-height: ${appHeight}px;
             overflow: hidden;
             z-index: 55;

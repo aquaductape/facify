@@ -116,9 +116,7 @@ const useCreateObserver = ({
 
       if (!e.matches) {
         console.log("addwindow");
-        window.addEventListener("scroll", onScrollRef.current!, {
-          passive: true,
-        });
+        window.addEventListener("scroll", onScrollRef.current!);
       } else {
         console.log("removewindow");
         window.removeEventListener("scroll", onScrollRef.current!);
@@ -140,6 +138,8 @@ const useCreateObserver = ({
       onScroll: scrollCallback,
     });
 
+    // console.log(sentinelItems);
+
     if (!onMediaQueryListenerRef.current) {
       onMediaQueryListenerRef.current = onMediaQueryListener;
     }
@@ -154,6 +154,7 @@ const useCreateObserver = ({
     }
 
     if (observer && desktopValid(mql)) {
+      // if (observer) {
       observer.observe(sentinelElRef.current!);
     }
 
@@ -164,9 +165,7 @@ const useCreateObserver = ({
     if (scrollCallback && !windowInit) {
       console.log("addwindow");
       windowInit = true;
-      window.addEventListener("scroll", onScrollRef.current!, {
-        passive: true,
-      });
+      window.addEventListener("scroll", onScrollRef.current!);
     }
   }, [imageHeight]);
 

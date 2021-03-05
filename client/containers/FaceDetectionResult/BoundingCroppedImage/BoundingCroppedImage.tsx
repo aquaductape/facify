@@ -1,3 +1,4 @@
+import { createSelector } from "@reduxjs/toolkit";
 import { useEffect, useRef, useState } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../../store/rootReducer";
@@ -9,18 +10,45 @@ import {
 } from "../ImageResult/demographicsSlice";
 import createCroppedImgUrl from "./createCroppedImgUrl";
 
-type BoundingCroppedImageProps = TDemographics & { idx: number };
+const selectCategoryEntity = ({
+  id,
+  demographicId,
+}: {
+  id: string;
+  demographicId: string;
+}) => {
+  return createSelector(
+    (state: RootState) => state.demographics.demographics,
+    (state) =>
+      state
+        .find((item) => {
+          // console.log("find demoitem");
+          return item.id === id;
+        })!
+        .display.find((item) => {
+          // console.log("find demodisplay");
+          return item.id === demographicId;
+        })!
+  );
+};
+
+type BoundingCroppedImageProps = Omit<TDemographics, "id"> & {
+  id: string;
+  demographicId: string;
+  idx: number;
+};
 const BoundingCroppedImage = ({
   id,
+  demographicId,
   bounding_box,
   concepts,
   idx,
 }: BoundingCroppedImageProps) => {
   const dispatch = useDispatch();
-  const imageUrl = useSelector((state: RootState) => state.imageUrl);
-  const demographic = useSelector(
-    (state: RootState) => state.demographics.demographicsDisplay[idx]
-  )!;
+  const imageUrl = useSelector(
+    (state: RootState) => state.imageUrl.images.find((item) => item.id === id)!
+  );
+  const demographic = useSelector(selectCategoryEntity({ id, demographicId }));
   const [renderImage, setRenderImage] = useState(false);
   const croppedImgUrlRef = useRef("");
   const imgElRef = useRef<HTMLImageElement>(null);
@@ -44,14 +72,14 @@ const BoundingCroppedImage = ({
 
   const onMouseEnter = () => {
     batch(() => {
-      dispatch(setDemoItemHoverActive({ id, active: true }));
-      dispatch(setHoverActive({ active: true }));
+      dispatch(setDemoItemHoverActive({ id, demographicId, active: true }));
+      dispatch(setHoverActive({ id, active: true }));
     });
   };
   const onMouseLeave = () => {
     batch(() => {
-      dispatch(setDemoItemHoverActive({ id, active: false }));
-      dispatch(setHoverActive({ active: false }));
+      dispatch(setDemoItemHoverActive({ id, demographicId, active: false }));
+      dispatch(setHoverActive({ id, active: false }));
     });
   };
 

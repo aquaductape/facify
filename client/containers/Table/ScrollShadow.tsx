@@ -1,9 +1,10 @@
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/rootReducer";
 
-const ScrollShadow = () => {
+const ScrollShadow = ({ id }: { id: string }) => {
   const scrollShadow = useSelector(
-    (state: RootState) => state.table.scrollShadow
+    (state: RootState) =>
+      state.table.tables.find((item) => item.id === id)!.scrollShadow
   );
 
   return (

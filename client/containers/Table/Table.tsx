@@ -5,21 +5,35 @@ import ScrollShadow from "./ScrollShadow";
 import { HorizontalSentinel, THeadSentinel } from "./Sentinel";
 import { parseConceptValue } from "../../utils/parseConcept";
 import THead from "./THead";
+import { createSelector } from "@reduxjs/toolkit";
 
-const Table = () => {
-  const demographics = useSelector(
-    (state: RootState) => state.demographics.demographics
+const selectCategoryEntity = (id: string) => {
+  return createSelector(
+    (state: RootState) => state.demographics.demographics,
+    (state) =>
+      state.find((item) => {
+        console.log("find demoitem");
+        return item.id === id;
+      })!.data
   );
+};
+
+const Table = ({ id }: { id: string }) => {
+  // const demographics = useSelector(
+  //   (state: RootState) =>
+  //     state.demographics.demographics.find((item) => item.id === id)!.data
+  // );
+  const demographics = useSelector(selectCategoryEntity(id));
   const thead = ["Face", "Age", "Gender", "Multicultural"];
 
   return (
     <div className="table-container">
-      <ScrollShadow></ScrollShadow>
+      <ScrollShadow id={id}></ScrollShadow>
       <div className="table-scroll-container">
-        <THead mobile={true}></THead>
+        <THead id={id} mobile={true}></THead>
         <div className="table-container-inner">
-          <HorizontalSentinel></HorizontalSentinel>
-          <THeadSentinel></THeadSentinel>
+          <HorizontalSentinel id={id}></HorizontalSentinel>
+          <THeadSentinel id={id}></THeadSentinel>
           <table>
             <thead className="thead">
               <tr>
@@ -34,56 +48,59 @@ const Table = () => {
               </tr>
             </thead>
             <tbody>
-              {demographics.map(({ id, bounding_box, concepts }, idx) => {
-                const {
-                  "age-appearence": age,
-                  "gender-appearance": gender,
-                  "multicultural-appearance": multicultural,
-                } = concepts;
+              {demographics.map(
+                ({ id: demographicId, bounding_box, concepts }, idx) => {
+                  const {
+                    "age-appearence": age,
+                    "gender-appearance": gender,
+                    "multicultural-appearance": multicultural,
+                  } = concepts;
 
-                return (
-                  <tr className="row" key={id + idx}>
-                    <td className="td-image">
-                      <BoundingCroppedImage
-                        id={id}
-                        bounding_box={bounding_box}
-                        concepts={concepts}
-                        idx={idx}
-                      />
-                    </td>
-                    <td>
-                      {age.map(({ id, name, value }, idx) => (
-                        <TdInnerValue
-                          name={name}
-                          value={value}
+                  return (
+                    <tr className="row" key={demographicId + idx}>
+                      <td className="td-image">
+                        <BoundingCroppedImage
+                          id={id}
+                          demographicId={demographicId}
+                          bounding_box={bounding_box}
+                          concepts={concepts}
                           idx={idx}
-                          key={id}
-                        ></TdInnerValue>
-                      ))}
-                    </td>
-                    <td>
-                      {gender.map(({ id, name, value }, idx) => (
-                        <TdInnerValue
-                          name={name}
-                          value={value}
-                          idx={idx}
-                          key={id}
-                        ></TdInnerValue>
-                      ))}
-                    </td>
-                    <td>
-                      {multicultural.map(({ id, name, value }, idx) => (
-                        <TdInnerValue
-                          name={name}
-                          value={value}
-                          idx={idx}
-                          key={id}
-                        ></TdInnerValue>
-                      ))}
-                    </td>
-                  </tr>
-                );
-              })}
+                        />
+                      </td>
+                      <td>
+                        {age.map(({ id, name, value }, idx) => (
+                          <TdInnerValue
+                            name={name}
+                            value={value}
+                            idx={idx}
+                            key={id}
+                          ></TdInnerValue>
+                        ))}
+                      </td>
+                      <td>
+                        {gender.map(({ id, name, value }, idx) => (
+                          <TdInnerValue
+                            name={name}
+                            value={value}
+                            idx={idx}
+                            key={id}
+                          ></TdInnerValue>
+                        ))}
+                      </td>
+                      <td>
+                        {multicultural.map(({ id, name, value }, idx) => (
+                          <TdInnerValue
+                            name={name}
+                            value={value}
+                            idx={idx}
+                            key={id}
+                          ></TdInnerValue>
+                        ))}
+                      </td>
+                    </tr>
+                  );
+                }
+              )}
             </tbody>
           </table>
         </div>
@@ -96,6 +113,7 @@ const Table = () => {
 
           .table-scroll-container {
             overflow-x: auto;
+            overflow-y: hidden;
           }
 
           .table-container-inner {
@@ -167,6 +185,7 @@ const Table = () => {
           @media (min-width: 1300px) {
             .table-scroll-container {
               overflow-x: hidden;
+              overflow-y: auto;
             }
           }
         `}

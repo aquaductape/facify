@@ -2,9 +2,10 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/rootReducer";
 
-const Stats = () => {
+const Stats = ({ id }: { id: string }) => {
   const demographics = useSelector(
-    (state: RootState) => state.demographics.demographics
+    (state: RootState) =>
+      state.demographics.demographics.find((item) => item.id === id)!.data
   );
   // face from boundingbox.length
   const faces = demographics.length;

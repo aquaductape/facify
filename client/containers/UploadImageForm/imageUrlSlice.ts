@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-type TImageUrlState = {
+export type TImageItem = {
+  id: string;
   uri: string | null;
   imageStatus: "EMPTY" | "LOADING" | "DONE";
   elOnLoadStatus: "EMPTY" | "LOADING" | "DONE";
@@ -7,54 +8,84 @@ type TImageUrlState = {
   naturalHeight: number | null;
   naturalWidth: number | null;
 };
+type TImageUrlState = {
+  images: TImageItem[];
+  imageLoaded: boolean;
+};
 
 const initialState: TImageUrlState = {
-  uri: null,
-  imageStatus: "EMPTY",
-  elOnLoadStatus: "EMPTY",
-  naturalHeight: null,
-  naturalWidth: null,
-  error: null,
+  images: [],
+  imageLoaded: false,
 };
 
 const imageUrlSlice = createSlice({
   name: "imageUrl",
   initialState,
   reducers: {
-    setUri: (state, action: PayloadAction<string>) => {
-      state.uri = action.payload;
+    addImage: (state, action: PayloadAction<TImageItem>) => {
+      state.images.push(action.payload);
+    },
+    setImageLoaded: (state, action: PayloadAction<boolean>) => {
+      state.imageLoaded = action.payload;
+    },
+    setUri: (state, action: PayloadAction<{ id: string; uri: string }>) => {
+      const { id, uri } = action.payload;
+      const result = state.images.find((item) => item.id === id)!;
+      result.uri = uri;
     },
     setImageStatus: (
       state,
-      action: PayloadAction<"EMPTY" | "LOADING" | "DONE">
+      action: PayloadAction<{
+        id: string;
+        imageStatus: "EMPTY" | "LOADING" | "DONE";
+      }>
     ) => {
-      state.imageStatus = action.payload;
+      const { id, imageStatus } = action.payload;
+      const result = state.images.find((item) => item.id === id)!;
+      result.imageStatus = imageStatus;
     },
     setElOnLoadStatus: (
       state,
-      action: PayloadAction<"EMPTY" | "LOADING" | "DONE">
+      action: PayloadAction<{
+        id: string;
+        elOnLoadStatus: "EMPTY" | "LOADING" | "DONE";
+      }>
     ) => {
-      state.elOnLoadStatus = action.payload;
+      const { id, elOnLoadStatus } = action.payload;
+      const result = state.images.find((item) => item.id === id)!;
+      result.elOnLoadStatus = elOnLoadStatus;
     },
-    setImageError: (state, action: PayloadAction<string | null>) => {
-      state.error = action.payload;
+    setImageError: (
+      state,
+      action: PayloadAction<{ id: string; error: string | null }>
+    ) => {
+      const { id, error } = action.payload;
+      const result = state.images.find((item) => item.id === id)!;
+      result.error = error;
     },
     saveImageDimensions: (
       state,
-      action: PayloadAction<{ naturalHeight: number; naturalWidth: number }>
+      action: PayloadAction<{
+        id: string;
+        naturalHeight: number;
+        naturalWidth: number;
+      }>
     ) => {
-      const { naturalHeight, naturalWidth } = action.payload;
-      state.naturalHeight = naturalHeight;
-      state.naturalWidth = naturalWidth;
+      const { id, naturalHeight, naturalWidth } = action.payload;
+      const result = state.images.find((item) => item.id === id)!;
+      result.naturalHeight = naturalHeight;
+      result.naturalWidth = naturalWidth;
     },
   },
 });
 
 export const {
+  addImage,
   setUri,
   setImageError,
   setImageStatus,
   setElOnLoadStatus,
   saveImageDimensions,
+  setImageLoaded,
 } = imageUrlSlice.actions;
 export default imageUrlSlice.reducer;

@@ -8,7 +8,7 @@ import useCreateObserver, {
   TObserverCallback,
 } from "./useCreateObserver";
 
-const HorizontalSentinel = () => {
+const HorizontalSentinel = ({ id }: { id: string }) => {
   const sentinelRef = useRef<HTMLDivElement>(null);
   const dispatch = useDispatch();
   useEffect(() => {
@@ -20,7 +20,7 @@ const HorizontalSentinel = () => {
         if (entry.intersectionRatio > 0) {
           isVisible = true;
         }
-        dispatch(setScrollShadow(!isVisible));
+        dispatch(setScrollShadow({ id, scrollShadow: !isVisible }));
       });
     };
     const observer = new IntersectionObserver(observerCb, {
@@ -45,17 +45,19 @@ const HorizontalSentinel = () => {
   );
 };
 
-let timestampStickyVisible = 0;
-const THeadSentinel = () => {
-  const id = "THeadSentinel";
+const THeadSentinel = ({ id }: { id: string }) => {
+  const sentinelId = "THeadSentinel";
   const dispatch = useDispatch();
   const imageHeight = useSelector(
-    (state: RootState) => state.demographics.imageHeight
+    (state: RootState) =>
+      state.demographics.demographics.find((item) => item.id === id)!
+        .imageHeight
   );
-
-  const theadEl = document.querySelector(
-    `.thead-sticky-mobile`
-  ) as HTMLDivElement;
+  const theadSelector = `.thead-sticky-mobile-${id}`;
+  const theadElRef = useRef<HTMLDivElement | null>(
+    document.querySelector(theadSelector)
+  );
+  const timestampStickyVisibleRef = useRef(0);
   const sentinelElRef = useRef<HTMLDivElement | null>(null);
   const imageHeightRef = useRef<number | null>(null);
   const theadStickyVisibleRef = useRef(false);
@@ -71,7 +73,7 @@ const THeadSentinel = () => {
     const scrollY = window.scrollY;
     const position = scrollY - prevScrollYRef.current;
 
-    theadEl.style.transform = `translateY(${position}px)`;
+    theadElRef.current!.style.transform = `translateY(${position}px)`;
   };
 
   const observerCallback: TObserverCallback = (entry) => {
@@ -79,18 +81,20 @@ const THeadSentinel = () => {
     if (entry.intersectionRatio > 0) {
       isVisible = true;
     }
-    console.log(entry.target, { isVisible });
+    // console.log(id, entry.target, { isVisible });
 
-    window.clearTimeout(timestampStickyVisible);
+    window.clearTimeout(timestampStickyVisibleRef.current);
 
     if (isVisible) {
-      timestampStickyVisible = window.setTimeout(() => {
+      timestampStickyVisibleRef.current = window.setTimeout(() => {
         theadStickyVisibleRef.current = !isVisible;
       }, 300);
     } else {
       theadStickyVisibleRef.current = !isVisible;
     }
-    dispatch(setShowStickyTHead({ active: !isVisible, triggeredBy: id }));
+    dispatch(
+      setShowStickyTHead({ id, active: !isVisible, triggeredBy: sentinelId })
+    );
   };
 
   const mqlCallback: TMqlCallback = ({ observer }) => {
@@ -104,17 +108,24 @@ const THeadSentinel = () => {
     console.log({ imageHeight });
     imageHeightRef.current = imageHeight;
 
-    prevScrollYRef.current = Math.ceil(
-      sentinelElRef.current!.getBoundingClientRect().top -
-        imageHeight! -
-        inputHeight -
-        topPadding +
-        window.scrollY
-    );
+    if (!theadElRef.current) {
+      theadElRef.current = document.querySelector(theadSelector);
+    }
+
+    setTimeout(() => {
+      prevScrollYRef.current = Math.ceil(
+        sentinelElRef.current!.getBoundingClientRect().top -
+          imageHeight! -
+          inputHeight -
+          topPadding +
+          window.scrollY
+      );
+      console.log("prevScrollRef", imageHeight);
+    }, 100);
   }, [imageHeight]);
 
   useCreateObserver({
-    id,
+    id: id + sentinelId,
     hasInit,
     imageHeight,
     imageHeightRef,
@@ -127,7 +138,11 @@ const THeadSentinel = () => {
   });
 
   return (
-    <div data-observer-id={id} className="sentinel" ref={sentinelElRef}>
+    <div
+      data-observer-id={id + sentinelId}
+      className="sentinel"
+      ref={sentinelElRef}
+    >
       <style jsx>
         {`
           .sentinel {
@@ -143,11 +158,13 @@ const THeadSentinel = () => {
   );
 };
 
-const InfoResultSentinel = () => {
-  const id = "infoResultSentinel";
+const InfoResultSentinel = ({ id }: { id: string }) => {
+  const sentinelId = `infoResultSentinel`;
   const dispatch = useDispatch();
   const imageHeight = useSelector(
-    (state: RootState) => state.demographics.imageHeight
+    (state: RootState) =>
+      state.demographics.demographics.find((item) => item.id === id)!
+        .imageHeight
   );
 
   const sentinelElRef = useRef<HTMLDivElement | null>(null);
@@ -157,14 +174,16 @@ const InfoResultSentinel = () => {
   const mqlRef = useMatchMedia();
 
   const observerCallback: TObserverCallback = (entry, observer) => {
-    console.log("InfoResultSentinel");
+    // console.log("InfoResultSentinel");
     let isVisible = false;
     if (entry.intersectionRatio > 0) {
       isVisible = true;
     }
-    console.log(entry.target, { isVisible });
+    // console.log(entry.target, { isVisible });
     theadStickyVisibleRef.current = !isVisible;
-    dispatch(setShowStickyTHead({ active: !isVisible, triggeredBy: id }));
+    dispatch(
+      setShowStickyTHead({ id, active: !isVisible, triggeredBy: sentinelId })
+    );
   };
 
   const mqlCallback: TMqlCallback = ({ e, observer }) => {
@@ -184,7 +203,7 @@ const InfoResultSentinel = () => {
   }, [imageHeight]);
 
   useCreateObserver({
-    id,
+    id: id + sentinelId,
     desktop: true,
     hasInit,
     imageHeight,
@@ -197,7 +216,11 @@ const InfoResultSentinel = () => {
   });
 
   return (
-    <div data-observer-id={id} className="sentinel" ref={sentinelElRef}>
+    <div
+      data-observer-id={id + sentinelId}
+      className="sentinel"
+      ref={sentinelElRef}
+    >
       <style jsx>
         {`
           .sentinel {

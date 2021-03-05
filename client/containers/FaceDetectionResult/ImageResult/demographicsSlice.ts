@@ -5,30 +5,34 @@ type TDemographicsDisplay = {
   hoverActive: boolean;
   scrollIntoView: boolean;
 };
-type TImageResultState = {
-  demographics: TDemographics[];
-  demographicsDisplay: TDemographicsDisplay[];
-  hoverActive: boolean;
+type TDemographicsItem = {
+  id: string;
+  data: TDemographics[];
+  display: TDemographicsDisplay[];
   imageHeight: number | null;
+  hoverActive: boolean;
+};
+
+type TImageResultState = {
+  demographics: TDemographicsItem[];
 };
 
 const initialState: TImageResultState = {
   demographics: [],
-  demographicsDisplay: [],
-  hoverActive: false,
-  imageHeight: null,
 };
 
 const demographicsSlice = createSlice({
   name: "demographics",
   initialState,
   reducers: {
-    setDemographics: (state, action: PayloadAction<TDemographics[]>) => {
-      state.demographics = action.payload;
-    },
-    setDemographicsDisplay: (state, action: PayloadAction<TDemographics[]>) => {
+    addDemographics: (
+      state,
+      action: PayloadAction<Omit<TDemographicsItem, "display">>
+    ) => {
+      const demographic = action.payload as TDemographicsItem;
+
       const result: TDemographicsDisplay[] = [];
-      action.payload.forEach((item) => {
+      demographic.data.forEach((item) => {
         const resultItem: TDemographicsDisplay = {
           id: item.id,
           hoverActive: false,
@@ -37,38 +41,52 @@ const demographicsSlice = createSlice({
         result.push(resultItem);
       });
 
-      state.demographicsDisplay = result;
+      demographic.display = result;
+      console.log("ran");
+      state.demographics.push(demographic);
     },
     setDemoItemHoverActive: (
       state,
       action: PayloadAction<{
         id: string;
+        demographicId: string;
         active: boolean;
         scrollIntoView?: boolean;
       }>
     ) => {
-      const { id, active, scrollIntoView } = action.payload;
+      const { id, demographicId, active, scrollIntoView } = action.payload;
 
-      const item = state.demographicsDisplay.find((demo) => demo.id === id)!;
+      const result = state.demographics.find((item) => item.id === id)!;
+      const item = result.display.find((demo) => demo.id === demographicId)!;
       item.hoverActive = active;
 
       if (scrollIntoView != null) {
         item.scrollIntoView = scrollIntoView;
       }
     },
-    setHoverActive: (state, action: PayloadAction<{ active: boolean }>) => {
-      const { active } = action.payload;
-      state.hoverActive = active;
+    setHoverActive: (
+      state,
+      action: PayloadAction<{ id: string; active: boolean }>
+    ) => {
+      const { id, active } = action.payload;
+      const result = state.demographics.find((item) => item.id === id)!;
+      result.hoverActive = active;
     },
-    setImageHeight: (state, action: PayloadAction<number | null>) => {
-      state.imageHeight = action.payload;
+    setImageHeight: (
+      state,
+      action: PayloadAction<{ id: string; imageHeight: number | null }>
+    ) => {
+      const { id, imageHeight } = action.payload;
+      const result = state.demographics.find((item) => item.id === id)!;
+      result.imageHeight = imageHeight;
+      // state.imageHeight = action.payload;
     },
   },
 });
 
 export const {
-  setDemographics,
-  setDemographicsDisplay,
+  addDemographics,
+  // setDemographicsDisplay,
   setDemoItemHoverActive,
   setHoverActive,
   setImageHeight,

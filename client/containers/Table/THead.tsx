@@ -1,14 +1,16 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/rootReducer";
 import getScrollbarWidth from "../../utils/getScrollWidth";
 
 type THeadProps = {
+  id: string;
   mobile?: boolean;
 };
-const THead = ({ mobile }: THeadProps) => {
+const THead = ({ id, mobile }: THeadProps) => {
   const showStickyTHead = useSelector(
-    (state: RootState) => state.table.showStickyTHead.active
+    (state: RootState) =>
+      state.table.tables.find((item) => item.id === id)!.showStickyTHead.active
   );
 
   const tHeadContainerElRef = useRef<HTMLDivElement>(null);
@@ -19,7 +21,7 @@ const THead = ({ mobile }: THeadProps) => {
     <div
       aria-hidden={!showStickyTHead}
       className={`${
-        mobile ? "thead-sticky-mobile" : "thead-sticky-desktop"
+        mobile ? `thead-sticky-mobile-${id}` : `thead-sticky-desktop-${id}`
       } container`}
       ref={containerElRef}
     >

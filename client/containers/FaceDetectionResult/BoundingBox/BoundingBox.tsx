@@ -7,17 +7,26 @@ import {
   setHoverActive,
 } from "../ImageResult/demographicsSlice";
 
-type TBoundingBoxProps = Pick<TDemographics, "id" | "bounding_box"> & {
-  idx: number;
+type TBoundingBoxProps = Pick<TDemographics, "bounding_box"> & {
+  id: string;
+  demographicId: string;
 };
 
-const BoundingBox = ({ id, idx, bounding_box }: TBoundingBoxProps) => {
+const BoundingBox = ({
+  id,
+  demographicId,
+  bounding_box,
+}: TBoundingBoxProps) => {
   const dispatch = useDispatch();
-  const demographic = useSelector(
-    (state: RootState) => state.demographics.demographicsDisplay[idx]
+  const demographic = useSelector((state: RootState) =>
+    state.demographics.demographics
+      .find((item) => item.id === id)!
+      .display.find((item) => item.id === demographicId)
   )!;
   const hoverActive = useSelector(
-    (state: RootState) => state.demographics.hoverActive
+    (state: RootState) =>
+      state.demographics.demographics.find((item) => item.id === id)!
+        .hoverActive
   )!;
   const mqlRef = useMatchMedia();
   // , onToggleBoundingBoxHighlight from redux
@@ -26,19 +35,25 @@ const BoundingBox = ({ id, idx, bounding_box }: TBoundingBoxProps) => {
       dispatch(
         setDemoItemHoverActive({
           id,
+          demographicId,
           active: true,
           scrollIntoView: mqlRef.current!.matches ? true : false,
         })
       );
-      dispatch(setHoverActive({ active: true }));
+      dispatch(setHoverActive({ id, active: true }));
     });
   };
   const onMouseLeave = () => {
     batch(() => {
       dispatch(
-        setDemoItemHoverActive({ id, active: false, scrollIntoView: false })
+        setDemoItemHoverActive({
+          id,
+          demographicId,
+          active: false,
+          scrollIntoView: false,
+        })
       );
-      dispatch(setHoverActive({ active: false }));
+      dispatch(setHoverActive({ id, active: false }));
     });
   };
 
@@ -65,8 +80,8 @@ const BoundingBox = ({ id, idx, bounding_box }: TBoundingBoxProps) => {
           }
 
           .active {
-            border: 3px solid #224aff;
-            outline: 1px solid #fff;
+            border: 2px solid #fff;
+            outline: 2px solid #224aff;
             outline-offset: -1px;
           }
         `}

@@ -1,5 +1,6 @@
 import { metadata, stub } from "../api/clarifai";
 import { TConcept, TDataOutput } from "../ts";
+import fs from "fs";
 
 type TDemographicsResult = {
   status: {
@@ -52,6 +53,8 @@ const getDemographics = (uri: string) => {
         console.log(response.status);
 
         result.data = filterDemographics(response);
+        fs.writeFileSync("./data.json", JSON.stringify(result));
+        fs.writeFileSync("./imageUri.txt", uri);
         resolve(result);
       }
     );

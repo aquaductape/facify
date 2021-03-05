@@ -1,23 +1,21 @@
-import { useSelector } from "react-redux";
 import Table from "../../Table/Table";
-import { RootState } from "../../../store/rootReducer";
 import Stats from "../../Stats/Stats";
 import { appHeight } from "../../../constants";
 import THead from "../../Table/THead";
 import { InfoResultSentinel } from "../../Table/Sentinel";
+import { TImageItem } from "../../UploadImageForm/imageUrlSlice";
 
-const InfoResult = () => {
-  const imageUrl = useSelector((state: RootState) => state.imageUrl);
-
-  if (imageUrl.elOnLoadStatus !== "DONE") return null;
+type TInforResultProps = Pick<TImageItem, "id" | "elOnLoadStatus">;
+const InfoResult = ({ id, elOnLoadStatus }: TInforResultProps) => {
+  if (elOnLoadStatus !== "DONE") return null;
 
   return (
     <div className="container">
-      <InfoResultSentinel></InfoResultSentinel>
-      <THead mobile={false}></THead>
+      <InfoResultSentinel id={id}></InfoResultSentinel>
+      <THead id={id} mobile={false}></THead>
       <div className="info-demo">
-        <Stats />
-        <Table></Table>
+        <Stats id={id} />
+        <Table id={id}></Table>
       </div>
 
       <style jsx>

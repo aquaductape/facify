@@ -21,7 +21,7 @@ type TParseProps = {
 };
 const parseConcept = ({ concepts, faceNumber }: TParseProps) => {
   const faceStr = faceNumber != null ? "Face" : "Human Face";
-  let msg = `${faceStr}${faceNumber != null ? faceNumber : ""}: `;
+  let msg = `${faceStr} ${faceNumber != null ? faceNumber : ""}: `;
   const numRegex = /^[0-9\-]+$/;
 
   for (const conceptKey in concepts) {

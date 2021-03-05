@@ -1,5 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 type TTableState = {
+  tables: TTableItem[];
+};
+type TTableItem = {
+  id: string;
   scrollShadow: boolean;
   showStickyTHead: {
     active: boolean;
@@ -9,60 +13,69 @@ type TTableState = {
 };
 
 const initialState: TTableState = {
-  scrollShadow: true,
-  showStickyTHead: {
-    active: false,
-    activatedByInfoResultSentinel: false,
-    activatedByTHeadSentinel: false,
-  },
+  tables: [],
 };
 
 const tableSlice = createSlice({
   name: "table",
   initialState,
   reducers: {
-    setScrollShadow: (state, action: PayloadAction<boolean>) => {
-      state.scrollShadow = action.payload;
+    addTable: (state, action: PayloadAction<TTableItem>) => {
+      state.tables.push(action.payload);
+    },
+    setScrollShadow: (
+      state,
+      action: PayloadAction<{ id: string; scrollShadow: boolean }>
+    ) => {
+      const { id, scrollShadow } = action.payload;
+      const result = state.tables.find((item) => item.id === id)!;
+      result.scrollShadow = scrollShadow;
     },
     setShowStickyTHead: (
       state,
       action: PayloadAction<{
+        id: string;
         active: boolean;
         triggeredBy: "infoResultSentinel" | "THeadSentinel";
       }>
     ) => {
-      const { active, triggeredBy } = action.payload;
-      const { showStickyTHead } = state;
+      const { id, active, triggeredBy } = action.payload;
+      const result = state.tables.find((item) => item.id === id)!;
+      const { showStickyTHead } = result;
 
       if (active) {
-        state.showStickyTHead.active = active;
+        result.showStickyTHead.active = active;
 
         if (triggeredBy === "infoResultSentinel") {
-          state.showStickyTHead.activatedByInfoResultSentinel = active;
+          result.showStickyTHead.activatedByInfoResultSentinel = active;
         } else {
-          state.showStickyTHead.activatedByTHeadSentinel = active;
+          result.showStickyTHead.activatedByTHeadSentinel = active;
         }
         return;
       }
 
       if (triggeredBy === "infoResultSentinel") {
-        state.showStickyTHead.activatedByInfoResultSentinel = active;
+        result.showStickyTHead.activatedByInfoResultSentinel = active;
         if (showStickyTHead.activatedByTHeadSentinel) return;
 
-        state.showStickyTHead.active = active;
+        result.showStickyTHead.active = active;
         return;
       }
 
       if (triggeredBy === "THeadSentinel") {
-        state.showStickyTHead.activatedByTHeadSentinel = active;
+        result.showStickyTHead.activatedByTHeadSentinel = active;
         if (showStickyTHead.activatedByInfoResultSentinel) return;
 
-        state.showStickyTHead.active = active;
+        result.showStickyTHead.active = active;
         return;
       }
     },
   },
 });
 
-export const { setScrollShadow, setShowStickyTHead } = tableSlice.actions;
+export const {
+  addTable,
+  setScrollShadow,
+  setShowStickyTHead,
+} = tableSlice.actions;
 export default tableSlice.reducer;

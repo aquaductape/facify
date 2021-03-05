@@ -1,3 +1,4 @@
+import { nanoid } from "nanoid";
 import {
   ChangeEvent,
   FormEvent,
@@ -7,17 +8,24 @@ import {
   useState,
 } from "react";
 import { batch, useDispatch } from "react-redux";
-import { demographicsResult } from "../../dummyData/demographicsResult";
-import { imageUri } from "../../dummyData/imageUri";
+import {
+  demographicsResult,
+  demographResult2,
+} from "../../dummyData/demographicsResult";
+import { imageUri, imgUri2 } from "../../dummyData/imageUri";
 import { TDemographicsResponse } from "../../ts";
 import { convertFileToBase64 } from "../../utils/convertFileToBase64";
 import dataURLtoFile from "../../utils/dataURLtoFile";
 import { JSON_Stringify_Parse } from "../../utils/jsonStringifyParse";
+import { addDemographics } from "../FaceDetectionResult/ImageResult/demographicsSlice";
+import { addTable } from "../Table/tableSlice";
 import {
-  setDemographics,
-  setDemographicsDisplay,
-} from "../FaceDetectionResult/ImageResult/demographicsSlice";
-import { setImageError, setImageStatus, setUri } from "./imageUrlSlice";
+  addImage,
+  setImageError,
+  setImageLoaded,
+  setImageStatus,
+  setUri,
+} from "./imageUrlSlice";
 import Input from "./Input";
 
 const placeholderError = "URL Required*";
@@ -39,19 +47,73 @@ const UploadImageForm = () => {
 
   useEffect(() => {
     const run = async () => {
-      dispatch(setImageStatus("LOADING"));
-      await new Promise((resolve) => setTimeout(() => resolve(true), 100));
-      const result = demographicsResult;
-      const base64 = imageUri;
-      console.log("fire");
+      // const id = nanoid();
 
-      batch(() => {
-        // setUr
-        dispatch(setUri(window.URL.createObjectURL(dataURLtoFile(base64))));
-        dispatch(setImageStatus("DONE"));
-        dispatch(setDemographics(result.data));
-        dispatch(setDemographicsDisplay(result.data));
-        // dispatch()
+      const items = [
+        {
+          id: nanoid(),
+          imageUri: imageUri,
+          data: demographicsResult,
+        },
+        // {
+        //   id: nanoid(),
+        //   imageUri: imageUri,
+        //   data: demographicsResult,
+        // },
+        {
+          id: nanoid(),
+          imageUri: imgUri2,
+          data: demographResult2,
+        },
+      ];
+
+      items.forEach(async ({ id, data, imageUri }) => {
+        dispatch(
+          addImage({
+            id,
+            imageStatus: "LOADING",
+            elOnLoadStatus: "EMPTY",
+            error: null,
+            naturalHeight: null,
+            naturalWidth: null,
+            uri: null,
+          })
+        );
+        // dispatch(setImageStatus("LOADING"));
+        await new Promise((resolve) => setTimeout(() => resolve(true), 100));
+        const result = data;
+        const base64 = imageUri;
+        console.log("fire");
+
+        batch(() => {
+          dispatch(
+            setUri({
+              id,
+              uri: window.URL.createObjectURL(dataURLtoFile(base64)),
+            })
+          );
+          dispatch(setImageLoaded(true));
+          dispatch(setImageStatus({ id, imageStatus: "DONE" }));
+          dispatch(
+            addDemographics({
+              id,
+              data: result.data,
+              imageHeight: null,
+              hoverActive: false,
+            })
+          );
+          dispatch(
+            addTable({
+              id,
+              scrollShadow: true,
+              showStickyTHead: {
+                active: false,
+                activatedByInfoResultSentinel: false,
+                activatedByTHeadSentinel: false,
+              },
+            })
+          );
+        });
       });
     };
     run();
@@ -66,7 +128,7 @@ const UploadImageForm = () => {
         return;
       }
       const file = files![0] as File;
-      dispatch(setImageStatus("LOADING"));
+      // dispatch(setImageStatus("LOADING"));
       const base64 = await convertFileToBase64(file);
       const res = await fetch("http://localhost:8000/scan-image", {
         method: "post",
@@ -80,21 +142,22 @@ const UploadImageForm = () => {
         }),
       });
       const result = (await res.json()) as TDemographicsResponse;
+      return;
 
-      batch(() => {
-        // setUr
-        dispatch(setUri(base64));
-        dispatch(setImageStatus("DONE"));
-        dispatch(setDemographics(result.data));
-        dispatch(setDemographicsDisplay(result.data));
-        // dispatch()
-      });
+      // batch(() => {
+      //   // setUr
+      //   dispatch(setUri(base64));
+      //   dispatch(setImageStatus("DONE"));
+      //   dispatch(setDemographics(result.data));
+      //   dispatch(setDemographicsDisplay(result.data));
+      //   // dispatch()
+      // });
       console.log(result);
     } catch (err) {
-      batch(() => {
-        dispatch(setImageStatus("DONE"));
-        dispatch(setImageError("Server Error"));
-      });
+      // batch(() => {
+      //   dispatch(setImageStatus("DONE"));
+      //   dispatch(setImageError("Server Error"));
+      // });
     }
   };
 
