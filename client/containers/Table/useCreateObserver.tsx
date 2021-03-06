@@ -75,7 +75,7 @@ const useCreateObserver = ({
 
       const positionTop = mediaMatches
         ? imageHeightRef.current! + topPadding + inputHeight
-        : 0;
+        : 50;
       console.log("new Observer", { positionTop });
 
       return new IntersectionObserver(
@@ -116,7 +116,9 @@ const useCreateObserver = ({
 
       if (!e.matches) {
         console.log("addwindow");
-        window.addEventListener("scroll", onScrollRef.current!);
+        window.addEventListener("scroll", onScrollRef.current!, {
+          passive: true,
+        });
       } else {
         console.log("removewindow");
         window.removeEventListener("scroll", onScrollRef.current!);
@@ -165,7 +167,9 @@ const useCreateObserver = ({
     if (scrollCallback && !windowInit) {
       console.log("addwindow");
       windowInit = true;
-      window.addEventListener("scroll", onScrollRef.current!);
+      window.addEventListener("scroll", onScrollRef.current!, {
+        passive: true,
+      });
     }
   }, [imageHeight]);
 

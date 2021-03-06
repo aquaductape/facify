@@ -1,4 +1,5 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { RootState } from "../../store/rootReducer";
 export type TImageItem = {
   id: string;
   uri: string | null;
@@ -7,6 +8,7 @@ export type TImageItem = {
   error: string | null;
   naturalHeight: number | null;
   naturalWidth: number | null;
+  name: string;
 };
 type TImageUrlState = {
   images: TImageItem[];
@@ -16,6 +18,17 @@ type TImageUrlState = {
 const initialState: TImageUrlState = {
   images: [],
   imageLoaded: false,
+};
+
+export const selectName = ({ id }: { id: string }) => {
+  return createSelector(
+    (state: RootState) => state.imageUrl.images,
+    (state) =>
+      state.find((item) => {
+        // console.log("get data");
+        return item.id === id;
+      })!.name
+  );
 };
 
 const imageUrlSlice = createSlice({

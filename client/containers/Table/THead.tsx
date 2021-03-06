@@ -43,13 +43,14 @@ const THead = ({ id, mobile }: THeadProps) => {
             top: 0;
             left: 0;
             height: 45px;
-            margin-bottom: -45px;
+            margin-bottom: 80px;
             z-index: 5;
           }
 
           .thead-container {
             display: grid;
             grid-template-columns: 120px 1fr 1fr 1fr;
+            border-top: 1px solid #d5d5d5;
             height: 35px;
             min-width: 700px;
             font-weight: bold;

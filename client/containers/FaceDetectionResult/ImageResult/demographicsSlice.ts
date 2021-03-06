@@ -1,4 +1,10 @@
-import { createSlice, PayloadAction, PrepareAction } from "@reduxjs/toolkit";
+import {
+  createSelector,
+  createSlice,
+  PayloadAction,
+  PrepareAction,
+} from "@reduxjs/toolkit";
+import { RootState } from "../../../store/rootReducer";
 import { TDemographics } from "../../../ts";
 type TDemographicsDisplay = {
   id: string;
@@ -19,6 +25,59 @@ type TImageResultState = {
 
 const initialState: TImageResultState = {
   demographics: [],
+};
+
+export const selectImageHeight = ({ id }: { id: string }) => {
+  return createSelector(
+    (state: RootState) => state.demographics.demographics,
+    (state) =>
+      state.find((item) => {
+        return item.id === id;
+      })!.imageHeight
+  );
+};
+
+export const selectHoverActive = ({ id }: { id: string }) => {
+  return createSelector(
+    (state: RootState) => state.demographics.demographics,
+    (state) =>
+      state.find((item) => {
+        return item.id === id;
+      })!.hoverActive
+  );
+};
+
+export const selectDemographicsData = ({ id }: { id: string }) => {
+  return createSelector(
+    (state: RootState) => state.demographics.demographics,
+    (state) =>
+      state.find((item) => {
+        // console.log("get data");
+        return item.id === id;
+      })!.data
+  );
+};
+
+export const selectDemographicsDisplay = ({
+  id,
+  demographicId,
+}: {
+  id: string;
+  demographicId: string;
+}) => {
+  return createSelector(
+    (state: RootState) => state.demographics.demographics,
+    (state) =>
+      state
+        .find((item) => {
+          // console.log("find demoitem");
+          return item.id === id;
+        })!
+        .display.find((item) => {
+          // console.log("find demodisplay");
+          return item.id === demographicId;
+        })!
+  );
 };
 
 const demographicsSlice = createSlice({

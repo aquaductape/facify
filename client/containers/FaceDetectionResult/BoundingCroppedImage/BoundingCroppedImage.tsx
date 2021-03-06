@@ -5,32 +5,11 @@ import { RootState } from "../../../store/rootReducer";
 import { TBoundingBox, TDemographics } from "../../../ts";
 import { parseConcept } from "../../../utils/parseConcept";
 import {
+  selectDemographicsDisplay,
   setDemoItemHoverActive,
   setHoverActive,
 } from "../ImageResult/demographicsSlice";
 import createCroppedImgUrl from "./createCroppedImgUrl";
-
-const selectCategoryEntity = ({
-  id,
-  demographicId,
-}: {
-  id: string;
-  demographicId: string;
-}) => {
-  return createSelector(
-    (state: RootState) => state.demographics.demographics,
-    (state) =>
-      state
-        .find((item) => {
-          // console.log("find demoitem");
-          return item.id === id;
-        })!
-        .display.find((item) => {
-          // console.log("find demodisplay");
-          return item.id === demographicId;
-        })!
-  );
-};
 
 type BoundingCroppedImageProps = Omit<TDemographics, "id"> & {
   id: string;
@@ -48,7 +27,21 @@ const BoundingCroppedImage = ({
   const imageUrl = useSelector(
     (state: RootState) => state.imageUrl.images.find((item) => item.id === id)!
   );
-  const demographic = useSelector(selectCategoryEntity({ id, demographicId }));
+  // const demographic = useSelector(
+  //   (state: RootState) =>
+  //     state.demographics.demographics
+  //       .find((item) => {
+  //         // console.log("find demoitem");
+  //         return item.id === id;
+  //       })!
+  //       .display.find((item) => {
+  //         // console.log("find demodisplay");
+  //         return item.id === demographicId;
+  //       })!
+  // );
+  const demographic = useSelector(
+    selectDemographicsDisplay({ id, demographicId })
+  );
   const [renderImage, setRenderImage] = useState(false);
   const croppedImgUrlRef = useRef("");
   const imgElRef = useRef<HTMLImageElement>(null);

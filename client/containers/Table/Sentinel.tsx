@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useMatchMedia } from "../../hooks/matchMedia";
 import { RootState } from "../../store/rootReducer";
+import { selectImageHeight } from "../FaceDetectionResult/ImageResult/demographicsSlice";
 import { setScrollShadow, setShowStickyTHead } from "./tableSlice";
 import useCreateObserver, {
   TMqlCallback,
@@ -48,11 +49,12 @@ const HorizontalSentinel = ({ id }: { id: string }) => {
 const THeadSentinel = ({ id }: { id: string }) => {
   const sentinelId = "THeadSentinel";
   const dispatch = useDispatch();
-  const imageHeight = useSelector(
-    (state: RootState) =>
-      state.demographics.demographics.find((item) => item.id === id)!
-        .imageHeight
-  );
+  // const imageHeight = useSelector(
+  //   (state: RootState) =>
+  //     state.demographics.demographics.find((item) => item.id === id)!
+  //       .imageHeight
+  // );
+  const imageHeight = useSelector(selectImageHeight({ id }));
   const theadSelector = `.thead-sticky-mobile-${id}`;
   const theadElRef = useRef<HTMLDivElement | null>(
     document.querySelector(theadSelector)
@@ -161,11 +163,12 @@ const THeadSentinel = ({ id }: { id: string }) => {
 const InfoResultSentinel = ({ id }: { id: string }) => {
   const sentinelId = `infoResultSentinel`;
   const dispatch = useDispatch();
-  const imageHeight = useSelector(
-    (state: RootState) =>
-      state.demographics.demographics.find((item) => item.id === id)!
-        .imageHeight
-  );
+  // const imageHeight = useSelector(
+  //   (state: RootState) =>
+  //     state.demographics.demographics.find((item) => item.id === id)!
+  //       .imageHeight
+  // );
+  const imageHeight = useSelector(selectImageHeight({ id }));
 
   const sentinelElRef = useRef<HTMLDivElement | null>(null);
   const imageHeightRef = useRef<number | null>(null);

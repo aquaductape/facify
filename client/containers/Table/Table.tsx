@@ -6,24 +6,14 @@ import { HorizontalSentinel, THeadSentinel } from "./Sentinel";
 import { parseConceptValue } from "../../utils/parseConcept";
 import THead from "./THead";
 import { createSelector } from "@reduxjs/toolkit";
-
-const selectCategoryEntity = (id: string) => {
-  return createSelector(
-    (state: RootState) => state.demographics.demographics,
-    (state) =>
-      state.find((item) => {
-        console.log("find demoitem");
-        return item.id === id;
-      })!.data
-  );
-};
+import { selectDemographicsData } from "../FaceDetectionResult/ImageResult/demographicsSlice";
 
 const Table = ({ id }: { id: string }) => {
   // const demographics = useSelector(
   //   (state: RootState) =>
   //     state.demographics.demographics.find((item) => item.id === id)!.data
   // );
-  const demographics = useSelector(selectCategoryEntity(id));
+  const demographics = useSelector(selectDemographicsData({ id }));
   const thead = ["Face", "Age", "Gender", "Multicultural"];
 
   return (
@@ -131,7 +121,7 @@ const Table = ({ id }: { id: string }) => {
           }
 
           .thead {
-            border-bottom: 1px solid #000;
+            border-top: 1px solid #d5d5d5;
           }
 
           .thead th {

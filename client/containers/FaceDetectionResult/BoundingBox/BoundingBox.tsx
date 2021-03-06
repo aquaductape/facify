@@ -1,8 +1,11 @@
+import { createSelector } from "@reduxjs/toolkit";
 import { batch, useDispatch, useSelector } from "react-redux";
 import { useMatchMedia } from "../../../hooks/matchMedia";
 import { RootState } from "../../../store/rootReducer";
 import { TDemographics } from "../../../ts";
 import {
+  selectDemographicsDisplay,
+  selectHoverActive,
   setDemoItemHoverActive,
   setHoverActive,
 } from "../ImageResult/demographicsSlice";
@@ -18,16 +21,22 @@ const BoundingBox = ({
   bounding_box,
 }: TBoundingBoxProps) => {
   const dispatch = useDispatch();
-  const demographic = useSelector((state: RootState) =>
-    state.demographics.demographics
-      .find((item) => item.id === id)!
-      .display.find((item) => item.id === demographicId)
-  )!;
-  const hoverActive = useSelector(
-    (state: RootState) =>
-      state.demographics.demographics.find((item) => item.id === id)!
-        .hoverActive
-  )!;
+  // const demographic = useSelector(
+  //   (state: RootState) =>
+  //     state.demographics.demographics
+  //       .find((item) => {
+  //         // console.log("find demoitem");
+  //         return item.id === id;
+  //       })!
+  //       .display.find((item) => {
+  //         // console.log("find demodisplay");
+  //         return item.id === demographicId;
+  //       })!
+  // );
+  const demographic = useSelector(
+    selectDemographicsDisplay({ id, demographicId })
+  );
+  const hoverActive = useSelector(selectHoverActive({ id }))!;
   const mqlRef = useMatchMedia();
   // , onToggleBoundingBoxHighlight from redux
   const onMouseEnter = () => {
@@ -83,6 +92,7 @@ const BoundingBox = ({
             border: 2px solid #fff;
             outline: 2px solid #224aff;
             outline-offset: -1px;
+            opacity: 1;
           }
         `}
       </style>
@@ -90,7 +100,7 @@ const BoundingBox = ({
       <style jsx>
         {`
           .active {
-            ${!demographic.hoverActive && hoverActive ? "opacity: 0;" : ""}
+            opacity: ${!demographic.hoverActive && hoverActive ? "0.4" : "1"};
           }
         `}
       </style>

@@ -1,7 +1,7 @@
 import { debounce } from "lodash";
 import { useEffect, useRef, useState } from "react";
 import { batch, useDispatch, useSelector, shallowEqual } from "react-redux";
-import { appHeight } from "../../../constants";
+import { appHeight, appHeightDesktop } from "../../../constants";
 import { RootState } from "../../../store/rootReducer";
 import { parseConcept } from "../../../utils/parseConcept";
 import { reflow } from "../../../utils/reflow";
@@ -11,7 +11,7 @@ import {
   TImageItem,
 } from "../../UploadImageForm/imageUrlSlice";
 import BoundingBox from "../BoundingBox/BoundingBox";
-import { setImageHeight } from "./demographicsSlice";
+import { selectDemographicsData, setImageHeight } from "./demographicsSlice";
 
 type TImageResultProps = Pick<
   TImageItem,
@@ -20,12 +20,7 @@ type TImageResultProps = Pick<
 const ImageResult = ({ id, error, imageStatus, uri }: TImageResultProps) => {
   const dispatch = useDispatch();
   const [renderBoundingBox, setRenderBoundingBox] = useState(false);
-  const demographics = useSelector(
-    (state: RootState) =>
-      state.demographics.demographics.find((item) => {
-        return item.id === id;
-      })!.data
-  );
+  const demographics = useSelector(selectDemographicsData({ id }));
 
   const renderBoundingBoxRef = useRef(false);
   const imageContainerRef = useRef<HTMLDivElement>(null);
@@ -132,7 +127,7 @@ const ImageResult = ({ id, error, imageStatus, uri }: TImageResultProps) => {
             display: flex;
             justify-content: center;
             align-items: center;
-            background: #000;
+            background: #2d3556;
             min-height: 200px;
             max-height: ${appHeight}px;
             overflow: hidden;
@@ -149,6 +144,13 @@ const ImageResult = ({ id, error, imageStatus, uri }: TImageResultProps) => {
           img {
             width: auto;
             max-height: ${appHeight}px;
+          }
+
+          @media (min-width: 1300px) {
+            .container,
+            img {
+              max-height: ${appHeightDesktop}px;
+            }
           }
         `}
       </style>

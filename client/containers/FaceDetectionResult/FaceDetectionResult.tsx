@@ -6,16 +6,20 @@ import { RootState } from "../../store/rootReducer";
 import { TImageItem } from "../UploadImageForm/imageUrlSlice";
 import ImageResult from "./ImageResult/ImageResult";
 import InfoResult from "./InfoResult/InfoResult";
+import Seperator from "./Bar/Seperator";
+import Bar from "./Bar/Bar";
 
 type TResultProps = Pick<
   TImageItem,
   "id" | "elOnLoadStatus" | "error" | "imageStatus" | "uri"
 > & {
+  idx: number;
   imageLoaded: boolean;
 };
 const Result = React.memo(
   ({
     id,
+    idx,
     elOnLoadStatus,
     error,
     imageStatus,
@@ -26,11 +30,8 @@ const Result = React.memo(
 
     return (
       <div className="container">
-        {/* <div className="bar">
-          <button className="btn-remove">
-            <CloseBtn></CloseBtn>
-          </button>
-        </div> */}
+        {idx ? <Seperator></Seperator> : null}
+        <Bar id={id} idx={idx}></Bar>
         <div className="image-panel">
           <ImageResult
             id={id}
@@ -42,17 +43,7 @@ const Result = React.memo(
         </div>
         <style jsx>
           {`
-            .image-panel {
-              padding-bottom: 50px;
-            }
-
-            .btn-remove {
-            }
-
-            .bar {
-              display: flex;
-              justify-content: flex-end;
-              height: 45px;
+            .container {
             }
 
             @media (min-width: 1300px) {
@@ -86,9 +77,10 @@ const FaceDetectionResult = () => {
   // return null;
   return (
     <>
-      {images.map(({ id, elOnLoadStatus, error, imageStatus, uri }) => (
+      {images.map(({ id, elOnLoadStatus, error, imageStatus, uri }, idx) => (
         <Result
           id={id}
+          idx={idx}
           imageLoaded={imageLoaded}
           elOnLoadStatus={elOnLoadStatus}
           error={error}

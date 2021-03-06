@@ -26,6 +26,7 @@ const Main = () => {
       <style jsx>
         {`
           main {
+            margin-bottom: 100px;
           }
 
           .hidden-cover {
@@ -56,8 +57,7 @@ const Main = () => {
 
           @media (min-width: 1300px) {
             main {
-              box-shadow: 10px 10px 0 #00000054;
-              max-height: ${appHeight}px;
+              box-shadow: 0px 10px 0 #00000054;
             }
 
             .hide-shadow {

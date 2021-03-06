@@ -8,7 +8,7 @@ body {
     )
     no-repeat center top fixed;
   background-size: 100% auto;
-  height: 2000px;
+  // height: 2000px;
 }
 
 .App {
@@ -22,11 +22,6 @@ body {
 
 main {
   background: #ffffff;
-}
-
-.stats {
-  text-align: center;
-  position: relative;
 }
 
 .multifile-upload-group--browser-view .label-input-file {

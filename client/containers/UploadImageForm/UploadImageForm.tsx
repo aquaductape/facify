@@ -54,6 +54,7 @@ const UploadImageForm = () => {
           id: nanoid(),
           imageUri: imageUri,
           data: demographicsResult,
+          name: "GettyImages-1147443912",
         },
         // {
         //   id: nanoid(),
@@ -64,10 +65,11 @@ const UploadImageForm = () => {
           id: nanoid(),
           imageUri: imgUri2,
           data: demographResult2,
+          name: "da-feasters",
         },
       ];
 
-      items.forEach(async ({ id, data, imageUri }) => {
+      items.forEach(async ({ id, data, imageUri, name }) => {
         dispatch(
           addImage({
             id,
@@ -77,6 +79,7 @@ const UploadImageForm = () => {
             naturalHeight: null,
             naturalWidth: null,
             uri: null,
+            name,
           })
         );
         // dispatch(setImageStatus("LOADING"));

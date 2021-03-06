@@ -1,6 +1,6 @@
 import Table from "../../Table/Table";
 import Stats from "../../Stats/Stats";
-import { appHeight } from "../../../constants";
+import { appHeight, appHeightDesktop } from "../../../constants";
 import THead from "../../Table/THead";
 import { InfoResultSentinel } from "../../Table/Sentinel";
 import { TImageItem } from "../../UploadImageForm/imageUrlSlice";
@@ -14,7 +14,7 @@ const InfoResult = ({ id, elOnLoadStatus }: TInforResultProps) => {
       <InfoResultSentinel id={id}></InfoResultSentinel>
       <THead id={id} mobile={false}></THead>
       <div className="info-demo">
-        <Stats id={id} />
+        {/* <Stats id={id} /> */}
         <Table id={id}></Table>
       </div>
 
@@ -27,7 +27,8 @@ const InfoResult = ({ id, elOnLoadStatus }: TInforResultProps) => {
           @media (min-width: 1300px) {
             .info-demo {
               overflow-y: auto;
-              max-height: ${appHeight}px;
+              max-height: ${appHeightDesktop}px;
+              margin-top: -125px;
             }
           }
         `}
