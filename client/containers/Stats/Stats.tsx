@@ -1,7 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import FaceIcon from "../../components/Logo/svg/FaceIcon";
-import { RootState } from "../../store/rootReducer";
 import { selectDemographicsData } from "../FaceDetectionResult/ImageResult/demographicsSlice";
 
 const Stats = ({ id }: { id: string }) => {

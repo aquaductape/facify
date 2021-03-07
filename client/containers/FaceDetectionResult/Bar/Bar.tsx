@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import CloseBtn from "../../../components/Logo/svg/CloseBtn";
+import { RootState } from "../../../store/rootReducer";
 import Stats from "../../Stats/Stats";
 import { selectName } from "../../UploadImageForm/imageUrlSlice";
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { useMatchMedia } from "../../hooks/matchMedia";
+import { RootState } from "../../store/rootReducer";
 import { hasAttributeValue } from "../../utils/hasAttributeValue";
 import { selectImageHeight } from "../FaceDetectionResult/ImageResult/demographicsSlice";
 import useCreateObserver, {

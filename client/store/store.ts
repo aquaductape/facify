@@ -1,9 +1,10 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
 import rootReducer from "./rootReducer";
 
 const store = configureStore({
   devTools: process.env.NODE_ENV !== "production",
   reducer: rootReducer,
+  middleware: [...getDefaultMiddleware({ immutableCheck: false })],
   // middleware: (getDefaultMiddleware) =>
   //   getDefaultMiddleware().prepend(saveToLSMiddleware),
 });

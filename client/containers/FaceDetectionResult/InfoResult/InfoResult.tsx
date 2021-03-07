@@ -11,7 +11,7 @@ const InfoResult = ({ id, elOnLoadStatus }: TInforResultProps) => {
   const containerElRef = useRef<HTMLDivElement | null>(null);
   if (elOnLoadStatus !== "DONE") return null;
 
-  useEffect(() => {}, []);
+  // useEffect(() => {}, []);
 
   return (
     <div className="container" ref={containerElRef}>

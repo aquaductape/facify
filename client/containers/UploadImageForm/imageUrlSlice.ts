@@ -23,9 +23,9 @@ const initialState: TImageUrlState = {
 export const selectName = ({ id }: { id: string }) => {
   return createSelector(
     (state: RootState) => state.imageUrl.images,
-    (state) =>
-      state.find((item) => {
-        // console.log("get data");
+    (result) =>
+      result.find((item) => {
+        console.log("get name");
         return item.id === id;
       })!.name
   );
