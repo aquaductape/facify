@@ -5,7 +5,6 @@ import ScrollShadow from "./ScrollShadow";
 import { HorizontalSentinel, THeadSentinel } from "./Sentinel";
 import { parseConceptValue } from "../../utils/parseConcept";
 import THead from "./THead";
-import { createSelector } from "@reduxjs/toolkit";
 import { selectDemographicsData } from "../FaceDetectionResult/ImageResult/demographicsSlice";
 
 const Table = ({ id }: { id: string }) => {
@@ -109,6 +108,7 @@ const Table = ({ id }: { id: string }) => {
           .table-container-inner {
             position: relative;
             min-width: 700px;
+            margin-top: -125px;
           }
 
           table {
@@ -173,6 +173,10 @@ const Table = ({ id }: { id: string }) => {
           }
 
           @media (min-width: 1300px) {
+            .table-container-inner {
+              margin-top: none;
+            }
+
             .table-scroll-container {
               overflow-x: hidden;
               overflow-y: auto;

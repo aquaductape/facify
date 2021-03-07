@@ -1,7 +1,5 @@
-import { createSelector } from "@reduxjs/toolkit";
 import React from "react";
 import { useSelector } from "react-redux";
-import CloseBtn from "../../components/Logo/svg/CloseBtn";
 import { RootState } from "../../store/rootReducer";
 import { TImageItem } from "../UploadImageForm/imageUrlSlice";
 import ImageResult from "./ImageResult/ImageResult";
@@ -30,7 +28,7 @@ const Result = React.memo(
 
     return (
       <div className="container">
-        {idx ? <Seperator></Seperator> : null}
+        {idx ? <Seperator id={id}></Seperator> : null}
         <Bar id={id} idx={idx}></Bar>
         <div className="image-panel">
           <ImageResult

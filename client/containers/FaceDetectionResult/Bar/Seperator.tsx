@@ -1,13 +1,13 @@
 import React from "react";
 
-const Seperator = () => {
+const Seperator = ({ id }: { id: string }) => {
   return (
     <div className="seperator">
       <div className="border-top">
         <div className="triangle-bottom-right"></div>
         <div className="rectangle"></div>
         <div className="triangle-bottom-left"></div>
-        <div className="close-btn-shadow">
+        <div data-id-close-btn-shadow={id} className="close-btn-shadow">
           <div className="triangle-top-right"></div>
           <div className="rectangle"></div>
           <div className="triangle-bottom-left"></div>
@@ -57,7 +57,7 @@ const Seperator = () => {
           .triangle-top-right {
             width: 0;
             height: 0;
-            border-top: 30px solid var(--blue-100);
+            border-top: 30px solid currentColor;
             border-left: 30px solid transparent;
           }
 
@@ -68,12 +68,24 @@ const Seperator = () => {
             display: flex;
           }
 
-          .close-btn-shadow .triangle-bottom-left {
-            border-bottom: 30px solid var(--blue-100);
+          .close-btn-shadow {
+            color: var(--blue-100);
+            transition: color 250ms;
           }
+
+          .close-btn-shadow .triangle-bottom-left {
+            border-bottom: 30px solid currentColor;
+            transition: border-color 250ms;
+          }
+
+          .close-btn-shadow .triangle-top-right {
+            transition: border-color 250ms;
+          }
+
           .close-btn-shadow .rectangle {
-            background: var(--blue-100);
+            background: currentColor;
             width: 15px;
+            transition: background-color 250ms;
           }
         `}
       </style>
