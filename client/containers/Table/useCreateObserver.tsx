@@ -66,17 +66,12 @@ const useCreateObserver = ({
   useEffect(() => {
     if (imageHeightRef.current == null || hasInit.current) return;
 
-    console.log("useCreateObserver: ", id);
-
-    console.log("prev", prevScrollYRef.current);
-
     const createObserver = (mediaMatches: boolean) => {
       if (observer) return observer;
 
       const positionTop = mediaMatches
         ? imageHeightRef.current! + topPadding + inputHeight
         : 50;
-      console.log("new Observer", { positionTop });
 
       return new IntersectionObserver(
         (entries, observer) => {
@@ -106,7 +101,6 @@ const useCreateObserver = ({
       observer!.disconnect();
       observer = null;
       observer = createObserver(!e.matches);
-      console.log(observer);
       // mqlCallbacks.forEach((item) =>
       //   item.callback({ e, observer: observer!, observerCallbacks })
       // );
@@ -164,7 +158,7 @@ const useCreateObserver = ({
       onScrollRef.current = onScroll;
     }
 
-    if (scrollCallback && !windowInit) {
+    if (scrollCallback && !windowInit && !mql.matches) {
       console.log("addwindow");
       windowInit = true;
       window.addEventListener("scroll", onScrollRef.current!, {

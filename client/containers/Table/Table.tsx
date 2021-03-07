@@ -8,15 +8,11 @@ import THead from "./THead";
 import { selectDemographicsData } from "../FaceDetectionResult/ImageResult/demographicsSlice";
 
 const Table = ({ id }: { id: string }) => {
-  // const demographics = useSelector(
-  //   (state: RootState) =>
-  //     state.demographics.demographics.find((item) => item.id === id)!.data
-  // );
   const demographics = useSelector(selectDemographicsData({ id }));
   const thead = ["Face", "Age", "Gender", "Multicultural"];
 
   return (
-    <div className="table-container">
+    <div data-id-table={id} className="table-container">
       <ScrollShadow id={id}></ScrollShadow>
       <div className="table-scroll-container">
         <THead id={id} mobile={true}></THead>
@@ -174,7 +170,7 @@ const Table = ({ id }: { id: string }) => {
 
           @media (min-width: 1300px) {
             .table-container-inner {
-              margin-top: none;
+              margin-top: 0;
             }
 
             .table-scroll-container {

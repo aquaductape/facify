@@ -1,6 +1,4 @@
 import React, { useRef } from "react";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store/rootReducer";
 import getScrollbarWidth from "../../utils/getScrollWidth";
 
 type THeadProps = {
@@ -8,24 +6,19 @@ type THeadProps = {
   mobile?: boolean;
 };
 const THead = ({ id, mobile }: THeadProps) => {
-  const showStickyTHead = useSelector(
-    (state: RootState) =>
-      state.table.tables.find((item) => item.id === id)!.showStickyTHead.active
-  );
-
-  const tHeadContainerElRef = useRef<HTMLDivElement>(null);
-  const containerElRef = useRef<HTMLDivElement>(null);
-
   const thead = ["Face", "Age", "Gender", "Multicultural"];
   return (
     <div
-      aria-hidden={!showStickyTHead}
+      // aria-hidden={!showStickyTHead}
       className={`${
         mobile ? `thead-sticky-mobile-${id}` : `thead-sticky-desktop-${id}`
       } container`}
-      ref={containerElRef}
     >
-      <div className="thead-container" ref={tHeadContainerElRef}>
+      <div
+        className="thead-container"
+        data-triggered-by-info-result="false"
+        data-triggered-by-thead="false"
+      >
         {thead.map((item, idx) => {
           return (
             <div className={idx === 0 ? "thead-image" : ""} key={idx}>
@@ -98,8 +91,8 @@ const THead = ({ id, mobile }: THeadProps) => {
               ? `calc(100% - ${getScrollbarWidth()}px)`
               : "100%"};
              {
-              /* opacity: ${showStickyTHead ? "1" : "0"};
-            transition: ${showStickyTHead
+              /* opacity: ${"showStickyTHead" ? "1" : "0"};
+            transition: ${"showStickyTHead"
                 ? "opacity 0ms 0ms"
                 : "opacity 0ms 250ms"}; */
             }
@@ -116,9 +109,11 @@ const THead = ({ id, mobile }: THeadProps) => {
           }
 
           .thead-container {
-            transform: ${showStickyTHead
-              ? "translateY(0)"
-              : "translateY(-125%)"};
+             {
+              /* transform: ${"showStickyTHead"
+                ? "translateY(0)"
+                : "translateY(-125%)"}; */
+            }
           }
           @media (min-width: 1300px) {
             .container {

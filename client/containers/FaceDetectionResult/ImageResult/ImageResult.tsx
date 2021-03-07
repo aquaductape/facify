@@ -2,7 +2,6 @@ import { debounce } from "lodash";
 import { useEffect, useRef, useState } from "react";
 import { batch, useDispatch, useSelector, shallowEqual } from "react-redux";
 import { appHeight, appHeightDesktop } from "../../../constants";
-import { RootState } from "../../../store/rootReducer";
 import { parseConcept } from "../../../utils/parseConcept";
 import { reflow } from "../../../utils/reflow";
 import {

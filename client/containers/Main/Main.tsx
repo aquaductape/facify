@@ -26,7 +26,7 @@ const Main = () => {
       <style jsx>
         {`
           main {
-            margin-bottom: 100px;
+            margin-bottom: 50px;
           }
 
           .hidden-cover {

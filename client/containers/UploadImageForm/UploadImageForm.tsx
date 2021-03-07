@@ -18,7 +18,6 @@ import { convertFileToBase64 } from "../../utils/convertFileToBase64";
 import dataURLtoFile from "../../utils/dataURLtoFile";
 import { JSON_Stringify_Parse } from "../../utils/jsonStringifyParse";
 import { addDemographics } from "../FaceDetectionResult/ImageResult/demographicsSlice";
-import { addTable } from "../Table/tableSlice";
 import {
   addImage,
   setImageError,
@@ -50,12 +49,12 @@ const UploadImageForm = () => {
       // const id = nanoid();
 
       const items = [
-        {
-          id: nanoid(),
-          imageUri: imageUri,
-          data: demographicsResult,
-          name: "GettyImages-1147443912",
-        },
+        // {
+        //   id: nanoid(),
+        //   imageUri: imageUri,
+        //   data: demographicsResult,
+        //   name: "GettyImages-1147443912",
+        // },
         // {
         //   id: nanoid(),
         //   imageUri: imageUri,
@@ -103,17 +102,6 @@ const UploadImageForm = () => {
               data: result.data,
               imageHeight: null,
               hoverActive: false,
-            })
-          );
-          dispatch(
-            addTable({
-              id,
-              scrollShadow: true,
-              showStickyTHead: {
-                active: false,
-                activatedByInfoResultSentinel: false,
-                activatedByTHeadSentinel: false,
-              },
             })
           );
         });

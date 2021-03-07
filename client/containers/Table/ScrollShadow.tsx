@@ -1,14 +1,6 @@
-import { useSelector } from "react-redux";
-import { RootState } from "../../store/rootReducer";
-
 const ScrollShadow = ({ id }: { id: string }) => {
-  const scrollShadow = useSelector(
-    (state: RootState) =>
-      state.table.tables.find((item) => item.id === id)!.scrollShadow
-  );
-
   return (
-    <div className="scroll-shadow">
+    <div data-id-scroll-shadow={id} className="scroll-shadow">
       <div className="scroll-inner-shadow"></div>
       <style jsx>
         {`
@@ -42,7 +34,9 @@ const ScrollShadow = ({ id }: { id: string }) => {
       <style jsx>
         {`
           .scroll-shadow {
-            opacity: ${scrollShadow ? "1" : "0"};
+             {
+              /* opacity: ${"scrollShadow" ? "1" : "0"}; */
+            }
           }
         `}
       </style>
