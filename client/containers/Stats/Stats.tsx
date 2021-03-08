@@ -1,10 +1,10 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import FaceIcon from "../../components/Logo/svg/FaceIcon";
-import { selectDemographicsData } from "../FaceDetectionResult/ImageResult/demographicsSlice";
+import { selectDemographicParentChildIds } from "../FaceDetectionResult/ImageResult/demographicsSlice";
 
-const Stats = ({ id }: { id: string }) => {
-  const demographics = useSelector(selectDemographicsData({ id }));
+const Stats = ({ id }: { id: number }) => {
+  const demographics = useSelector(selectDemographicParentChildIds({ id }));
   // face from boundingbox.length
   const faces = demographics.length;
   const strFace = faces && faces === 1 ? "Face" : "Faces";

@@ -2,25 +2,25 @@ import { debounce } from "lodash";
 import { useEffect, useRef, useState } from "react";
 import { batch, useDispatch, useSelector, shallowEqual } from "react-redux";
 import { appHeight, appHeightDesktop } from "../../../constants";
-import { RootState } from "../../../store/rootReducer";
-import { parseConcept } from "../../../utils/parseConcept";
 import { reflow } from "../../../utils/reflow";
-import {
-  saveImageDimensions,
-  setElOnLoadStatus,
-  TImageItem,
-} from "../../UploadImageForm/imageUrlSlice";
 import BoundingBox from "../BoundingBox/BoundingBox";
-import { selectDemographicsData, setImageHeight } from "./demographicsSlice";
+import {
+  selectDemographicParentChildIds,
+  selectImageUrl,
+  setImageDimensions,
+} from "./demographicsSlice";
 
-type TImageResultProps = Pick<
-  TImageItem,
-  "id" | "error" | "imageStatus" | "uri"
->;
-const ImageResult = ({ id, error, imageStatus, uri }: TImageResultProps) => {
+type TImageResultProps = {
+  id: number;
+};
+const ImageResult = ({ id }: TImageResultProps) => {
   const dispatch = useDispatch();
+  const parentId = id;
   const [renderBoundingBox, setRenderBoundingBox] = useState(false);
-  const demographics = useSelector(selectDemographicsData({ id }));
+  const demographicParentChildren = useSelector(
+    selectDemographicParentChildIds({ id })
+  );
+  const imageUrl = useSelector(selectImageUrl({ id }));
 
   const renderBoundingBoxRef = useRef(false);
   const imageContainerRef = useRef<HTMLDivElement>(null);
@@ -38,7 +38,7 @@ const ImageResult = ({ id, error, imageStatus, uri }: TImageResultProps) => {
       imageHeight = imgRef.current!.clientHeight;
       if (imageHeight < 200) imageHeight = 200;
 
-      dispatch(setImageHeight({ id, imageHeight }));
+      // dispatch(setImageHeight({ id, imageHeight }));
     }, 150)
   );
 
@@ -46,11 +46,12 @@ const ImageResult = ({ id, error, imageStatus, uri }: TImageResultProps) => {
     e: React.SyntheticEvent<HTMLImageElement, Event>
   ) => {
     const img = e.target as HTMLImageElement;
-    const { naturalHeight, naturalWidth } = img;
-    batch(() => {
-      dispatch(saveImageDimensions({ id, naturalHeight, naturalWidth }));
-      dispatch(setElOnLoadStatus({ id, elOnLoadStatus: "DONE" }));
-    });
+    const { src, naturalHeight, naturalWidth } = img;
+    // batch(() => {
+    //   dispatch(
+    //     setImageDimensions({ id, uri: src, naturalHeight, naturalWidth })
+    //   );
+    // });
     // creates cropped image url
     console.log("loaded!!");
 
@@ -58,38 +59,31 @@ const ImageResult = ({ id, error, imageStatus, uri }: TImageResultProps) => {
     renderBoundingBoxRef.current = true;
     // it's too bad I have to use setTimeout when onLoad is supposed to fire when image is fully loaded
     // also try catch doesn't work
-    setTimeout(() => {
-      window.URL.revokeObjectURL(img.src);
-    }, 500);
+    // setTimeout(() => {
+    //   window.URL.revokeObjectURL(img.src);
+    // }, 500);
   };
 
-  if (error) return <div>{error}</div>;
-
   const demographicsList = renderBoundingBox
-    ? demographics.map(({ id: demographicId, bounding_box }) => (
-        <BoundingBox
-          id={id}
-          demographicId={demographicId}
-          bounding_box={bounding_box}
-          key={demographicId}
-        ></BoundingBox>
+    ? demographicParentChildren.map((id) => (
+        <BoundingBox id={id} parentId={parentId} key={id}></BoundingBox>
       ))
     : null;
 
-  const alt = () => {
-    if (!renderBoundingBox) return "";
-
-    const faces = demographics.length;
-    const strFace = faces && faces === 1 ? "face" : "faces";
-    let msg = `${faces} ${strFace} detected. `;
-
-    demographics.forEach((demo, idx) => {
-      const { concepts } = demo;
-      msg += parseConcept({ concepts, faceNumber: idx + 1 });
-    });
-
-    return msg;
-  };
+  //   const alt = () => {
+  //     if (!renderBoundingBox) return "";
+  //
+  //     const faces = demographicParent.length;
+  //     const strFace = faces && faces === 1 ? "face" : "faces";
+  //     let msg = `${faces} ${strFace} detected. `;
+  //
+  //     demographicParent.forEach((demo, idx) => {
+  //       const { concepts } = demo;
+  //       msg += parseConcept({ concepts, faceNumber: idx + 1 });
+  //     });
+  //
+  //     return msg;
+  //   };
 
   useEffect(() => {
     if (!renderBoundingBox) return;
@@ -113,8 +107,8 @@ const ImageResult = ({ id, error, imageStatus, uri }: TImageResultProps) => {
           ref={imgRef}
           onLoad={onMainImageLoad}
           className="image-demo"
-          src={uri!}
-          alt={alt()}
+          src={imageUrl.uri}
+          // alt={alt()}
         />
         {demographicsList}
       </div>

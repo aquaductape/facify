@@ -5,10 +5,92 @@ import ScrollShadow from "./ScrollShadow";
 import { HorizontalSentinel, THeadSentinel } from "./Sentinel";
 import { parseConceptValue } from "../../utils/parseConcept";
 import THead from "./THead";
-import { selectDemographicsData } from "../FaceDetectionResult/ImageResult/demographicsSlice";
+import {
+  selectDemographicParentChildIds,
+  selectDemographicsDisplay,
+} from "../FaceDetectionResult/ImageResult/demographicsSlice";
 
-const Table = ({ id }: { id: string }) => {
-  const demographics = useSelector(selectDemographicsData({ id }));
+type TRowProps = {
+  id: number;
+  parentId: number;
+  idx: number;
+};
+const Row = ({ id, parentId, idx }: TRowProps) => {
+  const concepts = useSelector((state: RootState) => {
+    const result = state.demographics.demographicNodes[id].concepts;
+    return result;
+  });
+
+  const {
+    "age-appearence": age,
+    "gender-appearance": gender,
+    "multicultural-appearance": multicultural,
+  } = concepts;
+
+  return (
+    <tr className="row">
+      <td className="td-image">
+        <BoundingCroppedImage id={id} parentId={parentId} idx={idx} />
+      </td>
+      <td>
+        {age.map(({ id, name, value }, idx) => (
+          <TdInnerValue
+            name={name}
+            value={value}
+            idx={idx}
+            key={id}
+          ></TdInnerValue>
+        ))}
+      </td>
+      <td>
+        {gender.map(({ id, name, value }, idx) => (
+          <TdInnerValue
+            name={name}
+            value={value}
+            idx={idx}
+            key={id}
+          ></TdInnerValue>
+        ))}
+      </td>
+      <td>
+        {multicultural.map(({ id, name, value }, idx) => (
+          <TdInnerValue
+            name={name}
+            value={value}
+            idx={idx}
+            key={id}
+          ></TdInnerValue>
+        ))}
+      </td>
+      <style jsx>
+        {`
+          .row:nth-child(odd) {
+            background: #eee;
+          }
+
+          td {
+            min-height: 90px;
+            padding: 10px 0;
+          }
+
+          .td-image {
+            position: sticky;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 1;
+          }
+        `}
+      </style>
+    </tr>
+  );
+};
+
+const Table = ({ id }: { id: number }) => {
+  const demographicParent = useSelector(
+    selectDemographicParentChildIds({ id })
+  );
   const thead = ["Face", "Age", "Gender", "Multicultural"];
 
   return (
@@ -33,59 +115,9 @@ const Table = ({ id }: { id: string }) => {
               </tr>
             </thead>
             <tbody>
-              {demographics.map(
-                ({ id: demographicId, bounding_box, concepts }, idx) => {
-                  const {
-                    "age-appearence": age,
-                    "gender-appearance": gender,
-                    "multicultural-appearance": multicultural,
-                  } = concepts;
-
-                  return (
-                    <tr className="row" key={demographicId + idx}>
-                      <td className="td-image">
-                        <BoundingCroppedImage
-                          id={id}
-                          demographicId={demographicId}
-                          bounding_box={bounding_box}
-                          concepts={concepts}
-                          idx={idx}
-                        />
-                      </td>
-                      <td>
-                        {age.map(({ id, name, value }, idx) => (
-                          <TdInnerValue
-                            name={name}
-                            value={value}
-                            idx={idx}
-                            key={id}
-                          ></TdInnerValue>
-                        ))}
-                      </td>
-                      <td>
-                        {gender.map(({ id, name, value }, idx) => (
-                          <TdInnerValue
-                            name={name}
-                            value={value}
-                            idx={idx}
-                            key={id}
-                          ></TdInnerValue>
-                        ))}
-                      </td>
-                      <td>
-                        {multicultural.map(({ id, name, value }, idx) => (
-                          <TdInnerValue
-                            name={name}
-                            value={value}
-                            idx={idx}
-                            key={id}
-                          ></TdInnerValue>
-                        ))}
-                      </td>
-                    </tr>
-                  );
-                }
-              )}
+              {demographicParent.map((item, idx) => (
+                <Row id={item} parentId={id} idx={idx} key={idx}></Row>
+              ))}
             </tbody>
           </table>
         </div>
@@ -123,24 +155,6 @@ const Table = ({ id }: { id: string }) => {
           .thead th {
             text-align: left;
             padding: 8px 0;
-          }
-
-          .row:nth-child(odd) {
-            background: #eee;
-          }
-
-          td {
-            min-height: 90px;
-            padding: 10px 0;
-          }
-
-          .td-image {
-            position: sticky;
-            top: 0;
-            left: 0;
-            pointer-events: none;
-            overflow: hidden;
-            z-index: 1;
           }
 
           .thead-image {

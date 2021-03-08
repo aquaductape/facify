@@ -1,18 +1,15 @@
 import React, { useEffect, useRef } from "react";
-import { useSelector } from "react-redux";
 import { useMatchMedia } from "../../hooks/matchMedia";
-import { RootState } from "../../store/rootReducer";
 import { hasAttributeValue } from "../../utils/hasAttributeValue";
-import { selectImageHeight } from "../FaceDetectionResult/ImageResult/demographicsSlice";
 import useCreateObserver, {
   TMqlCallback,
   TObserverCallback,
 } from "./useCreateObserver";
 
-const HorizontalSentinel = ({ id }: { id: string }) => {
+const HorizontalSentinel = ({ id }: { id: number }) => {
   const sentinelElRef = useRef<HTMLDivElement | null>(null);
   // const shadowElRef = useRef<HTMLDivElement | null>(null)
-  const shadowSelector = `[data-id-scroll-shadow=${id}]`;
+  const shadowSelector = `[data-id-scroll-shadow="${id}"]`;
 
   useEffect(() => {
     const shadowElRef = document.querySelector(
@@ -51,8 +48,8 @@ const HorizontalSentinel = ({ id }: { id: string }) => {
   );
 };
 
-const THeadSentinel = ({ id }: { id: string }) => {
-  const imageHeight = useSelector(selectImageHeight({ id }));
+const THeadSentinel = ({ id }: { id: number }) => {
+  // const imageHeight = useSelector(selectImageHeight({ id }));
 
   const sentinelId = "THeadSentinel";
   const tableSelector = `[data-id-table="${id}"]`;
@@ -60,6 +57,7 @@ const THeadSentinel = ({ id }: { id: string }) => {
   const theadDesktopSelector = `.thead-sticky-desktop-${id}`;
   const theadInnerSelector = ".thead-container";
 
+  const imgElRef = useRef<HTMLImageElement | null>(null);
   const tableElRef = useRef<HTMLTableElement | null>(null);
   const theadElRef = useRef<HTMLDivElement | null>(null);
   const theadInnerElRef = useRef<HTMLDivElement | null>(null);
@@ -157,9 +155,9 @@ const THeadSentinel = ({ id }: { id: string }) => {
   };
 
   useEffect(() => {
-    if (imageHeight == null) return;
+    // if (imageHeight == null) return;
 
-    imageHeightRef.current = imageHeight;
+    // imageHeightRef.current = imageHeight;
 
     window.clearTimeout(timeStampGetPositions.current);
 
@@ -167,7 +165,8 @@ const THeadSentinel = ({ id }: { id: string }) => {
       getPrevScroll();
       getStopPosition();
     }, 200);
-  }, [imageHeight]);
+    // }, [imageHeight]);
+  }, []);
 
   const getTheadEl = ({ mobile }: { mobile: boolean }) => {
     const parent = mobile ? tableElRef.current! : document;
@@ -187,7 +186,7 @@ const THeadSentinel = ({ id }: { id: string }) => {
   useCreateObserver({
     id: id + sentinelId,
     hasInit,
-    imageHeight,
+    imageHeight: 0,
     imageHeightRef,
     mql: mqlRef.current!,
     observerCallback,
@@ -218,10 +217,10 @@ const THeadSentinel = ({ id }: { id: string }) => {
   );
 };
 
-const InfoResultSentinel = ({ id }: { id: string }) => {
+const InfoResultSentinel = ({ id }: { id: number }) => {
   const sentinelId = `infoResultSentinel`;
 
-  const imageHeight = useSelector(selectImageHeight({ id }));
+  // const imageHeight = useSelector(selectImageHeight({ id }));
 
   const theadSelector = `.thead-sticky-desktop-${id} .thead-container`;
   const theadInnerElRef = useRef<HTMLDivElement | null>(null);
@@ -270,11 +269,11 @@ const InfoResultSentinel = ({ id }: { id: string }) => {
     }
   };
 
-  useEffect(() => {
-    if (imageHeight == null) return;
+  // useEffect(() => {
+  // if (imageHeight == null) return;
 
-    imageHeightRef.current = imageHeight;
-  }, [imageHeight]);
+  // imageHeightRef.current = imageHeight;
+  // }, [imageHeight]);
 
   useEffect(() => {
     theadInnerElRef.current = document.querySelector(theadSelector);
@@ -284,7 +283,7 @@ const InfoResultSentinel = ({ id }: { id: string }) => {
     id: id + sentinelId,
     desktop: true,
     hasInit,
-    imageHeight,
+    imageHeight: 0,
     imageHeightRef,
     mql: mqlRef.current!,
     observerCallback,

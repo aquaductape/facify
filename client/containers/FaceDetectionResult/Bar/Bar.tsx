@@ -1,15 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import CloseBtn from "../../../components/Logo/svg/CloseBtn";
-import { RootState } from "../../../store/rootReducer";
 import Stats from "../../Stats/Stats";
-import { selectName } from "../../UploadImageForm/imageUrlSlice";
+import { selectName } from "../ImageResult/demographicsSlice";
 
 export const useBtnRemoveHover = ({
   id,
   idx,
 }: {
-  id: string;
+  id: number;
   idx: number;
 }): {
   onMouseLeave: () => void;
@@ -41,7 +40,7 @@ export const useBtnRemoveHover = ({
   return { onMouseLeave, onMouseEnter, onFocus, onBlur };
 };
 
-const Bar = ({ id, idx }: { id: string; idx: number }) => {
+const Bar = ({ id, idx }: { id: number; idx: number }) => {
   const imageName = useSelector(selectName({ id }));
 
   const { onBlur, onFocus, onMouseEnter, onMouseLeave } = useBtnRemoveHover({

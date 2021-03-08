@@ -1,14 +1,14 @@
-import {
-  createSelector,
-  createSlice,
-  PayloadAction,
-  PrepareAction,
-} from "@reduxjs/toolkit";
+import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../../store/rootReducer";
 import { TDemographics } from "../../../ts";
+
+let parentId = 0;
+let demographicId = 0;
+
 type TDemographicsDisplay = {
-  id: string;
+  id: number;
   hoverActive: boolean;
+  generalHover: boolean;
   scrollIntoView: boolean;
 };
 type TDemographicsItem = {
@@ -19,64 +19,66 @@ type TDemographicsItem = {
   hoverActive: boolean;
 };
 
+type TImageUrl = {
+  uri: string;
+  naturalWidth: number | null;
+  naturalHeight: number | null;
+};
+
+type TParent = {
+  id: number;
+  imageUrl: TImageUrl;
+  name: string;
+  childIds: number[];
+};
+
+export type TDemographicNode = TDemographicsDisplay & TDemographics;
+
 type TImageResultState = {
-  demographics: TDemographicsItem[];
+  parents: TParent[];
+  demographicNodes: TDemographicNode[];
+  hoverActive: boolean;
 };
 
 const initialState: TImageResultState = {
-  demographics: [],
-};
-
-export const selectImageHeight = ({ id }: { id: string }) => {
-  return createSelector(
-    (state: RootState) => state.demographics.demographics,
-    (result) =>
-      result.find((item) => {
-        return item.id === id;
-      })!.imageHeight
-  );
-};
-
-export const selectHoverActive = ({ id }: { id: string }) => {
-  return createSelector(
-    (state: RootState) => state.demographics.demographics,
-    (result) =>
-      result.find((item) => {
-        return item.id === id;
-      })!.hoverActive
-  );
-};
-
-export const selectDemographicsData = ({ id }: { id: string }) => {
-  return createSelector(
-    (state: RootState) => state.demographics.demographics,
-    (result) =>
-      result.find((item) => {
-        // console.log("get data");
-        return item.id === id;
-      })!.data
-  );
+  parents: [],
+  demographicNodes: [],
+  hoverActive: false,
 };
 
 export const selectDemographicsDisplay = ({
   id,
-  demographicId,
 }: {
-  id: string;
-  demographicId: string;
+  id: number;
+  activeOnly?: boolean;
 }) => {
   return createSelector(
-    (state: RootState) => state.demographics.demographics,
-    (result) =>
-      result
-        .find((item) => {
-          // console.log("find demoitem");
-          return item.id === id;
-        })!
-        .display.find((item) => {
-          console.log("find demodisplay");
-          return item.id === demographicId;
-        })!
+    (state: RootState) => state.demographics.demographicNodes,
+    (result) => {
+      console.log("get node");
+      return result[id];
+    }
+  );
+};
+
+export const selectDemographicParentChildIds = ({ id }: { id: number }) => {
+  return createSelector(
+    (state: RootState) => state.demographics,
+    (result) => result.parents[id].childIds
+  );
+};
+
+export const selectImageUrl = ({ id }: { id: number }) => {
+  return createSelector(
+    (state: RootState) => state.demographics,
+    (result) => result.parents[id].imageUrl
+  );
+};
+
+export const selectName = ({ id }: { id: number }) => {
+  return createSelector(
+    (state: RootState) => state.demographics,
+    (result) => result.parents[id].name
   );
 };
 
@@ -84,70 +86,126 @@ const demographicsSlice = createSlice({
   name: "demographics",
   initialState,
   reducers: {
-    addDemographics: (
-      state,
-      action: PayloadAction<Omit<TDemographicsItem, "display">>
-    ) => {
-      const demographic = action.payload as TDemographicsItem;
+    addDemographicsParentAndChildren: {
+      reducer: (
+        state,
+        action: PayloadAction<{
+          data: TDemographicNode[];
+          parent: TParent;
+        }>
+      ) => {
+        const { data, parent } = action.payload;
 
-      const result: TDemographicsDisplay[] = [];
-      demographic.data.forEach((item) => {
-        const resultItem: TDemographicsDisplay = {
-          id: item.id,
-          hoverActive: false,
-          scrollIntoView: false,
-        };
-        result.push(resultItem);
-      });
+        parent.childIds = data.map((item) => item.id);
 
-      demographic.display = result;
-      console.log("ran");
-      state.demographics.push(demographic);
+        state.demographicNodes.push(...data);
+        state.parents.push(parent);
+      },
+      prepare: ({
+        data: _data,
+        parent: _parent,
+      }: {
+        data: Omit<TDemographicNode, "id">[];
+        parent: Omit<TParent, "id" | "childIds">;
+      }) => {
+        const data = (_data as unknown) as TDemographicNode[];
+        const parent = (_parent as unknown) as TParent;
+
+        parent.id = parentId++;
+
+        data.forEach((item) => {
+          const id = demographicId++;
+          item.id = id;
+        });
+
+        return { payload: { data, parent } };
+      },
+    },
+    addParent: {
+      reducer: (state, action: PayloadAction<TParent | TParent[]>) => {
+        const newParent = action.payload;
+        if (Array.isArray(newParent)) {
+          state.parents.push(...newParent);
+          return;
+        }
+
+        state.parents.push(newParent);
+      },
+      prepare: (_input: Omit<TParent, "id"> | Omit<TParent, "id">[]) => {
+        const input = (_input as unknown) as TParent | TParent[];
+
+        if (Array.isArray(input)) {
+          input.forEach((item) => (item.id = parentId++));
+
+          return { payload: input };
+        }
+
+        input.id = parentId++;
+
+        return { payload: input };
+      },
     },
     setDemoItemHoverActive: (
       state,
       action: PayloadAction<{
-        id: string;
-        demographicId: string;
+        id: number;
+        parentId: number;
         active: boolean;
+        // activeBy
         scrollIntoView?: boolean;
       }>
     ) => {
-      const { id, demographicId, active, scrollIntoView } = action.payload;
+      const { id, parentId, active, scrollIntoView } = action.payload;
 
-      const result = state.demographics.find((item) => item.id === id)!;
-      const item = result.display.find((demo) => demo.id === demographicId)!;
-      item.hoverActive = active;
+      const parent = state.parents[parentId];
+      parent.childIds.forEach((childId) => {
+        const result = state.demographicNodes[childId];
+        if (childId === id) {
+          result.hoverActive = active;
 
-      if (scrollIntoView != null) {
-        item.scrollIntoView = scrollIntoView;
-      }
+          if (scrollIntoView != null) {
+            result.scrollIntoView = scrollIntoView;
+          }
+        }
+
+        result.generalHover = active;
+      });
+
+      // const result = state.demographicNodes[id];
+      // result.hoverActive = active;
+      // if (scrollIntoView != null) {
+      //   result.scrollIntoView = scrollIntoView;
+      // }
     },
-    setHoverActive: (
-      state,
-      action: PayloadAction<{ id: string; active: boolean }>
-    ) => {
-      const { id, active } = action.payload;
-      const result = state.demographics.find((item) => item.id === id)!;
-      result.hoverActive = active;
+    setHoverActive: (state, action: PayloadAction<{ active: boolean }>) => {
+      const { active } = action.payload;
+      // const result = state.demographics.find((item) => item.id === id)!;
+      state.hoverActive = active;
     },
-    setImageHeight: (
+    setImageDimensions: (
       state,
-      action: PayloadAction<{ id: string; imageHeight: number | null }>
+      action: PayloadAction<{
+        id: number;
+        uri: string;
+        naturalHeight: number;
+        naturalWidth: number;
+      }>
     ) => {
-      const { id, imageHeight } = action.payload;
-      const result = state.demographics.find((item) => item.id === id)!;
-      result.imageHeight = imageHeight;
-      // state.imageHeight = action.payload;
+      const { id, uri, naturalHeight, naturalWidth } = action.payload;
+
+      state.parents[id].imageUrl = {
+        uri,
+        naturalHeight,
+        naturalWidth,
+      };
     },
   },
 });
 
 export const {
-  addDemographics,
-  // setDemographicsDisplay,
+  addDemographicsParentAndChildren,
+  setImageDimensions,
   setDemoItemHoverActive,
   setHoverActive,
-  setImageHeight,
 } = demographicsSlice.actions;
 export default demographicsSlice.reducer;

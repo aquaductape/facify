@@ -1,15 +1,12 @@
 import Table from "../../Table/Table";
-import Stats from "../../Stats/Stats";
-import { appHeight, appHeightDesktop } from "../../../constants";
+import { appHeightDesktop } from "../../../constants";
 import THead from "../../Table/THead";
 import { InfoResultSentinel } from "../../Table/Sentinel";
-import { TImageItem } from "../../UploadImageForm/imageUrlSlice";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 
-type TInforResultProps = Pick<TImageItem, "id" | "elOnLoadStatus">;
-const InfoResult = ({ id, elOnLoadStatus }: TInforResultProps) => {
+type TInforResultProps = { id: number };
+const InfoResult = ({ id }: TInforResultProps) => {
   const containerElRef = useRef<HTMLDivElement | null>(null);
-  if (elOnLoadStatus !== "DONE") return null;
 
   // useEffect(() => {}, []);
 

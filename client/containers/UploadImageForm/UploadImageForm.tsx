@@ -17,14 +17,11 @@ import { TDemographicsResponse } from "../../ts";
 import { convertFileToBase64 } from "../../utils/convertFileToBase64";
 import dataURLtoFile from "../../utils/dataURLtoFile";
 import { JSON_Stringify_Parse } from "../../utils/jsonStringifyParse";
-import { addDemographics } from "../FaceDetectionResult/ImageResult/demographicsSlice";
 import {
-  addImage,
-  setImageError,
-  setImageLoaded,
-  setImageStatus,
-  setUri,
-} from "./imageUrlSlice";
+  addDemographicsParentAndChildren,
+  TDemographicNode,
+} from "../FaceDetectionResult/ImageResult/demographicsSlice";
+import { setImageLoaded, setImageStatus, setUri } from "./imageUrlSlice";
 import Input from "./Input";
 
 const placeholderError = "URL Required*";
@@ -49,12 +46,12 @@ const UploadImageForm = () => {
       // const id = nanoid();
 
       const items = [
-        // {
-        //   id: nanoid(),
-        //   imageUri: imageUri,
-        //   data: demographicsResult,
-        //   name: "GettyImages-1147443912",
-        // },
+        {
+          id: nanoid(),
+          imageUri: imageUri,
+          data: demographicsResult,
+          name: "GettyImages-1147443912",
+        },
         // {
         //   id: nanoid(),
         //   imageUri: imageUri,
@@ -66,42 +63,51 @@ const UploadImageForm = () => {
           data: demographResult2,
           name: "da-feasters",
         },
+        // {
+        //   id: nanoid(),
+        //   imageUri: imgUri2,
+        //   data: JSON.parse(JSON.stringify(demographResult2)),
+        //   name: "da-feasters",
+        // },
       ];
 
       items.forEach(async ({ id, data, imageUri, name }) => {
-        dispatch(
-          addImage({
-            id,
-            imageStatus: "LOADING",
-            elOnLoadStatus: "EMPTY",
-            error: null,
-            naturalHeight: null,
-            naturalWidth: null,
-            uri: null,
-            name,
-          })
+        const objectUrl = window.URL.createObjectURL(dataURLtoFile(imageUri));
+        const img = new Image();
+        img.src = objectUrl;
+
+        await new Promise((resolve) =>
+          setTimeout(
+            () =>
+              (img.onload = () => {
+                resolve(true);
+              })
+          )
         );
-        // dispatch(setImageStatus("LOADING"));
-        await new Promise((resolve) => setTimeout(() => resolve(true), 100));
-        const result = data;
+        const result = (data.data as unknown) as TDemographicNode[];
+        result.forEach((item) => {
+          item.hoverActive = false;
+          item.scrollIntoView = false;
+          item.generalHover = false;
+        });
         const base64 = imageUri;
         console.log("fire");
 
         batch(() => {
-          dispatch(
-            setUri({
-              id,
-              uri: window.URL.createObjectURL(dataURLtoFile(base64)),
-            })
-          );
+          // dispatch(setUri(objectUrl));
           dispatch(setImageLoaded(true));
-          dispatch(setImageStatus({ id, imageStatus: "DONE" }));
+          dispatch(setImageStatus("DONE"));
           dispatch(
-            addDemographics({
-              id,
-              data: result.data,
-              imageHeight: null,
-              hoverActive: false,
+            addDemographicsParentAndChildren({
+              parent: {
+                name,
+                imageUrl: {
+                  naturalWidth: img.naturalWidth,
+                  naturalHeight: img.naturalHeight,
+                  uri: imageUri,
+                },
+              },
+              data: result,
             })
           );
         });

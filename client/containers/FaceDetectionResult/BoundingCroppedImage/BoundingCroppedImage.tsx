@@ -1,47 +1,27 @@
-import { createSelector } from "@reduxjs/toolkit";
 import { useEffect, useRef, useState } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../../store/rootReducer";
-import { TBoundingBox, TDemographics } from "../../../ts";
 import { parseConcept } from "../../../utils/parseConcept";
 import {
   selectDemographicsDisplay,
+  selectImageUrl,
   setDemoItemHoverActive,
   setHoverActive,
 } from "../ImageResult/demographicsSlice";
 import createCroppedImgUrl from "./createCroppedImgUrl";
 
-type BoundingCroppedImageProps = Omit<TDemographics, "id"> & {
-  id: string;
-  demographicId: string;
+type BoundingCroppedImageProps = {
+  id: number;
+  parentId: number;
   idx: number;
 };
 const BoundingCroppedImage = ({
   id,
-  demographicId,
-  bounding_box,
-  concepts,
+  parentId,
   idx,
 }: BoundingCroppedImageProps) => {
   const dispatch = useDispatch();
-  const imageUrl = useSelector(
-    (state: RootState) => state.imageUrl.images.find((item) => item.id === id)!
-  );
-  // const demographic = useSelector(
-  //   (state: RootState) =>
-  //     state.demographics.demographics
-  //       .find((item) => {
-  //         // console.log("find demoitem");
-  //         return item.id === id;
-  //       })!
-  //       .display.find((item) => {
-  //         // console.log("find demodisplay");
-  //         return item.id === demographicId;
-  //       })!
-  // );
-  const demographic = useSelector(
-    selectDemographicsDisplay({ id, demographicId })
-  );
+  const demographic = useSelector(selectDemographicsDisplay({ id }));
+  const imageUrl = useSelector(selectImageUrl({ id: parentId }));
   const [renderImage, setRenderImage] = useState(false);
   const croppedImgUrlRef = useRef("");
   const imgElRef = useRef<HTMLImageElement>(null);
@@ -55,7 +35,7 @@ const BoundingCroppedImage = ({
 
     const run = async () => {
       croppedImgUrlRef.current = await createCroppedImgUrl({
-        boundingBox: bounding_box,
+        boundingBox: demographic.bounding_box,
         img,
       });
       setRenderImage(true);
@@ -65,18 +45,18 @@ const BoundingCroppedImage = ({
 
   const onMouseEnter = () => {
     batch(() => {
-      dispatch(setDemoItemHoverActive({ id, demographicId, active: true }));
-      dispatch(setHoverActive({ id, active: true }));
+      dispatch(setDemoItemHoverActive({ id, parentId, active: true }));
+      dispatch(setHoverActive({ active: true }));
     });
   };
   const onMouseLeave = () => {
     batch(() => {
-      dispatch(setDemoItemHoverActive({ id, demographicId, active: false }));
-      dispatch(setHoverActive({ id, active: false }));
+      dispatch(setDemoItemHoverActive({ id, parentId, active: false }));
+      dispatch(setHoverActive({ active: false }));
     });
   };
 
-  const alt = parseConcept({ concepts });
+  const alt = parseConcept({ concepts: demographic.concepts });
 
   useEffect(() => {
     if (!demographic.hoverActive || !demographic.scrollIntoView) return;
