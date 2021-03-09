@@ -62,6 +62,22 @@ const useCreateObserver = ({
   const prevScrollYRef = useRef(0);
   const inputHeight = 45;
   const topPadding = 15;
+  const barHeight = 0;
+
+  //   const onUpdateRootMargin = (imageHeight: number | null) => {
+  //     if (imageHeight == null || !hasInit.current) return;
+  //     if (imageHeight > 300 && mql.matches) return;
+  //
+  //     console.log("onupdateroot", mql.matches);
+  //
+  //     observer!.disconnect();
+  //     observer = null;
+  //     observer = createObserver(!mql.matches);
+  //   };
+  //
+  //   useEffect(() => {
+  //     onUpdateRootMargin(imageHeight);
+  //   }, [imageHeight]);
 
   useEffect(() => {
     if (imageHeightRef.current == null || hasInit.current) return;
@@ -70,7 +86,7 @@ const useCreateObserver = ({
       if (observer) return observer;
 
       const positionTop = mediaMatches
-        ? imageHeightRef.current! + topPadding + inputHeight
+        ? imageHeightRef.current! + topPadding + inputHeight + barHeight
         : 50;
 
       return new IntersectionObserver(
@@ -79,12 +95,13 @@ const useCreateObserver = ({
             const target = entry.target as HTMLElement;
             const id = target.dataset.observerId;
             const result = sentinelItems.find((item) => item.id === id);
+            // console.log(sentinelItems, id);
             if (result) result.onObserve(entry, observer);
           });
         },
         {
           threshold: [0, 1],
-          rootMargin: `-${positionTop}px 0px 0px 0px`,
+          rootMargin: `-${0}px 0px 0px 0px`,
         }
       );
     };
@@ -98,21 +115,17 @@ const useCreateObserver = ({
     };
 
     const onMediaQueryListener = (e: MediaQueryListEvent) => {
-      observer!.disconnect();
-      observer = null;
-      observer = createObserver(!e.matches);
-      // mqlCallbacks.forEach((item) =>
-      //   item.callback({ e, observer: observer!, observerCallbacks })
-      // );
+      // observer!.disconnect();
+      // observer = null;
+      // observer = createObserver(!e.matches);
+
       sentinelItems.forEach((item) => {
         if (item.onMql) item.onMql({ e, observer: observer! });
       });
 
       if (!e.matches) {
         console.log("addwindow");
-        window.addEventListener("scroll", onScrollRef.current!, {
-          passive: true,
-        });
+        window.addEventListener("scroll", onScrollRef.current!);
       } else {
         console.log("removewindow");
         window.removeEventListener("scroll", onScrollRef.current!);
@@ -151,6 +164,7 @@ const useCreateObserver = ({
 
     if (observer && desktopValid(mql)) {
       // if (observer) {
+      console.log("observe", id);
       observer.observe(sentinelElRef.current!);
     }
 
@@ -161,16 +175,14 @@ const useCreateObserver = ({
     if (scrollCallback && !windowInit && !mql.matches) {
       console.log("addwindow");
       windowInit = true;
-      window.addEventListener("scroll", onScrollRef.current!, {
-        passive: true,
-      });
+      window.addEventListener("scroll", onScrollRef.current!);
     }
   }, [imageHeight]);
 
   useEffect(() => {
     return () => {
-      const sentinelEl = sentinelElRef.current as HTMLElement;
-      observer!.unobserve(sentinelEl);
+      // const sentinelEl = sentinelElRef.current as HTMLElement;
+      // observer!.unobserve(sentinelEl);
 
       const idx = sentinelItems.findIndex((item) => item.id === id!)!;
 
@@ -181,7 +193,7 @@ const useCreateObserver = ({
       console.log("CLEAN UP");
       if (!sentinelItems.length) {
         window.removeEventListener("scroll", onScrollRef.current!);
-        mql.removeEventListener("change", onMediaQueryListenerRef.current!);
+        // mql.removeEventListener("change", onMediaQueryListenerRef.current!);
         mqlInit = false;
         windowInit = false;
         observer = null;

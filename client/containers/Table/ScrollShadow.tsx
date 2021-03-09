@@ -15,7 +15,7 @@ const ScrollShadow = ({ id }: { id: number }) => {
             border-bottom-right-radius: 0;
             background: radial-gradient(
               ellipse at 100%,
-              #0000002e,
+              #00000017,
               transparent 24px
             );
             z-index: 10;
@@ -24,7 +24,7 @@ const ScrollShadow = ({ id }: { id: number }) => {
           }
           .scroll-inner-shadow {
             height: 100%;
-            background: linear-gradient(-90deg, #0000001f, transparent);
+            background: linear-gradient(-90deg, #00000042, transparent);
             width: 20px;
             margin-left: auto;
           }

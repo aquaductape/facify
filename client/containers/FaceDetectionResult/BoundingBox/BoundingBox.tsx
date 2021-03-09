@@ -3,6 +3,7 @@ import { useMatchMedia } from "../../../hooks/matchMedia";
 import { RootState } from "../../../store/rootReducer";
 import {
   selectDemographicsDisplay,
+  selectHoverActive,
   setDemoItemHoverActive,
   setHoverActive,
 } from "../ImageResult/demographicsSlice";
@@ -15,21 +16,19 @@ type TBoundingBoxProps = {
 const BoundingBox = ({ id, parentId }: TBoundingBoxProps) => {
   const dispatch = useDispatch();
   const demographic = useSelector(selectDemographicsDisplay({ id }));
-  // const hoverActive = useSelector(
-  //   (state: RootState) => state.demographics.hoverActive
-  // );
+  const hoverActive = useSelector(selectHoverActive({ id: parentId }));
   const mqlRef = useMatchMedia();
   const onMouseEnter = () => {
     batch(() => {
       dispatch(
         setDemoItemHoverActive({
           id,
-          parentId,
+          // parentId,
           active: true,
-          scrollIntoView: mqlRef.current!.matches ? true : false,
+          scrollIntoView: true,
         })
       );
-      dispatch(setHoverActive({ active: true }));
+      dispatch(setHoverActive({ id: parentId, active: true }));
     });
   };
   const onMouseLeave = () => {
@@ -37,12 +36,12 @@ const BoundingBox = ({ id, parentId }: TBoundingBoxProps) => {
       dispatch(
         setDemoItemHoverActive({
           id,
-          parentId,
+          // parentId,
           active: false,
           scrollIntoView: false,
         })
       );
-      dispatch(setHoverActive({ active: false }));
+      dispatch(setHoverActive({ id: parentId, active: false }));
     });
   };
 
@@ -79,9 +78,7 @@ const BoundingBox = ({ id, parentId }: TBoundingBoxProps) => {
       <style jsx>
         {`
           .active {
-            opacity: ${!demographic.hoverActive && demographic.generalHover
-              ? "0.4"
-              : "1"};
+            opacity: ${!demographic.hoverActive && hoverActive ? "0.4" : "1"};
           }
         `}
       </style>

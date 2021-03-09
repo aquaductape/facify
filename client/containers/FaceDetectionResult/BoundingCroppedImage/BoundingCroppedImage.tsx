@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
+import scrollIntoView from "scroll-into-view-if-needed";
+import { useMatchMedia } from "../../../hooks/matchMedia";
 import { parseConcept } from "../../../utils/parseConcept";
 import {
   selectDemographicsDisplay,
@@ -14,6 +16,7 @@ type BoundingCroppedImageProps = {
   parentId: number;
   idx: number;
 };
+
 const BoundingCroppedImage = ({
   id,
   parentId,
@@ -22,9 +25,13 @@ const BoundingCroppedImage = ({
   const dispatch = useDispatch();
   const demographic = useSelector(selectDemographicsDisplay({ id }));
   const imageUrl = useSelector(selectImageUrl({ id: parentId }));
-  const [renderImage, setRenderImage] = useState(false);
+
   const croppedImgUrlRef = useRef("");
+  const infoResultElRef = useRef<HTMLTableElement | null>(null);
   const imgElRef = useRef<HTMLImageElement>(null);
+  const mql = useMatchMedia();
+
+  const [renderImage, setRenderImage] = useState(false);
 
   useEffect(() => {
     const img = {
@@ -45,14 +52,26 @@ const BoundingCroppedImage = ({
 
   const onMouseEnter = () => {
     batch(() => {
-      dispatch(setDemoItemHoverActive({ id, parentId, active: true }));
-      dispatch(setHoverActive({ active: true }));
+      dispatch(
+        setDemoItemHoverActive({
+          id,
+          // parentId,
+          active: true,
+        })
+      );
+      dispatch(setHoverActive({ id: parentId, active: true }));
     });
   };
   const onMouseLeave = () => {
     batch(() => {
-      dispatch(setDemoItemHoverActive({ id, parentId, active: false }));
-      dispatch(setHoverActive({ active: false }));
+      dispatch(
+        setDemoItemHoverActive({
+          id,
+          // parentId,
+          active: false,
+        })
+      );
+      dispatch(setHoverActive({ id: parentId, active: false }));
     });
   };
 
@@ -60,10 +79,18 @@ const BoundingCroppedImage = ({
 
   useEffect(() => {
     if (!demographic.hoverActive || !demographic.scrollIntoView) return;
-    imgElRef.current?.scrollIntoView({
-      behavior: "auto",
-      block: "nearest",
-      inline: "start",
+    if (!infoResultElRef.current) {
+      infoResultElRef.current = document.querySelector(
+        `[data-id-info-result="${parentId}"]`
+      );
+    }
+    requestAnimationFrame(() => {
+      scrollIntoView(imgElRef.current!, {
+        behavior: "smooth",
+        block: "center",
+        inline: "center",
+        boundary: mql.current?.matches ? infoResultElRef.current! : null,
+      });
     });
   }, [demographic.scrollIntoView]);
 

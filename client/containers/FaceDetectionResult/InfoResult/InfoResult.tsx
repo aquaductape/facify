@@ -11,7 +11,7 @@ const InfoResult = ({ id }: TInforResultProps) => {
   // useEffect(() => {}, []);
 
   return (
-    <div className="container" ref={containerElRef}>
+    <div data-id-info-result={id} className="container" ref={containerElRef}>
       <InfoResultSentinel id={id}></InfoResultSentinel>
       <THead id={id} mobile={false}></THead>
       <div className="info-demo">

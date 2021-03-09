@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { batch, useDispatch, useSelector, shallowEqual } from "react-redux";
 import { appHeight, appHeightDesktop } from "../../../constants";
 import { reflow } from "../../../utils/reflow";
+import { setImageHeight } from "../../Table/imageHeightSlice";
 import BoundingBox from "../BoundingBox/BoundingBox";
 import {
   selectDemographicParentChildIds,
@@ -37,8 +38,9 @@ const ImageResult = ({ id }: TImageResultProps) => {
       reflow();
       imageHeight = imgRef.current!.clientHeight;
       if (imageHeight < 200) imageHeight = 200;
+      console.log({ imageHeight });
 
-      // dispatch(setImageHeight({ id, imageHeight }));
+      dispatch(setImageHeight({ id, imageHeight }));
     }, 150)
   );
 
@@ -47,11 +49,6 @@ const ImageResult = ({ id }: TImageResultProps) => {
   ) => {
     const img = e.target as HTMLImageElement;
     const { src, naturalHeight, naturalWidth } = img;
-    // batch(() => {
-    //   dispatch(
-    //     setImageDimensions({ id, uri: src, naturalHeight, naturalWidth })
-    //   );
-    // });
     // creates cropped image url
     console.log("loaded!!");
 

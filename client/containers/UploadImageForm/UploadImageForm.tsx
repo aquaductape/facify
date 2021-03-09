@@ -21,6 +21,7 @@ import {
   addDemographicsParentAndChildren,
   TDemographicNode,
 } from "../FaceDetectionResult/ImageResult/demographicsSlice";
+import { addImage } from "../Table/imageHeightSlice";
 import { setImageLoaded, setImageStatus, setUri } from "./imageUrlSlice";
 import Input from "./Input";
 
@@ -97,10 +98,12 @@ const UploadImageForm = () => {
           // dispatch(setUri(objectUrl));
           dispatch(setImageLoaded(true));
           dispatch(setImageStatus("DONE"));
+          dispatch(addImage({ input: { imageHeight: null } }));
           dispatch(
             addDemographicsParentAndChildren({
               parent: {
                 name,
+                hoverActive: false,
                 imageUrl: {
                   naturalWidth: img.naturalWidth,
                   naturalHeight: img.naturalHeight,

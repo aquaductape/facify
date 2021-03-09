@@ -35,7 +35,7 @@ const Main = () => {
             left: 15px;
             right: 15px;
             height: 15px;
-            background: #224aff;
+            background: var(--blue-main);
             z-index: 80;
           }
           .hide-shadow {
@@ -45,7 +45,7 @@ const Main = () => {
             display: none;
             width: 10px;
             height: 70px;
-            background: #224aff;
+            background: var(--blue-main);
           }
 
           @media (min-width: 768px) {

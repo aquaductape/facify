@@ -102,7 +102,7 @@ const Table = ({ id }: { id: number }) => {
           <HorizontalSentinel id={id}></HorizontalSentinel>
           <THeadSentinel id={id}></THeadSentinel>
           <table>
-            <thead className="thead">
+            <thead data-id-static-thead={id} className="thead">
               <tr>
                 {thead.map((item, idx) => {
                   return (

@@ -1,8 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { batch, useDispatch, useSelector } from "react-redux";
 import CloseBtn from "../../../components/Logo/svg/CloseBtn";
 import Stats from "../../Stats/Stats";
-import { selectName } from "../ImageResult/demographicsSlice";
+import { BarSentinel } from "../../Table/Sentinel";
+import {
+  removeParentAndNodeChildren,
+  selectName,
+} from "../ImageResult/demographicsSlice";
 
 export const useBtnRemoveHover = ({
   id,
@@ -41,7 +45,14 @@ export const useBtnRemoveHover = ({
 };
 
 const Bar = ({ id, idx }: { id: number; idx: number }) => {
+  const dispatch = useDispatch();
   const imageName = useSelector(selectName({ id }));
+
+  const onClick = () => {
+    batch(() => {
+      dispatch(removeParentAndNodeChildren({ id }));
+    });
+  };
 
   const { onBlur, onFocus, onMouseEnter, onMouseLeave } = useBtnRemoveHover({
     id,
@@ -50,6 +61,7 @@ const Bar = ({ id, idx }: { id: number; idx: number }) => {
 
   return (
     <div className="bar">
+      <BarSentinel id={id}></BarSentinel>
       <div className="title">
         <div className="title-number">{idx + 1}</div>
         <div className="title-name">{imageName}</div>
@@ -63,6 +75,7 @@ const Bar = ({ id, idx }: { id: number; idx: number }) => {
         onMouseLeave={onMouseLeave}
         onFocus={onFocus}
         onBlur={onBlur}
+        onClick={onClick}
       >
         <CloseBtn></CloseBtn>
       </button>

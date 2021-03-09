@@ -11,13 +11,6 @@ type TDemographicsDisplay = {
   generalHover: boolean;
   scrollIntoView: boolean;
 };
-type TDemographicsItem = {
-  id: string;
-  data: TDemographics[];
-  display: TDemographicsDisplay[];
-  imageHeight: number | null;
-  hoverActive: boolean;
-};
 
 type TImageUrl = {
   uri: string;
@@ -29,33 +22,28 @@ type TParent = {
   id: number;
   imageUrl: TImageUrl;
   name: string;
+  hoverActive: boolean;
   childIds: number[];
 };
 
 export type TDemographicNode = TDemographicsDisplay & TDemographics;
 
-type TImageResultState = {
+type TDemographicState = {
   parents: TParent[];
   demographicNodes: TDemographicNode[];
   hoverActive: boolean;
 };
 
-const initialState: TImageResultState = {
+const initialState: TDemographicState = {
   parents: [],
   demographicNodes: [],
   hoverActive: false,
 };
 
-export const selectDemographicsDisplay = ({
-  id,
-}: {
-  id: number;
-  activeOnly?: boolean;
-}) => {
+export const selectDemographicsDisplay = ({ id }: { id: number }) => {
   return createSelector(
     (state: RootState) => state.demographics.demographicNodes,
     (result) => {
-      console.log("get node");
       return result[id];
     }
   );
@@ -63,22 +51,31 @@ export const selectDemographicsDisplay = ({
 
 export const selectDemographicParentChildIds = ({ id }: { id: number }) => {
   return createSelector(
-    (state: RootState) => state.demographics,
-    (result) => result.parents[id].childIds
+    (state: RootState) => state.demographics.parents,
+    (result) => result[id].childIds
   );
 };
 
 export const selectImageUrl = ({ id }: { id: number }) => {
   return createSelector(
-    (state: RootState) => state.demographics,
-    (result) => result.parents[id].imageUrl
+    (state: RootState) => state.demographics.parents,
+    (result) => {
+      return result[id].imageUrl;
+    }
   );
 };
 
 export const selectName = ({ id }: { id: number }) => {
   return createSelector(
-    (state: RootState) => state.demographics,
-    (result) => result.parents[id].name
+    (state: RootState) => state.demographics.parents,
+    (result) => result[id].name
+  );
+};
+
+export const selectHoverActive = ({ id }: { id: number }) => {
+  return createSelector(
+    (state: RootState) => state.demographics.parents,
+    (result) => result[id].hoverActive
   );
 };
 
@@ -145,42 +142,62 @@ const demographicsSlice = createSlice({
         return { payload: input };
       },
     },
+    removeParentAndNodeChildren: (
+      state,
+      action: PayloadAction<{ id: number }>
+    ) => {
+      const { id } = action.payload;
+      const { childIds } = state.parents[id];
+      const startId = childIds[0];
+
+      state.demographicNodes.splice(startId, childIds.length);
+      state.parents.splice(id, 1);
+    },
     setDemoItemHoverActive: (
       state,
       action: PayloadAction<{
         id: number;
-        parentId: number;
+        // parentId: number;
         active: boolean;
         // activeBy
         scrollIntoView?: boolean;
       }>
     ) => {
-      const { id, parentId, active, scrollIntoView } = action.payload;
+      const {
+        id,
+        //
+        // parentId,
+        active,
+        scrollIntoView,
+      } = action.payload;
 
-      const parent = state.parents[parentId];
-      parent.childIds.forEach((childId) => {
-        const result = state.demographicNodes[childId];
-        if (childId === id) {
-          result.hoverActive = active;
+      //       const parent = state.parents[parentId];
+      //       parent.childIds.forEach((childId) => {
+      //         const result = state.demographicNodes[childId];
+      //         if (childId === id) {
+      //           result.hoverActive = active;
+      //
+      //           if (scrollIntoView != null) {
+      //             result.scrollIntoView = scrollIntoView;
+      //           }
+      //         }
+      //
+      //         result.generalHover = active;
+      //       });
 
-          if (scrollIntoView != null) {
-            result.scrollIntoView = scrollIntoView;
-          }
-        }
-
-        result.generalHover = active;
-      });
-
-      // const result = state.demographicNodes[id];
-      // result.hoverActive = active;
-      // if (scrollIntoView != null) {
-      //   result.scrollIntoView = scrollIntoView;
-      // }
+      const result = state.demographicNodes[id];
+      result.hoverActive = active;
+      if (scrollIntoView != null) {
+        result.scrollIntoView = scrollIntoView;
+      }
     },
-    setHoverActive: (state, action: PayloadAction<{ active: boolean }>) => {
-      const { active } = action.payload;
-      // const result = state.demographics.find((item) => item.id === id)!;
-      state.hoverActive = active;
+    setHoverActive: (
+      state,
+      action: PayloadAction<{ id: number; active: boolean }>
+    ) => {
+      const { id, active } = action.payload;
+      // state.hoverActive = active;
+      state.parents[id].hoverActive = active;
     },
     setImageDimensions: (
       state,
@@ -204,6 +221,7 @@ const demographicsSlice = createSlice({
 
 export const {
   addDemographicsParentAndChildren,
+  removeParentAndNodeChildren,
   setImageDimensions,
   setDemoItemHoverActive,
   setHoverActive,
