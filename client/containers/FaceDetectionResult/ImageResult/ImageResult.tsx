@@ -47,8 +47,8 @@ const ImageResult = ({ id }: TImageResultProps) => {
   const onMainImageLoad = (
     e: React.SyntheticEvent<HTMLImageElement, Event>
   ) => {
-    const img = e.target as HTMLImageElement;
-    const { src, naturalHeight, naturalWidth } = img;
+    // const img = e.target as HTMLImageElement;
+    // const { src, naturalHeight, naturalWidth } = img;
     // creates cropped image url
     console.log("loaded!!");
 

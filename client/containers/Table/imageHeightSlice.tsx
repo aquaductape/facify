@@ -50,8 +50,16 @@ const imageHeightSlice = createSlice({
       const { id, imageHeight } = action.payload;
       state.images[id].imageHeight = imageHeight;
     },
+    removeImageHeight: (state, action: PayloadAction<{ id: number }>) => {
+      const { id } = action.payload;
+      delete state.images[id];
+    },
   },
 });
 
-export const { addImage, setImageHeight } = imageHeightSlice.actions;
+export const {
+  removeImageHeight,
+  addImage,
+  setImageHeight,
+} = imageHeightSlice.actions;
 export default imageHeightSlice.reducer;

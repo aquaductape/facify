@@ -1,6 +1,6 @@
 import React from "react";
 
-const Seperator = ({ id }: { id: number }) => {
+const Seperator = ({ id }: { id: string }) => {
   return (
     <div className="seperator">
       <div className="border-top">
@@ -24,7 +24,7 @@ const Seperator = ({ id }: { id: number }) => {
               0deg,
               var(--blue-3) -8%,
               var(--blue-2) 15%,
-              transparent 48%
+              #fff 48%
             );
           }
 

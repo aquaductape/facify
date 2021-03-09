@@ -8,7 +8,7 @@ import useCreateObserver, {
   TObserverCallback,
 } from "./useCreateObserver";
 
-const HorizontalSentinel = ({ id }: { id: number }) => {
+const HorizontalSentinel = ({ id }: { id: string }) => {
   const sentinelElRef = useRef<HTMLDivElement | null>(null);
   // const shadowElRef = useRef<HTMLDivElement | null>(null)
   const shadowSelector = `[data-id-scroll-shadow="${id}"]`;
@@ -50,12 +50,12 @@ const HorizontalSentinel = ({ id }: { id: number }) => {
   );
 };
 
-const THeadSentinel = ({ id }: { id: number }) => {
+const THeadSentinel = ({ id, _id }: { id: number; _id: string }) => {
   const imageHeight = useSelector(selectImageHeight({ id }));
 
   const sentinelId = "THeadSentinel";
-  const tableSelector = `[data-id-table="${id}"]`;
-  const theadSelector = `.thead-sticky-desktop-${id} .thead-container`;
+  const tableSelector = `[data-id-table="${_id}"]`;
+  const theadSelector = `.thead-sticky-desktop-${_id} .thead-container`;
 
   const tableElRef = useRef<HTMLTableElement | null>(null);
   const theadElRef = useRef<HTMLDivElement | null>(null);
@@ -79,7 +79,11 @@ const THeadSentinel = ({ id }: { id: number }) => {
   const observerCallback: TObserverCallback = (entry) => {
     const theadEl = theadElRef.current;
     let isVisible = false;
-    if (entry.intersectionRatio > 0) {
+
+    const nearBottom =
+      entry.boundingClientRect.top / entry.rootBounds!.height > 0.5;
+    if (entry.intersectionRatio > 0 || nearBottom) {
+      // if (entry.intersectionRatio > 0) {
       isVisible = true;
     }
 
@@ -168,7 +172,7 @@ const THeadSentinel = ({ id }: { id: number }) => {
   }, []);
 
   useCreateObserver({
-    id: id + sentinelId,
+    id: _id + sentinelId,
     hasInit,
     imageHeight,
     imageHeightRef,
@@ -182,7 +186,7 @@ const THeadSentinel = ({ id }: { id: number }) => {
 
   return (
     <div
-      data-observer-id={id + sentinelId}
+      data-observer-id={_id + sentinelId}
       className="sentinel"
       ref={sentinelElRef}
     >
@@ -201,13 +205,13 @@ const THeadSentinel = ({ id }: { id: number }) => {
   );
 };
 
-const BarSentinel = ({ id }: { id: number }) => {
+const BarSentinel = ({ id, _id }: { id: number; _id: string }) => {
   const imageHeight = useSelector(selectImageHeight({ id }));
 
   const sentinelId = "BarSentinel";
-  const tableSelector = `[data-id-table="${id}"]`;
-  const theadStaticSelector = `[data-id-static-thead="${id}"]`;
-  const theadSelector = `.thead-sticky-mobile-${id}`;
+  const tableSelector = `[data-id-table="${_id}"]`;
+  const theadStaticSelector = `[data-id-static-thead="${_id}"]`;
+  const theadSelector = `.thead-sticky-mobile-${_id}`;
   const theadInnerSelector = ".thead-container";
 
   const tableElRef = useRef<HTMLTableElement | null>(null);
@@ -246,7 +250,10 @@ const BarSentinel = ({ id }: { id: number }) => {
   const observerCallback: TObserverCallback = (entry) => {
     const theadInnerEl = theadInnerElRef.current;
     let isVisible = false;
-    if (entry.intersectionRatio > 0) {
+
+    const nearBottom =
+      entry.boundingClientRect.top + 100 > entry.rootBounds!.height;
+    if (entry.intersectionRatio > 0 || nearBottom) {
       isVisible = true;
     }
 
@@ -324,9 +331,10 @@ const BarSentinel = ({ id }: { id: number }) => {
     window.clearTimeout(timeStampGetPositions.current);
 
     timeStampGetPositions.current = window.setTimeout(() => {
+      console.log("RUN!!");
       getPrevScroll();
       getStopPosition();
-    }, 200);
+    }, 1000);
   }, [imageHeight]);
 
   useEffect(() => {
@@ -344,7 +352,7 @@ const BarSentinel = ({ id }: { id: number }) => {
   }, []);
 
   useCreateObserver({
-    id: id + sentinelId,
+    id: _id + sentinelId,
     hasInit,
     imageHeight,
     imageHeightRef,
@@ -358,7 +366,7 @@ const BarSentinel = ({ id }: { id: number }) => {
 
   return (
     <div
-      data-observer-id={id + sentinelId}
+      data-observer-id={_id + sentinelId}
       className="sentinel"
       ref={sentinelElRef}
     >
@@ -377,7 +385,7 @@ const BarSentinel = ({ id }: { id: number }) => {
   );
 };
 
-const InfoResultSentinel = ({ id }: { id: number }) => {
+const InfoResultSentinel = ({ id, _id }: { id: number; _id: string }) => {
   const sentinelId = `infoResultSentinel`;
 
   const imageHeight = useSelector(selectImageHeight({ id }));
@@ -394,8 +402,10 @@ const InfoResultSentinel = ({ id }: { id: number }) => {
     const theadInnerEl = theadInnerElRef.current!;
     let isVisible = false;
 
-    console.log("fire");
-    if (entry.intersectionRatio > 0) {
+    const nearBottom =
+      entry.boundingClientRect.top + 100 > entry.rootBounds!.height;
+    if (entry.intersectionRatio > 0 || nearBottom) {
+      // if (entry.intersectionRatio > 0) {
       isVisible = true;
     }
 
@@ -441,7 +451,7 @@ const InfoResultSentinel = ({ id }: { id: number }) => {
   }, []);
 
   useCreateObserver({
-    id: id + sentinelId,
+    id: _id + sentinelId,
     desktop: true,
     hasInit,
     imageHeight,
@@ -455,7 +465,7 @@ const InfoResultSentinel = ({ id }: { id: number }) => {
 
   return (
     <div
-      data-observer-id={id + sentinelId}
+      data-observer-id={_id + sentinelId}
       className="sentinel"
       ref={sentinelElRef}
     >
@@ -463,7 +473,7 @@ const InfoResultSentinel = ({ id }: { id: number }) => {
         {`
           .sentinel {
             position: absolute;
-            top: 0px;
+            top: -45px;
             left: 0;
             width: 100%;
             height: 0px;

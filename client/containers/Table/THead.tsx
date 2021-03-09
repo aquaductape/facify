@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import getScrollbarWidth from "../../utils/getScrollWidth";
 
 type THeadProps = {
-  id: number;
+  id: string;
   mobile?: boolean;
 };
 const THead = ({ id, mobile }: THeadProps) => {

@@ -1,67 +1,16 @@
-import React, { useEffect, useRef, useState } from "react";
-import { batch, useDispatch, useSelector } from "react-redux";
-import CloseBtn from "../../../components/Logo/svg/CloseBtn";
+import React from "react";
+import { useSelector } from "react-redux";
 import Stats from "../../Stats/Stats";
 import { BarSentinel } from "../../Table/Sentinel";
-import {
-  removeParentAndNodeChildren,
-  selectName,
-} from "../ImageResult/demographicsSlice";
+import { selectName } from "../ImageResult/demographicsSlice";
+import CloseBtn from "./CloseBtn";
 
-export const useBtnRemoveHover = ({
-  id,
-  idx,
-}: {
-  id: number;
-  idx: number;
-}): {
-  onMouseLeave: () => void;
-  onMouseEnter: () => void;
-  onFocus: () => void;
-  onBlur: () => void;
-} => {
-  const btnShadowElRef = useRef<HTMLElement | null>(null);
-
-  const onChangeColor = (active: boolean) => {
-    if (idx === 0) return;
-
-    const el = btnShadowElRef.current!;
-    el.style.color = active ? "#d5daea" : "";
-  };
-  const onMouseEnter = () => onChangeColor(true);
-  const onMouseLeave = () => onChangeColor(false);
-  const onFocus = () => onChangeColor(true);
-  const onBlur = () => onChangeColor(false);
-
-  useEffect(() => {
-    if (idx === 0) return;
-
-    btnShadowElRef.current = document.querySelector(
-      `[data-id-close-btn-shadow="${id}"]`
-    );
-  }, []);
-
-  return { onMouseLeave, onMouseEnter, onFocus, onBlur };
-};
-
-const Bar = ({ id, idx }: { id: number; idx: number }) => {
-  const dispatch = useDispatch();
+const Bar = ({ id, _id, idx }: { id: number; _id: string; idx: number }) => {
   const imageName = useSelector(selectName({ id }));
-
-  const onClick = () => {
-    batch(() => {
-      dispatch(removeParentAndNodeChildren({ id }));
-    });
-  };
-
-  const { onBlur, onFocus, onMouseEnter, onMouseLeave } = useBtnRemoveHover({
-    id,
-    idx,
-  });
 
   return (
     <div className="bar">
-      <BarSentinel id={id}></BarSentinel>
+      <BarSentinel id={id} _id={_id}></BarSentinel>
       <div className="title">
         <div className="title-number">{idx + 1}</div>
         <div className="title-name">{imageName}</div>
@@ -69,16 +18,7 @@ const Bar = ({ id, idx }: { id: number; idx: number }) => {
       <div className="stats">
         <Stats id={id}></Stats>
       </div>
-      <button
-        className="btn-remove"
-        onMouseEnter={onMouseEnter}
-        onMouseLeave={onMouseLeave}
-        onFocus={onFocus}
-        onBlur={onBlur}
-        onClick={onClick}
-      >
-        <CloseBtn></CloseBtn>
-      </button>
+      <CloseBtn id={id} _id={_id} idx={idx}></CloseBtn>
       <style jsx>
         {`
           .bar {
@@ -115,24 +55,6 @@ const Bar = ({ id, idx }: { id: number; idx: number }) => {
             left: 50%;
             height: 100%;
             display: none;
-          }
-
-          .btn-remove {
-            height: 45px;
-            width: 45px;
-            background: #efefef;
-            border: 3px solid #efefef;
-            transition: border-color 250ms;
-          }
-
-          .btn-remove:hover,
-          .btn-remove:focus {
-            border-color: #b0b7cf;
-          }
-
-          .btn-remove:focus {
-            outline: 3px solid #000;
-            outline-offset: 2px;
           }
 
           @media (min-width: 1300px) {

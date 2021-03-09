@@ -9,10 +9,11 @@ import {
 } from "react";
 import { batch, useDispatch } from "react-redux";
 import {
+  demographicResult3,
   demographicsResult,
   demographResult2,
 } from "../../dummyData/demographicsResult";
-import { imageUri, imgUri2 } from "../../dummyData/imageUri";
+import { imageUri, imageUri3, imgUri2 } from "../../dummyData/imageUri";
 import { TDemographicsResponse } from "../../ts";
 import { convertFileToBase64 } from "../../utils/convertFileToBase64";
 import dataURLtoFile from "../../utils/dataURLtoFile";
@@ -48,7 +49,7 @@ const UploadImageForm = () => {
 
       const items = [
         {
-          id: nanoid(),
+          _id: nanoid(),
           imageUri: imageUri,
           data: demographicsResult,
           name: "GettyImages-1147443912",
@@ -59,11 +60,23 @@ const UploadImageForm = () => {
         //   data: demographicsResult,
         // },
         {
-          id: nanoid(),
+          _id: nanoid(),
+          imageUri: imageUri3,
+          data: demographicResult3,
+          name: "2021768",
+        },
+        {
+          _id: nanoid(),
           imageUri: imgUri2,
           data: demographResult2,
           name: "da-feasters",
         },
+        // {
+        //   id: nanoid(),
+        //   imageUri: imageUri,
+        //   data: demographicsResult,
+        //   name: "GettyImages-1147443912",
+        // },
         // {
         //   id: nanoid(),
         //   imageUri: imgUri2,
@@ -72,7 +85,7 @@ const UploadImageForm = () => {
         // },
       ];
 
-      items.forEach(async ({ id, data, imageUri, name }) => {
+      items.forEach(async ({ _id, data, imageUri, name }) => {
         const objectUrl = window.URL.createObjectURL(dataURLtoFile(imageUri));
         const img = new Image();
         img.src = objectUrl;
@@ -102,6 +115,7 @@ const UploadImageForm = () => {
           dispatch(
             addDemographicsParentAndChildren({
               parent: {
+                _id,
                 name,
                 hoverActive: false,
                 imageUrl: {
@@ -127,6 +141,8 @@ const UploadImageForm = () => {
         // throw notification error: "cannot upload more than 10 images"
         return;
       }
+      // console.log(files[0].size);
+      // return;
       const file = files![0] as File;
       // dispatch(setImageStatus("LOADING"));
       const base64 = await convertFileToBase64(file);
@@ -141,17 +157,32 @@ const UploadImageForm = () => {
           imageBase64: base64,
         }),
       });
-      const result = (await res.json()) as TDemographicsResponse;
-      return;
 
-      // batch(() => {
-      //   // setUr
-      //   dispatch(setUri(base64));
-      //   dispatch(setImageStatus("DONE"));
-      //   dispatch(setDemographics(result.data));
-      //   dispatch(setDemographicsDisplay(result.data));
-      //   // dispatch()
-      // });
+      const result = (await res.json()) as TDemographicsResponse;
+      // return;
+
+      batch(() => {
+        // setUr
+        // dispatch(setUri(base64));
+        // dispatch(setImageStatus("DONE"));
+        dispatch(addImage({ input: { imageHeight: null } }));
+        dispatch(
+          addDemographicsParentAndChildren({
+            parent: {
+              _id,
+              name,
+              hoverActive: false,
+              imageUrl: {
+                naturalWidth: img.naturalWidth,
+                naturalHeight: img.naturalHeight,
+                uri: imageUri,
+              },
+            },
+            data: result,
+          })
+        );
+        // dispatch()
+      });
       console.log(result);
     } catch (err) {
       // batch(() => {

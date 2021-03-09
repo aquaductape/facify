@@ -14,6 +14,7 @@ const Main = () => {
 
   return (
     <>
+      <div className="main-bg"></div>
       <div className="hidden-cover">
         <div className="hide-shadow"></div>
       </div>
@@ -56,10 +57,6 @@ const Main = () => {
           }
 
           @media (min-width: 1300px) {
-            main {
-              box-shadow: 0px 10px 0 #00000054;
-            }
-
             .hide-shadow {
               display: block;
             }

@@ -2,21 +2,37 @@ import Table from "../../Table/Table";
 import { appHeightDesktop } from "../../../constants";
 import THead from "../../Table/THead";
 import { InfoResultSentinel } from "../../Table/Sentinel";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
+import { useMatchMedia } from "../../../hooks/matchMedia";
 
-type TInforResultProps = { id: number };
-const InfoResult = ({ id }: TInforResultProps) => {
+type TInforResultProps = { id: number; _id: string };
+const InfoResult = ({ id, _id }: TInforResultProps) => {
   const containerElRef = useRef<HTMLDivElement | null>(null);
+  const infoDemoElRef = useRef<HTMLDivElement | null>(null);
+  const mql = useMatchMedia();
 
-  // useEffect(() => {}, []);
+  useEffect(() => {
+    if (!mql.current!.matches) return;
+
+    setTimeout(() => {
+      const infoDemoEl = infoDemoElRef.current!;
+      const thead = containerElRef.current!.querySelector(
+        `.thead-sticky-desktop-${_id}`
+      ) as HTMLDivElement;
+
+      if (infoDemoEl.clientHeight === infoDemoEl.scrollHeight) {
+        thead.style.width = "100%";
+      }
+    }, 200);
+  }, []);
 
   return (
-    <div data-id-info-result={id} className="container" ref={containerElRef}>
-      <InfoResultSentinel id={id}></InfoResultSentinel>
-      <THead id={id} mobile={false}></THead>
-      <div className="info-demo">
+    <div data-id-info-result={_id} className="container" ref={containerElRef}>
+      <InfoResultSentinel id={id} _id={_id}></InfoResultSentinel>
+      <THead id={_id} mobile={false}></THead>
+      <div className="info-demo" ref={infoDemoElRef}>
         {/* <Stats id={id} /> */}
-        <Table id={id}></Table>
+        <Table id={id} _id={_id}></Table>
       </div>
 
       <style jsx>

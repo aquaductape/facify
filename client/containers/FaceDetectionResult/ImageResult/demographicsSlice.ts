@@ -20,6 +20,7 @@ type TImageUrl = {
 
 type TParent = {
   id: number;
+  _id: string;
   imageUrl: TImageUrl;
   name: string;
   hoverActive: boolean;
@@ -76,6 +77,13 @@ export const selectHoverActive = ({ id }: { id: number }) => {
   return createSelector(
     (state: RootState) => state.demographics.parents,
     (result) => result[id].hoverActive
+  );
+};
+
+export const selectParents = () => {
+  return createSelector(
+    (state: RootState) => state.demographics.parents,
+    (result) => result
   );
 };
 
@@ -148,10 +156,12 @@ const demographicsSlice = createSlice({
     ) => {
       const { id } = action.payload;
       const { childIds } = state.parents[id];
-      const startId = childIds[0];
 
-      state.demographicNodes.splice(startId, childIds.length);
-      state.parents.splice(id, 1);
+      delete state.parents[id];
+
+      childIds.forEach((id) => {
+        delete state.demographicNodes[id];
+      });
     },
     setDemoItemHoverActive: (
       state,

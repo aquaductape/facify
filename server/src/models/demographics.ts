@@ -100,7 +100,7 @@ const filterDemographics = (response: any) => {
 
 const filterConcepts = (concept: TConcept, idx: number, self: TConcept[]) => {
   if (idx === 0) return true;
-  return concept.value >= 0.1 && idx <= 3;
+  return concept.value >= 0.05 && idx <= 3;
 };
 
 const manageRegions = (regions: any) => {
