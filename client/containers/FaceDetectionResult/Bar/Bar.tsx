@@ -5,20 +5,20 @@ import { BarSentinel } from "../../Table/Sentinel";
 import { selectName } from "../ImageResult/demographicsSlice";
 import CloseBtn from "./CloseBtn";
 
-const Bar = ({ id, _id, idx }: { id: number; _id: string; idx: number }) => {
+const Bar = ({ id, idx }: { id: number; idx: number }) => {
   const imageName = useSelector(selectName({ id }));
 
   return (
     <div className="bar">
-      <BarSentinel id={id} _id={_id}></BarSentinel>
+      <BarSentinel id={id}></BarSentinel>
       <div className="title">
-        <div className="title-number">{idx + 1}</div>
+        <div className="title-number"></div>
         <div className="title-name">{imageName}</div>
       </div>
       <div className="stats">
         <Stats id={id}></Stats>
       </div>
-      <CloseBtn id={id} _id={_id} idx={idx}></CloseBtn>
+      <CloseBtn id={id} idx={idx}></CloseBtn>
       <style jsx>
         {`
           .bar {
@@ -27,23 +27,36 @@ const Bar = ({ id, _id, idx }: { id: number; _id: string; idx: number }) => {
             justify-content: space-between;
             align-items: center;
             height: 45px;
+            background: #fff;
           }
 
           .title {
             display: flex;
             align-items: center;
+            width: 80%;
           }
 
           .title-number {
+            position: relative;
+            counter-increment: demographic-counter;
             color: #888;
             font-size: 28px;
             margin: 0 15px;
             font-weight: bold;
           }
 
+          .title-number::before {
+            content: counter(demographic-counter);
+            top: 0;
+            left: 0;
+            color: #888;
+            font-size: 28px;
+            font-weight: bold;
+          }
+
           .title-name {
             font-size: 18px;
-            max-width: 225px;
+            width: 100%;
             text-overflow: ellipsis;
             white-space: nowrap;
             overflow: hidden;
@@ -58,6 +71,10 @@ const Bar = ({ id, _id, idx }: { id: number; _id: string; idx: number }) => {
           }
 
           @media (min-width: 1300px) {
+            .title {
+              width: auto;
+            }
+
             .title-number {
               font-size: 30px;
               margin: 0 20px;

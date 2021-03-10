@@ -5,8 +5,8 @@ import { InfoResultSentinel } from "../../Table/Sentinel";
 import { useEffect, useRef } from "react";
 import { useMatchMedia } from "../../../hooks/matchMedia";
 
-type TInforResultProps = { id: number; _id: string };
-const InfoResult = ({ id, _id }: TInforResultProps) => {
+type TInforResultProps = { id: number };
+const InfoResult = ({ id }: TInforResultProps) => {
   const containerElRef = useRef<HTMLDivElement | null>(null);
   const infoDemoElRef = useRef<HTMLDivElement | null>(null);
   const mql = useMatchMedia();
@@ -17,7 +17,7 @@ const InfoResult = ({ id, _id }: TInforResultProps) => {
     setTimeout(() => {
       const infoDemoEl = infoDemoElRef.current!;
       const thead = containerElRef.current!.querySelector(
-        `.thead-sticky-desktop-${_id}`
+        `.thead-sticky-desktop-${id}`
       ) as HTMLDivElement;
 
       if (infoDemoEl.clientHeight === infoDemoEl.scrollHeight) {
@@ -27,12 +27,12 @@ const InfoResult = ({ id, _id }: TInforResultProps) => {
   }, []);
 
   return (
-    <div data-id-info-result={_id} className="container" ref={containerElRef}>
-      <InfoResultSentinel id={id} _id={_id}></InfoResultSentinel>
-      <THead id={_id} mobile={false}></THead>
+    <div data-id-info-result={id} className="container" ref={containerElRef}>
+      <InfoResultSentinel id={id}></InfoResultSentinel>
+      <THead id={id} mobile={false}></THead>
       <div className="info-demo" ref={infoDemoElRef}>
         {/* <Stats id={id} /> */}
-        <Table id={id} _id={_id}></Table>
+        <Table id={id}></Table>
       </div>
 
       <style jsx>

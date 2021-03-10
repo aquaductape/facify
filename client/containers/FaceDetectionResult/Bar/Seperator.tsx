@@ -1,8 +1,10 @@
 import React from "react";
 
-const Seperator = ({ id }: { id: string }) => {
+const Seperator = ({ id }: { id: number }) => {
   return (
     <div className="seperator">
+      <div className="gradient light"></div>
+      <div className="gradient dark"></div>
       <div className="border-top">
         <div className="triangle-bottom-right"></div>
         <div className="rectangle"></div>
@@ -16,16 +18,43 @@ const Seperator = ({ id }: { id: string }) => {
       <style jsx>
         {`
           .seperator {
+            position: relative;
             display: flex;
             justify-content: center;
             align-items: flex-end;
             height: 80px;
+          }
+
+          .gradient {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transition: opacity 800ms;
+          }
+
+          .dark {
+            opacity: 0;
+            background: linear-gradient(0deg, #00000066, transparent 100%);
+          }
+
+          .light {
+            opacity: 1;
             background: linear-gradient(
               0deg,
               var(--blue-3) -8%,
               var(--blue-2) 15%,
-              #fff 48%
+              transparent 48%
             );
+          }
+          .dark.active {
+            opacity: 1;
+            transition: opacity 250ms;
+          }
+          .light.active {
+            opacity: 0;
+            transition: opacity 250ms;
           }
 
           .border-top {

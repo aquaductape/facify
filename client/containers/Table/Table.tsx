@@ -87,22 +87,22 @@ const Row = ({ id, parentId, idx }: TRowProps) => {
   );
 };
 
-const Table = ({ id, _id }: { id: number; _id: string }) => {
+const Table = ({ id }: { id: number }) => {
   const demographicParent = useSelector(
     selectDemographicParentChildIds({ id })
   );
   const thead = ["Face", "Age", "Gender", "Multicultural"];
 
   return (
-    <div data-id-table={_id} className="table-container">
-      <ScrollShadow id={_id}></ScrollShadow>
+    <div data-id-table={id} className="table-container">
+      <ScrollShadow id={id}></ScrollShadow>
       <div className="table-scroll-container">
-        <THead id={_id} mobile={true}></THead>
+        <THead id={id} mobile={true}></THead>
         <div className="table-container-inner">
-          <HorizontalSentinel id={_id}></HorizontalSentinel>
-          <THeadSentinel id={id} _id={_id}></THeadSentinel>
+          <HorizontalSentinel id={id}></HorizontalSentinel>
+          <THeadSentinel id={id}></THeadSentinel>
           <table>
-            <thead data-id-static-thead={_id} className="thead">
+            <thead data-id-static-thead={id} className="thead">
               <tr>
                 {thead.map((item, idx) => {
                   return (
@@ -140,6 +140,7 @@ const Table = ({ id, _id }: { id: number; _id: string }) => {
           }
 
           table {
+            background: #fff;
             position: relative;
             width: 100%;
             table-layout: fixed;

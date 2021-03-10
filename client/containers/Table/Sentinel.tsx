@@ -8,7 +8,7 @@ import useCreateObserver, {
   TObserverCallback,
 } from "./useCreateObserver";
 
-const HorizontalSentinel = ({ id }: { id: string }) => {
+const HorizontalSentinel = ({ id }: { id: number }) => {
   const sentinelElRef = useRef<HTMLDivElement | null>(null);
   // const shadowElRef = useRef<HTMLDivElement | null>(null)
   const shadowSelector = `[data-id-scroll-shadow="${id}"]`;
@@ -50,12 +50,12 @@ const HorizontalSentinel = ({ id }: { id: string }) => {
   );
 };
 
-const THeadSentinel = ({ id, _id }: { id: number; _id: string }) => {
+const THeadSentinel = ({ id }: { id: number }) => {
   const imageHeight = useSelector(selectImageHeight({ id }));
 
   const sentinelId = "THeadSentinel";
-  const tableSelector = `[data-id-table="${_id}"]`;
-  const theadSelector = `.thead-sticky-desktop-${_id} .thead-container`;
+  const tableSelector = `[data-id-table="${id}"]`;
+  const theadSelector = `.thead-sticky-desktop-${id} .thead-container`;
 
   const tableElRef = useRef<HTMLTableElement | null>(null);
   const theadElRef = useRef<HTMLDivElement | null>(null);
@@ -172,7 +172,7 @@ const THeadSentinel = ({ id, _id }: { id: number; _id: string }) => {
   }, []);
 
   useCreateObserver({
-    id: _id + sentinelId,
+    id: id + sentinelId,
     hasInit,
     imageHeight,
     imageHeightRef,
@@ -186,7 +186,7 @@ const THeadSentinel = ({ id, _id }: { id: number; _id: string }) => {
 
   return (
     <div
-      data-observer-id={_id + sentinelId}
+      data-observer-id={id + sentinelId}
       className="sentinel"
       ref={sentinelElRef}
     >
@@ -205,13 +205,13 @@ const THeadSentinel = ({ id, _id }: { id: number; _id: string }) => {
   );
 };
 
-const BarSentinel = ({ id, _id }: { id: number; _id: string }) => {
+const BarSentinel = ({ id }: { id: number }) => {
   const imageHeight = useSelector(selectImageHeight({ id }));
 
   const sentinelId = "BarSentinel";
-  const tableSelector = `[data-id-table="${_id}"]`;
-  const theadStaticSelector = `[data-id-static-thead="${_id}"]`;
-  const theadSelector = `.thead-sticky-mobile-${_id}`;
+  const tableSelector = `[data-id-table="${id}"]`;
+  const theadStaticSelector = `[data-id-static-thead="${id}"]`;
+  const theadSelector = `.thead-sticky-mobile-${id}`;
   const theadInnerSelector = ".thead-container";
 
   const tableElRef = useRef<HTMLTableElement | null>(null);
@@ -352,7 +352,7 @@ const BarSentinel = ({ id, _id }: { id: number; _id: string }) => {
   }, []);
 
   useCreateObserver({
-    id: _id + sentinelId,
+    id: id + sentinelId,
     hasInit,
     imageHeight,
     imageHeightRef,
@@ -366,7 +366,7 @@ const BarSentinel = ({ id, _id }: { id: number; _id: string }) => {
 
   return (
     <div
-      data-observer-id={_id + sentinelId}
+      data-observer-id={id + sentinelId}
       className="sentinel"
       ref={sentinelElRef}
     >
@@ -385,7 +385,7 @@ const BarSentinel = ({ id, _id }: { id: number; _id: string }) => {
   );
 };
 
-const InfoResultSentinel = ({ id, _id }: { id: number; _id: string }) => {
+const InfoResultSentinel = ({ id }: { id: number }) => {
   const sentinelId = `infoResultSentinel`;
 
   const imageHeight = useSelector(selectImageHeight({ id }));
@@ -451,7 +451,7 @@ const InfoResultSentinel = ({ id, _id }: { id: number; _id: string }) => {
   }, []);
 
   useCreateObserver({
-    id: _id + sentinelId,
+    id: id + sentinelId,
     desktop: true,
     hasInit,
     imageHeight,
@@ -465,7 +465,7 @@ const InfoResultSentinel = ({ id, _id }: { id: number; _id: string }) => {
 
   return (
     <div
-      data-observer-id={_id + sentinelId}
+      data-observer-id={id + sentinelId}
       className="sentinel"
       ref={sentinelElRef}
     >

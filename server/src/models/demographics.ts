@@ -53,8 +53,8 @@ const getDemographics = (uri: string) => {
         console.log(response.status);
 
         result.data = filterDemographics(response);
-        fs.writeFileSync("./data.json", JSON.stringify(result));
-        fs.writeFileSync("./imageUri.txt", uri);
+        // fs.writeFileSync("./data.json", JSON.stringify(result));
+        // fs.writeFileSync("./imageUri.txt", uri);
         resolve(result);
       }
     );
@@ -100,7 +100,7 @@ const filterDemographics = (response: any) => {
 
 const filterConcepts = (concept: TConcept, idx: number, self: TConcept[]) => {
   if (idx === 0) return true;
-  return concept.value >= 0.05 && idx <= 3;
+  return concept.value >= 0.03 && idx <= 3;
 };
 
 const manageRegions = (regions: any) => {

@@ -20,7 +20,6 @@ type TImageUrl = {
 
 type TParent = {
   id: number;
-  _id: string;
   imageUrl: TImageUrl;
   name: string;
   hoverActive: boolean;

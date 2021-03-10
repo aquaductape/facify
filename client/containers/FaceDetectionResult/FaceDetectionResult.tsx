@@ -7,22 +7,26 @@ import Seperator from "./Bar/Seperator";
 import Bar from "./Bar/Bar";
 
 type TResultProps = {
-  _id: string;
   id: number;
   idx: number;
 };
-const Result = React.memo(({ id, _id, idx }: TResultProps) => {
+const Result = React.memo(({ id, idx }: TResultProps) => {
   return (
-    <div className="container">
-      {idx ? <Seperator id={_id}></Seperator> : null}
-      <Bar id={id} _id={_id} idx={idx}></Bar>
+    <div id={`demographic-node-${id}`} className="container">
+      <div className="bar-container">
+        {idx ? <Seperator id={id}></Seperator> : null}
+        <Bar id={id} idx={idx}></Bar>
+      </div>
+
       <div className="image-panel">
         <ImageResult id={id} />
-        <InfoResult id={id} _id={_id} />
+        <InfoResult id={id} />
       </div>
+
       <style jsx>
         {`
           .container {
+            background: #fff;
           }
 
           @media (min-width: 1300px) {
@@ -55,8 +59,8 @@ const FaceDetectionResult = () => {
   // return null;
   return (
     <>
-      {images.map(({ id, _id }, idx) => (
-        <Result id={id} _id={_id} idx={idx} key={id}></Result>
+      {images.map(({ id }, idx) => (
+        <Result id={id} idx={idx} key={id}></Result>
       ))}
     </>
   );

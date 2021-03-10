@@ -1,4 +1,4 @@
-const ScrollShadow = ({ id }: { id: string }) => {
+const ScrollShadow = ({ id }: { id: number }) => {
   return (
     <div data-id-scroll-shadow={id} className="scroll-shadow">
       <div className="scroll-inner-shadow"></div>

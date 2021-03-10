@@ -9,10 +9,9 @@ body {
   //   no-repeat center top fixed;
   // background-size: 100% auto;
   background: #344cb9;
-  height: 3000px;
 }
 
-.main-bg {
+.app-bg {
   position: fixed;
   top: 0;
   left: 0;
@@ -35,21 +34,8 @@ body {
   margin: auto;
 }
 
-main {
-  background: #ffffff;
-}
-
 .multifile-upload-group--browser-view .label-input-file {
   height: 38px;
-}
-
-#logo {
-  color: white;
-  font-weight: bold;
-  font-size: 2rem;
-  margin: 50px 0;
-  text-align: center;
-  user-select: none;
 }
 
 .error-message {

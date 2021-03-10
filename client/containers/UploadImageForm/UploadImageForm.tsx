@@ -115,13 +115,12 @@ const UploadImageForm = () => {
           dispatch(
             addDemographicsParentAndChildren({
               parent: {
-                _id,
                 name,
                 hoverActive: false,
                 imageUrl: {
                   naturalWidth: img.naturalWidth,
                   naturalHeight: img.naturalHeight,
-                  uri: imageUri,
+                  uri: objectUrl,
                 },
               },
               data: result,
@@ -159,6 +158,24 @@ const UploadImageForm = () => {
       });
 
       const result = (await res.json()) as TDemographicsResponse;
+      const objectUrl = window.URL.createObjectURL(file);
+      const img = new Image();
+      img.src = objectUrl;
+
+      await new Promise((resolve) =>
+        setTimeout(
+          () =>
+            (img.onload = () => {
+              resolve(true);
+            })
+        )
+      );
+      const data = (result.data as unknown) as TDemographicNode[];
+      data.forEach((item) => {
+        item.hoverActive = false;
+        item.scrollIntoView = false;
+        item.generalHover = false;
+      });
       // return;
 
       batch(() => {
@@ -169,16 +186,15 @@ const UploadImageForm = () => {
         dispatch(
           addDemographicsParentAndChildren({
             parent: {
-              _id,
-              name,
+              name: file.name,
               hoverActive: false,
               imageUrl: {
                 naturalWidth: img.naturalWidth,
                 naturalHeight: img.naturalHeight,
-                uri: imageUri,
+                uri: objectUrl,
               },
             },
-            data: result,
+            data,
           })
         );
         // dispatch()

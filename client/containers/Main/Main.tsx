@@ -14,20 +14,39 @@ const Main = () => {
 
   return (
     <>
-      <div className="main-bg"></div>
+      <div className="app-bg"></div>
       <div className="hidden-cover">
         <div className="hide-shadow"></div>
       </div>
       <LogoText></LogoText>
       <UploadImageForm></UploadImageForm>
-      <main>
-        <Landing></Landing>
-        <FaceDetectionResult></FaceDetectionResult>
+      <main id="main">
+        <div className="main-bg"></div>
+        <div className="main-inner">
+          <Landing></Landing>
+          <FaceDetectionResult></FaceDetectionResult>
+        </div>
       </main>
       <style jsx>
         {`
           main {
+            position: relative;
             margin-bottom: 50px;
+            counter-reset: demographic-counter;
+          }
+
+          .main-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #fff;
+          }
+
+          .main-inner {
+            position: relative;
+            z-index: 1;
           }
 
           .hidden-cover {
