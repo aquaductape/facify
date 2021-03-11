@@ -31,7 +31,6 @@ const Main = () => {
         {`
           main {
             position: relative;
-            margin-bottom: 50px;
             counter-reset: demographic-counter;
           }
 

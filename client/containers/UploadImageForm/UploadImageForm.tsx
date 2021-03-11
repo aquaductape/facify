@@ -43,83 +43,83 @@ const UploadImageForm = () => {
     },
   });
 
-  useEffect(() => {
-    const run = async () => {
-      // const id = nanoid();
-
-      const items = [
-        {
-          _id: nanoid(),
-          imageUri: imgUri2,
-          data: JSON_Stringify_Parse(demographResult2),
-          name: "da-feasters",
-        },
-        {
-          _id: nanoid(),
-          imageUri: imageUri,
-          data: demographicsResult,
-          name: "GettyImages-1147443912",
-        },
-        {
-          _id: nanoid(),
-          imageUri: imageUri3,
-          data: demographicResult3,
-          name: "2021768",
-        },
-        {
-          _id: nanoid(),
-          imageUri: imgUri2,
-          data: JSON_Stringify_Parse(demographResult2),
-          name: "da-feasters",
-        },
-      ];
-
-      for (const { _id, data, imageUri, name } of items) {
-        const objectUrl = window.URL.createObjectURL(dataURLtoFile(imageUri));
-        const img = new Image();
-        img.src = objectUrl;
-
-        await new Promise((resolve) =>
-          setTimeout(
-            () =>
-              (img.onload = () => {
-                resolve(true);
-              })
-          )
-        );
-        const result = (data.data as unknown) as TDemographicNode[];
-        result.forEach((item) => {
-          item.hoverActive = false;
-          item.scrollIntoView = false;
-          item.generalHover = false;
-        });
-        const base64 = imageUri;
-        console.log("fire");
-
-        batch(() => {
-          // dispatch(setUri(objectUrl));
-          dispatch(setImageLoaded(true));
-          dispatch(setImageStatus("DONE"));
-          dispatch(addImage({ input: { imageHeight: null } }));
-          dispatch(
-            addDemographicsParentAndChildren({
-              parent: {
-                name,
-                hoverActive: false,
-                imageUrl: {
-                  naturalWidth: img.naturalWidth,
-                  naturalHeight: img.naturalHeight,
-                  uri: objectUrl,
-                },
-              },
-              data: result,
-            })
-          );
-        });
-      }
-    };
-    run();
-  }, []);
+  //   useEffect(() => {
+  //     const run = async () => {
+  //       // const id = nanoid();
+  //
+  //       const items = [
+  //         {
+  //           _id: nanoid(),
+  //           imageUri: imgUri2,
+  //           data: JSON_Stringify_Parse(demographResult2),
+  //           name: "da-feasters",
+  //         },
+  //         {
+  //           _id: nanoid(),
+  //           imageUri: imageUri,
+  //           data: demographicsResult,
+  //           name: "GettyImages-1147443912",
+  //         },
+  //         {
+  //           _id: nanoid(),
+  //           imageUri: imageUri3,
+  //           data: demographicResult3,
+  //           name: "2021768",
+  //         },
+  //         {
+  //           _id: nanoid(),
+  //           imageUri: imgUri2,
+  //           data: JSON_Stringify_Parse(demographResult2),
+  //           name: "da-feasters",
+  //         },
+  //       ];
+  //
+  //       for (const { _id, data, imageUri, name } of items) {
+  //         const objectUrl = window.URL.createObjectURL(dataURLtoFile(imageUri));
+  //         const img = new Image();
+  //         img.src = objectUrl;
+  //
+  //         await new Promise((resolve) =>
+  //           setTimeout(
+  //             () =>
+  //               (img.onload = () => {
+  //                 resolve(true);
+  //               })
+  //           )
+  //         );
+  //         const result = (data.data as unknown) as TDemographicNode[];
+  //         result.forEach((item) => {
+  //           item.hoverActive = false;
+  //           item.scrollIntoView = false;
+  //           item.generalHover = false;
+  //         });
+  //         const base64 = imageUri;
+  //         console.log("fire");
+  //
+  //         batch(() => {
+  //           // dispatch(setUri(objectUrl));
+  //           dispatch(setImageLoaded(true));
+  //           dispatch(setImageStatus("DONE"));
+  //           dispatch(addImage({ input: { imageHeight: null } }));
+  //           dispatch(
+  //             addDemographicsParentAndChildren({
+  //               parent: {
+  //                 name,
+  //                 hoverActive: false,
+  //                 imageUrl: {
+  //                   naturalWidth: img.naturalWidth,
+  //                   naturalHeight: img.naturalHeight,
+  //                   uri: objectUrl,
+  //                 },
+  //               },
+  //               data: result,
+  //             })
+  //           );
+  //         });
+  //       }
+  //     };
+  //     run();
+  //   }, []);
 
   const onImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     try {

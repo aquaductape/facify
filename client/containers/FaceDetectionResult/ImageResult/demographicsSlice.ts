@@ -52,7 +52,6 @@ export const selectDemographicsConcepts = ({ id }: { id: number }) => {
   return createSelector(
     (state: RootState) => state.demographics.demographicNodes,
     (result) => {
-      console.log("getConcepts");
       return result[id].concepts;
     }
   );
@@ -188,20 +187,6 @@ const demographicsSlice = createSlice({
         active,
         scrollIntoView,
       } = action.payload;
-
-      //       const parent = state.parents[parentId];
-      //       parent.childIds.forEach((childId) => {
-      //         const result = state.demographicNodes[childId];
-      //         if (childId === id) {
-      //           result.hoverActive = active;
-      //
-      //           if (scrollIntoView != null) {
-      //             result.scrollIntoView = scrollIntoView;
-      //           }
-      //         }
-      //
-      //         result.generalHover = active;
-      //       });
 
       const result = state.demographicNodes[id];
       result.hoverActive = active;
