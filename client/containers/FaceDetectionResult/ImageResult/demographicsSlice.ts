@@ -48,6 +48,15 @@ export const selectDemographicsDisplay = ({ id }: { id: number }) => {
     }
   );
 };
+export const selectDemographicsConcepts = ({ id }: { id: number }) => {
+  return createSelector(
+    (state: RootState) => state.demographics.demographicNodes,
+    (result) => {
+      console.log("getConcepts");
+      return result[id].concepts;
+    }
+  );
+};
 
 export const selectDemographicParentChildIds = ({ id }: { id: number }) => {
   return createSelector(

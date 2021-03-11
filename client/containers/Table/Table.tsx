@@ -1,4 +1,4 @@
-import { useSelector } from "react-redux";
+import { useSelector, shallowEqual } from "react-redux";
 import BoundingCroppedImage from "../FaceDetectionResult/BoundingCroppedImage/BoundingCroppedImage";
 import { RootState } from "../../store/rootReducer";
 import ScrollShadow from "./ScrollShadow";
@@ -7,6 +7,7 @@ import { parseConceptValue } from "../../utils/parseConcept";
 import THead from "./THead";
 import {
   selectDemographicParentChildIds,
+  selectDemographicsConcepts,
   selectDemographicsDisplay,
 } from "../FaceDetectionResult/ImageResult/demographicsSlice";
 
@@ -16,10 +17,11 @@ type TRowProps = {
   idx: number;
 };
 const Row = ({ id, parentId, idx }: TRowProps) => {
-  const concepts = useSelector((state: RootState) => {
-    const result = state.demographics.demographicNodes[id].concepts;
-    return result;
-  });
+  const concepts = useSelector(selectDemographicsConcepts({ id }));
+  // const foo = useSelector(
+  //   (state: RootState) => state.demographics.demographicNodes,
+  //   shallowEqual
+  // );
 
   const {
     "age-appearence": age,

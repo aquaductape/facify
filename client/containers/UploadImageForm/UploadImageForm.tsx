@@ -50,15 +50,16 @@ const UploadImageForm = () => {
       const items = [
         {
           _id: nanoid(),
+          imageUri: imgUri2,
+          data: JSON_Stringify_Parse(demographResult2),
+          name: "da-feasters",
+        },
+        {
+          _id: nanoid(),
           imageUri: imageUri,
           data: demographicsResult,
           name: "GettyImages-1147443912",
         },
-        // {
-        //   id: nanoid(),
-        //   imageUri: imageUri,
-        //   data: demographicsResult,
-        // },
         {
           _id: nanoid(),
           imageUri: imageUri3,
@@ -68,24 +69,12 @@ const UploadImageForm = () => {
         {
           _id: nanoid(),
           imageUri: imgUri2,
-          data: demographResult2,
+          data: JSON_Stringify_Parse(demographResult2),
           name: "da-feasters",
         },
-        // {
-        //   id: nanoid(),
-        //   imageUri: imageUri,
-        //   data: demographicsResult,
-        //   name: "GettyImages-1147443912",
-        // },
-        // {
-        //   id: nanoid(),
-        //   imageUri: imgUri2,
-        //   data: JSON.parse(JSON.stringify(demographResult2)),
-        //   name: "da-feasters",
-        // },
       ];
 
-      items.forEach(async ({ _id, data, imageUri, name }) => {
+      for (const { _id, data, imageUri, name } of items) {
         const objectUrl = window.URL.createObjectURL(dataURLtoFile(imageUri));
         const img = new Image();
         img.src = objectUrl;
@@ -127,7 +116,7 @@ const UploadImageForm = () => {
             })
           );
         });
-      });
+      }
     };
     run();
   }, []);

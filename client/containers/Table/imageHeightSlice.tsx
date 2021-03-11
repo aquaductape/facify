@@ -5,12 +5,14 @@ type TImageHeightState = {
   images: {
     imageHeight: number | null;
   }[];
+  triggerRefresh: number;
 };
 
 let imageId = 0;
 
 const initialState: TImageHeightState = {
   images: [],
+  triggerRefresh: 0,
 };
 
 export const selectImageHeight = ({ id }: { id: number }) => {
@@ -50,6 +52,9 @@ const imageHeightSlice = createSlice({
       const { id, imageHeight } = action.payload;
       state.images[id].imageHeight = imageHeight;
     },
+    setTriggerRefresh: (state, action: PayloadAction<number>) => {
+      state.triggerRefresh = action.payload;
+    },
     removeImageHeight: (state, action: PayloadAction<{ id: number }>) => {
       const { id } = action.payload;
       delete state.images[id];
@@ -58,6 +63,7 @@ const imageHeightSlice = createSlice({
 });
 
 export const {
+  setTriggerRefresh,
   removeImageHeight,
   addImage,
   setImageHeight,

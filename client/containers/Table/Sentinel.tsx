@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { useMatchMedia } from "../../hooks/matchMedia";
+import { RootState } from "../../store/rootReducer";
 import { hasAttributeValue } from "../../utils/hasAttributeValue";
 import { selectImageHeight } from "./imageHeightSlice";
 import useCreateObserver, {
@@ -52,6 +53,9 @@ const HorizontalSentinel = ({ id }: { id: number }) => {
 
 const THeadSentinel = ({ id }: { id: number }) => {
   const imageHeight = useSelector(selectImageHeight({ id }));
+  const triggerRefresh = useSelector(
+    (state: RootState) => state.imageHeight.triggerRefresh
+  );
 
   const sentinelId = "THeadSentinel";
   const tableSelector = `[data-id-table="${id}"]`;
@@ -164,7 +168,7 @@ const THeadSentinel = ({ id }: { id: number }) => {
       getPrevScroll();
       getStopPosition();
     }, 200);
-  }, [imageHeight]);
+  }, [imageHeight, triggerRefresh]);
 
   useEffect(() => {
     tableElRef.current = document.querySelector(tableSelector);
@@ -207,6 +211,9 @@ const THeadSentinel = ({ id }: { id: number }) => {
 
 const BarSentinel = ({ id }: { id: number }) => {
   const imageHeight = useSelector(selectImageHeight({ id }));
+  const triggerRefresh = useSelector(
+    (state: RootState) => state.imageHeight.triggerRefresh
+  );
 
   const sentinelId = "BarSentinel";
   const tableSelector = `[data-id-table="${id}"]`;
@@ -335,7 +342,7 @@ const BarSentinel = ({ id }: { id: number }) => {
       getPrevScroll();
       getStopPosition();
     }, 1000);
-  }, [imageHeight]);
+  }, [imageHeight, triggerRefresh]);
 
   useEffect(() => {
     tableElRef.current = document.querySelector(tableSelector);

@@ -5,7 +5,10 @@ import {
   selectParents,
 } from "../ImageResult/demographicsSlice";
 import { default as CloseBtnIcon } from "../../../components/Logo/svg/CloseBtn";
-import { removeImageHeight } from "../../Table/imageHeightSlice";
+import {
+  removeImageHeight,
+  setTriggerRefresh,
+} from "../../Table/imageHeightSlice";
 import { reflow } from "../../../utils/reflow";
 
 const useBtnRemoveHover = ({
@@ -167,6 +170,7 @@ const CloseBtn = ({ id, idx }: CloseBtnProps) => {
     batch(() => {
       dispatch(removeParentAndNodeChildren({ id }));
       dispatch(removeImageHeight({ id }));
+      dispatch(setTriggerRefresh(Date.now()));
     });
     // console.log( isFirstItem());
   };
