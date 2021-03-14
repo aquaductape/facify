@@ -1,17 +1,8 @@
 import { useSelector } from "react-redux";
-import FaceDetect from "../../components/Logo/svg/FaceDetect";
 import LandingPageImgExample from "../../components/Logo/svg/LandingPageImgExample";
 import LogoIcon from "../../components/Logo/svg/LogoIcon";
 import { RootState } from "../../store/rootReducer";
 
-// Upload an image and we'll detect not only just faces, but show age, gender and multicultural appearance approximation.
-// Detect not only just faces, but show age, gender and multicultural appearance approximation.
-
-// Upload image by:
-//  drag&drop files (up to 5 at time)
-//  url
-//  webcam
-// Image size over 3.5 MB will be compressed
 const Landing = () => {
   const imageLoaded = useSelector(
     (state: RootState) => state.imageUrl.imageLoaded
@@ -22,50 +13,69 @@ const Landing = () => {
   }
 
   return (
-    <section>
-      <div className="info">
-        <div className="header-title">
-          <div className="header-title--logo" title="Facify">
-            <LogoIcon></LogoIcon>
+    <div className="container">
+      <section>
+        <div className="info">
+          <div className="header-title">
+            <div className="header-title--logo" title="Facify">
+              <LogoIcon></LogoIcon>
+            </div>
+            <h1>
+              Find <span className="header-title-subtext">Faces</span>
+            </h1>
           </div>
-          <h1>
-            Find <span>Faces</span>
-          </h1>
-        </div>
-        {/* <div className="header-image" title="human face vector art">
+          {/* <div className="header-image" title="human face vector art">
         <FaceDetect></FaceDetect>
       </div> */}
-        <p className="info">
-          Detects not only just faces, it approximates age, gender and
-          multicultural appearance.
-        </p>
-        <div className="list">
-          <p>Upload Image by:</p>
-          <ul>
-            <li>Drag & Drop Files (up to 5 at time)</li>
-            <li>Paste URL</li>
-            <li>Capture photo by webcam</li>
-          </ul>
+          <p className="info">
+            Detects not only just faces, it approximates age, gender and
+            multicultural appearance.
+          </p>
+          <div className="list">
+            <p className="list-title">Upload Image by:</p>
+            <ul>
+              <li>Drag & Drop Files (up to 5 at time)</li>
+              <li>Paste URL</li>
+              <li>Capture photo by webcam</li>
+            </ul>
+          </div>
+          <p className="image-size-info desktop">
+            Image size over 3.5 megabytes will be compressed
+          </p>
         </div>
-      </div>
-      <div className="hero">
-        <div className="landing-img">
-          <LandingPageImgExample></LandingPageImgExample>
+        <div className="hero">
+          <div className="landing-img">
+            <LandingPageImgExample></LandingPageImgExample>
+          </div>
+          <p className="image-size-info mobile">
+            Image size over 3.5 megabytes will be compressed
+          </p>
         </div>
-        <p className="image-size-info">
-          Image size over 3.5 megabytes will be compressed
-        </p>
-      </div>
+      </section>
       <style jsx>
         {`
+          .container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: auto;
+            background: #fff;
+          }
+
           section {
             padding: 25px;
+          }
+
+          .header-title-subtext {
+            color: var(--blue-main);
           }
 
           .header-title {
             display: flex;
             align-items: center;
             justify-content: center;
+            margin-bottom: 30px;
           }
 
           .landing-img {
@@ -88,15 +98,25 @@ const Landing = () => {
             text-align: center;
           }
 
+          .image-size-info.desktop {
+            display: none;
+          }
+
+          .image-size-info.mobile {
+            display: block;
+          }
+
           .info {
             line-height: 25px;
           }
+
           .list {
             margin: 30px 0;
           }
 
-          .list p {
+          .list-title {
             margin: 0;
+            margin-bottom: -10px;
           }
 
           li {
@@ -120,8 +140,17 @@ const Landing = () => {
               display: flex;
               align-items: center;
               max-width: 1000px;
-              padding: 50px 20px;
+              padding: 50px;
               margin: 0 auto;
+            }
+
+            .image-size-info.desktop {
+              display: block;
+              text-align: left;
+            }
+
+            .image-size-info.mobile {
+              display: none;
             }
 
             .info {
@@ -148,23 +177,36 @@ const Landing = () => {
             section {
               height: 70vh;
               max-height: 800px;
-              min-height: 470px;
+              min-height: 550px;
             }
 
             .info {
               align-self: center;
             }
-          }
-          @media (min-width: 1400px) {
-            .hero {
-              width: 100%;
-              margin-right: -150px;
+
+            .info {
+              width: 90%;
             }
           }
 
-          @media (min-width: 1900px) {
+          @media (min-width: 1400px) {
             .hero {
-              margin-right: -320px;
+              width: 100%;
+              margin-right: -180px;
+            }
+          }
+
+          @media (min-width: 1900px) and (min-height: 850px) {
+            section {
+              max-width: 1200px;
+            }
+
+            .info {
+              width: 80%;
+            }
+
+            .hero {
+              margin-right: -310px;
             }
 
             .landing-img {
@@ -179,7 +221,7 @@ const Landing = () => {
           }
         `}
       </style>
-    </section>
+    </div>
   );
 };
 

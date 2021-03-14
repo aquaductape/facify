@@ -52,13 +52,13 @@
 }
 
 .faces-arrow .arrow-body {
-  stroke-dasharray: 25.8;
+  stroke-dasharray: 25.8px;
   stroke-dashoffset: 0;
   transition: stroke-dashoffset 2000ms;
 }
 
 .faces-arrow:hover .arrow-body {
-  stroke-dashoffset: 103;
+  stroke-dashoffset: 103px;
 }
 
 .fake-url-bar {
@@ -68,7 +68,7 @@
 
 .fake-url-bar-shadow,
 .face-btn-bg {
-  transition: opacity 800ms;
+  transition: opacity 200ms;
 }
 
 .face-btn-bg {
@@ -93,7 +93,32 @@
   cursor: pointer;
 }
 
-@media (min-width: 1900px) {
+.fake-url-bar-outline {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.fake-url-bar-loader {
+  stroke-width: 0;
+  stroke-dasharray: 73.7px;
+  stroke-dashoffset: 73.5px;
+  transition: stroke-dashoffset 1500ms cubic-bezier(0.4, 0, 0.2, 1);
+  &.active {
+    stroke-width: 0.7;
+    stroke-dashoffset: 0;
+  }
+}
+
+.fake-url-bar {
+  &.focus-visible {
+    .fake-url-bar-outline {
+      opacity: 1;
+      transform: scaleY(1.5) scaleX(1.05);
+    }
+  }
+}
+
+@media (min-width: 1900px) and (min-height: 850px) {
   .face-btn {
     transform: translateX(-6px);
   }

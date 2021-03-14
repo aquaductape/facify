@@ -3,6 +3,7 @@ import LogoText from "../../components/Logo/LogoText";
 import { appHeight } from "../../constants";
 import getScrollbarWidth from "../../utils/getScrollWidth";
 import FaceDetectionResult from "../FaceDetectionResult/FaceDetectionResult";
+import Footer from "../Footer/Footer";
 import Landing from "../Landing/Landing";
 import UploadImageForm from "../UploadImageForm/UploadImageForm";
 
@@ -21,16 +22,16 @@ const Main = () => {
       <LogoText></LogoText>
       <UploadImageForm></UploadImageForm>
       <main id="main">
-        <div className="main-bg"></div>
-        <div className="main-inner">
-          <Landing></Landing>
-          <FaceDetectionResult></FaceDetectionResult>
-        </div>
+        {/* <div className="main-bg"></div> */}
+        {/* <div className="main-inner"> */}
+        {/* <Landing></Landing> */}
+        <FaceDetectionResult></FaceDetectionResult>
+        {/* </div> */}
       </main>
+      <Footer></Footer>
       <style jsx>
         {`
           main {
-            position: relative;
             counter-reset: demographic-counter;
           }
 
