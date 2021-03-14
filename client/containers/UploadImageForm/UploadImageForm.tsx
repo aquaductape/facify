@@ -169,8 +169,9 @@ const UploadImageForm = () => {
 
       batch(() => {
         // setUr
-        // dispatch(setUri(base64));
-        // dispatch(setImageStatus("DONE"));
+        dispatch(setUri(base64));
+        dispatch(setImageLoaded(true));
+        dispatch(setImageStatus("DONE"));
         dispatch(addImage({ input: { imageHeight: null } }));
         dispatch(
           addDemographicsParentAndChildren({

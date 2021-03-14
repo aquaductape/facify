@@ -22,16 +22,17 @@ const Main = () => {
       <LogoText></LogoText>
       <UploadImageForm></UploadImageForm>
       <main id="main">
-        {/* <div className="main-bg"></div> */}
-        {/* <div className="main-inner"> */}
-        {/* <Landing></Landing> */}
-        <FaceDetectionResult></FaceDetectionResult>
-        {/* </div> */}
+        <div className="main-bg"></div>
+        <div className="main-inner">
+          <FaceDetectionResult></FaceDetectionResult>
+          <Landing></Landing>
+        </div>
       </main>
       <Footer></Footer>
       <style jsx>
         {`
           main {
+            position: relative;
             counter-reset: demographic-counter;
           }
 

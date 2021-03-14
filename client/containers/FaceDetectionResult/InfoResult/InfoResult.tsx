@@ -27,10 +27,10 @@ const InfoResult = ({ id }: TInforResultProps) => {
   }, []);
 
   return (
-    <div data-id-info-result={id} className="container" ref={containerElRef}>
+    <div className="container" ref={containerElRef}>
       <InfoResultSentinel id={id}></InfoResultSentinel>
       <THead id={id} mobile={false}></THead>
-      <div className="info-demo" ref={infoDemoElRef}>
+      <div data-id-info-result={id} className="info-demo" ref={infoDemoElRef}>
         {/* <Stats id={id} /> */}
         <Table id={id}></Table>
       </div>

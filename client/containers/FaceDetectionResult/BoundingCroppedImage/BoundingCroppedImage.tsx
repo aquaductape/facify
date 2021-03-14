@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
-import scrollIntoView from "scroll-into-view-if-needed";
 import { useMatchMedia } from "../../../hooks/matchMedia";
 import { parseConcept } from "../../../utils/parseConcept";
 import {
@@ -10,6 +9,7 @@ import {
   setHoverActive,
 } from "../ImageResult/demographicsSlice";
 import createCroppedImgUrl from "./createCroppedImgUrl";
+import smoothScrollTo from "../../../utils/smoothScrollTo";
 
 type BoundingCroppedImageProps = {
   id: number;
@@ -84,12 +84,49 @@ const BoundingCroppedImage = ({
         `[data-id-info-result="${parentId}"]`
       );
     }
+    const viewPortTopPadding = 15;
+    const inputHeight = 45;
+    const theadPadding = 50;
+    const matches = mql.current?.matches;
+    const imageResultEl = !matches
+      ? document.querySelector(`[data-id-image-result="${parentId}"]`)
+      : null;
+
+    const getInfoPosition = () => {
+      const { scrollY } = window;
+      const stickyPadding = inputHeight + viewPortTopPadding;
+      const infoPositionInDoc =
+        infoResultElRef.current!.getBoundingClientRect().top + scrollY;
+      const diff = scrollY - infoPositionInDoc;
+
+      if (infoPositionInDoc < diff + scrollY) {
+        return diff + stickyPadding;
+      }
+
+      return 0;
+    };
     requestAnimationFrame(() => {
-      scrollIntoView(imgElRef.current!, {
-        behavior: "smooth",
-        block: "center",
-        inline: "center",
-        boundary: mql.current?.matches ? infoResultElRef.current! : null,
+      const container = matches ? infoResultElRef.current! : window;
+      const infoPosition = matches ? getInfoPosition() : 0;
+      const padding = matches
+        ? -(theadPadding + infoPosition)
+        : -(
+            viewPortTopPadding +
+            inputHeight +
+            theadPadding +
+            imageResultEl!.clientHeight
+          );
+
+      const destination = matches
+        ? imgElRef.current?.parentElement?.parentElement?.parentElement
+            ?.offsetTop!
+        : imgElRef.current!;
+
+      smoothScrollTo({
+        destination,
+        duration: 500,
+        padding,
+        container,
       });
     });
   }, [demographic.scrollIntoView]);

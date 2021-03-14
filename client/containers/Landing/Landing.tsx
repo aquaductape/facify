@@ -54,15 +54,6 @@ const Landing = () => {
       </section>
       <style jsx>
         {`
-          .container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: auto;
-            background: #fff;
-          }
-
           section {
             padding: 25px;
           }

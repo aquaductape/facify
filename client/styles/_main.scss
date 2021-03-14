@@ -2,13 +2,6 @@
   box-sizing: border-box;
 }
 
-html,
-body,
-#__next,
-.App {
-  height: 100%;
-}
-
 body {
   // background: svg-url(
   //     '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 252.929 304.07" height="1149.24" width="955.952"><defs><linearGradient id="a"><stop offset="0"/><stop offset="1" stop-opacity="0"/></linearGradient><linearGradient xlink:href="#a" id="b" gradientUnits="userSpaceOnUse" x1="12.851" y1="76.435" x2="257.402" y2="76.435" gradientTransform="matrix(1.03426 0 0 1.0532 -13.291 -4.484)"/></defs><path fill="#fff" paint-order="markers fill stroke" d="M0 0h259.192v314.214H0z"/><path d="M126.272 22.052l47.57 83.142s-22.369-18.874-38.25 28.42c-1.696 5.047-8.98-12.303 17.135-9.075 10.753 1.328 8.882 55.758-.508 81.115-19.973 53.94-54.215 136.1-111.56 131.643-15.655-1.217-47.368-14.356-57.49-33.287-16.14-30.193-6.178-71.05-6.178-71.05L4.628 11.436z" fill="#f5f5f5"/><path d="M241.378 92.513c3.112 76.468-106.99 99.583-92.862 63.537 8.435-21.52-109.618-7.624-109.618-63.537 0-55.914 45.326-101.24 101.24-101.24 55.913 0 99.3 53.554 101.24 101.24z" fill="#e3e3e3"/><path d="M0 1.791h252.93s-12.59 86.283-42.612 112.26C158.064 159.268 8.984 157.046 8.984 157.046z" fill-opacity=".224"/><path d="M0 0h252.93s-12.277 86.663-42.612 112.26C155.431 158.576 0 151.67 0 151.67z" fill="#224aff"/><path d="M249.508 0s-11.752 86.596-41.926 112.26C153.559 158.206 0 151.67 0 151.67s155.43 6.905 210.318-39.41C240.653 86.662 252.929 0 252.929 0z" fill="url(#b)"/></svg>'
@@ -16,7 +9,6 @@ body {
   //   no-repeat center top fixed;
   // background-size: 100% auto;
   background: #344cb9;
-  min-height: 100%;
 }
 
 .app-bg {
@@ -39,7 +31,6 @@ body {
   // display: flow-root; cleanest solution to prevent margin spilling, but has 90% browser support
   max-width: 1550px;
   padding: 0 15px;
-  min-height: 100vh;
   margin: 0 auto;
 }
 

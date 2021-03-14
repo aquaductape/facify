@@ -125,7 +125,9 @@ const useCreateObserver = ({
 
       if (!e.matches) {
         console.log("addwindow");
-        window.addEventListener("scroll", onScrollRef.current!);
+        window.addEventListener("scroll", onScrollRef.current!, {
+          passive: true,
+        });
       } else {
         console.log("removewindow");
         window.removeEventListener("scroll", onScrollRef.current!);
@@ -175,7 +177,9 @@ const useCreateObserver = ({
     if (scrollCallback && !windowInit && !mql.matches) {
       console.log("addwindow");
       windowInit = true;
-      window.addEventListener("scroll", onScrollRef.current!);
+      window.addEventListener("scroll", onScrollRef.current!, {
+        passive: true,
+      });
     }
   }, [imageHeight]);
 

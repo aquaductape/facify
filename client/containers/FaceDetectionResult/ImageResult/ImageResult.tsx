@@ -98,7 +98,11 @@ const ImageResult = ({ id }: TImageResultProps) => {
   }, []);
 
   return (
-    <div className="container" ref={imageContainerRef}>
+    <div
+      data-id-image-result={id}
+      className="container"
+      ref={imageContainerRef}
+    >
       <div className="image-demo-container">
         <img
           ref={imgRef}
