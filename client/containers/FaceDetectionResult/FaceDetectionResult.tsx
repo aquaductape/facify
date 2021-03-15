@@ -32,14 +32,14 @@ const Result = React.memo(({ id, idx }: TResultProps) => {
           @media (min-width: 1300px) {
             .image-panel {
               display: grid;
-              grid-template-columns: 450px 3fr;
+              grid-template-columns: 450px 1fr;
             }
           }
 
-          @media (min-width: 1500px) {
+          @media (min-width: 1400px) {
             .image-panel {
               display: grid;
-              grid-template-columns: 650px 1fr;
+              grid-template-columns: 1fr 850px;
             }
           }
         `}

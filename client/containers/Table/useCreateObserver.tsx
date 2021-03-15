@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { TMqlGroup } from "../../hooks/useMatchMedia";
 
 type TCreateObserverProps = {
   id: string;
@@ -9,7 +10,7 @@ type TCreateObserverProps = {
   hasInit: React.MutableRefObject<boolean>;
   theadStickyVisibleRef: React.MutableRefObject<boolean>;
   matchOnDesktop?: boolean;
-  mql: MediaQueryList;
+  mql: TMqlGroup;
   observerCallback: TObserverCallback;
   mqlCallback?: TMqlCallback;
   scrollCallback?: () => void;
@@ -51,7 +52,7 @@ const useCreateObserver = ({
   imageHeight,
   observerCallback,
   scrollCallback,
-  mql,
+  mql: _mql,
   mqlCallback,
 }: TCreateObserverProps) => {
   const onScrollRef = useRef<(() => void) | null>(null);
@@ -81,6 +82,8 @@ const useCreateObserver = ({
 
   useEffect(() => {
     if (imageHeightRef.current == null || hasInit.current) return;
+
+    const mql = _mql.minWidth_1300;
 
     const createObserver = (mediaMatches: boolean) => {
       if (observer) return observer;

@@ -1,6 +1,4 @@
 import { batch, useDispatch, useSelector } from "react-redux";
-import { useMatchMedia } from "../../../hooks/matchMedia";
-import { RootState } from "../../../store/rootReducer";
 import {
   selectDemographicsDisplay,
   selectHoverActive,
@@ -17,7 +15,6 @@ const BoundingBox = ({ id, parentId }: TBoundingBoxProps) => {
   const dispatch = useDispatch();
   const demographic = useSelector(selectDemographicsDisplay({ id }));
   const hoverActive = useSelector(selectHoverActive({ id: parentId }));
-  const mqlRef = useMatchMedia();
   const onMouseEnter = () => {
     batch(() => {
       dispatch(

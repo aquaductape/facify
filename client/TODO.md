@@ -12,3 +12,4 @@
 6. Clarifai maximum image size is 3.6MB. Compress url that has over 3.6MB https://media.defense.gov/2014/Sep/08/2000943675/-1/-1/0/140907-F-WE773-015.JPG
 7. When removing demograhicNode use translate effect. Get removing target top position > remove observers > target pointer events none > translate
 8. Predict image size on resizing between 1300px. Layout thrashing.
+9. Have table of contents on the right side. On mobile either have a nav icon on the viewport's bottom right, or have a nav icon on item utility panel.

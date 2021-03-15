@@ -3,16 +3,16 @@ import { appHeightDesktop } from "../../../constants";
 import THead from "../../Table/THead";
 import { InfoResultSentinel } from "../../Table/Sentinel";
 import { useEffect, useRef } from "react";
-import { useMatchMedia } from "../../../hooks/matchMedia";
+import { useMatchMedia } from "../../../hooks/useMatchMedia";
 
 type TInforResultProps = { id: number };
 const InfoResult = ({ id }: TInforResultProps) => {
   const containerElRef = useRef<HTMLDivElement | null>(null);
   const infoDemoElRef = useRef<HTMLDivElement | null>(null);
-  const mql = useMatchMedia();
+  const mqlGroup = useMatchMedia();
 
   useEffect(() => {
-    if (!mql.current!.matches) return;
+    if (!mqlGroup.current!.minWidth_1300.matches) return;
 
     setTimeout(() => {
       const infoDemoEl = infoDemoElRef.current!;

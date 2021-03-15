@@ -5,8 +5,8 @@ const Footer = () => {
       <style jsx>
         {`
           .container {
-            height: 50px;
-            padding: 20px;
+            padding: 25px 0;
+            margin-top: 40px;
             text-align: left;
             color: #fff;
           }

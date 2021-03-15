@@ -21,14 +21,17 @@ const Main = () => {
       </div>
       <LogoText></LogoText>
       <UploadImageForm></UploadImageForm>
-      <main id="main">
-        <div className="main-bg"></div>
-        <div className="main-inner">
-          <FaceDetectionResult></FaceDetectionResult>
-          <Landing></Landing>
-        </div>
-      </main>
-      <Footer></Footer>
+      <div className="main-container">
+        <main id="main">
+          <div className="main-bg"></div>
+          <div className="main-inner">
+            <FaceDetectionResult></FaceDetectionResult>
+            <Landing></Landing>
+          </div>
+        </main>
+        <div className="spacer"></div>
+        <Footer></Footer>
+      </div>
       <style jsx>
         {`
           main {
@@ -48,6 +51,16 @@ const Main = () => {
           .main-inner {
             position: relative;
             z-index: 1;
+          }
+
+          .main-container {
+            display: flex;
+            flex-direction: column;
+            min-height: calc(100vh - 45px - 140px);
+          }
+
+          .spacer {
+            flex: 1;
           }
 
           .hidden-cover {

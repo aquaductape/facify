@@ -54,24 +54,24 @@ const UploadImageForm = () => {
           data: JSON_Stringify_Parse(demographResult2),
           name: "da-feasters",
         },
-        {
-          _id: nanoid(),
-          imageUri: imageUri,
-          data: demographicsResult,
-          name: "GettyImages-1147443912",
-        },
-        {
-          _id: nanoid(),
-          imageUri: imageUri3,
-          data: demographicResult3,
-          name: "2021768",
-        },
-        {
-          _id: nanoid(),
-          imageUri: imgUri2,
-          data: JSON_Stringify_Parse(demographResult2),
-          name: "da-feasters",
-        },
+        // {
+        //   _id: nanoid(),
+        //   imageUri: imageUri,
+        //   data: demographicsResult,
+        //   name: "GettyImages-1147443912",
+        // },
+        // {
+        //   _id: nanoid(),
+        //   imageUri: imageUri3,
+        //   data: demographicResult3,
+        //   name: "2021768",
+        // },
+        // {
+        //   _id: nanoid(),
+        //   imageUri: imgUri2,
+        //   data: JSON_Stringify_Parse(demographResult2),
+        //   name: "da-feasters",
+        // },
       ];
 
       for (const { _id, data, imageUri, name } of items) {
@@ -118,7 +118,18 @@ const UploadImageForm = () => {
         });
       }
     };
-    run();
+
+    setTimeout(() => {
+      run();
+    }, 1500);
+
+    // result is visibly hidden, still has geometry
+    // after result renders
+    // get Landing page height
+    // get REsult height
+    // if Landing height > Result => translate Landing up
+    //  else z-index -1 on Landing and translate Result down
+    // remove Landing page
   }, []);
 
   const onImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {

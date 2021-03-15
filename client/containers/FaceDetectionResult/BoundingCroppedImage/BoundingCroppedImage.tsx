@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
-import { useMatchMedia } from "../../../hooks/matchMedia";
+import { useMatchMedia } from "../../../hooks/useMatchMedia";
 import { parseConcept } from "../../../utils/parseConcept";
 import {
   selectDemographicsDisplay,
@@ -29,7 +29,7 @@ const BoundingCroppedImage = ({
   const croppedImgUrlRef = useRef("");
   const infoResultElRef = useRef<HTMLTableElement | null>(null);
   const imgElRef = useRef<HTMLImageElement>(null);
-  const mql = useMatchMedia();
+  const mqlGroup = useMatchMedia();
 
   const [renderImage, setRenderImage] = useState(false);
 
@@ -87,8 +87,8 @@ const BoundingCroppedImage = ({
     const viewPortTopPadding = 15;
     const inputHeight = 45;
     const theadPadding = 50;
-    const matches = mql.current?.matches;
-    const imageResultEl = !matches
+    const mql = mqlGroup.current!.minWidth_1300;
+    const imageResultEl = !mql.matches
       ? document.querySelector(`[data-id-image-result="${parentId}"]`)
       : null;
 
@@ -106,9 +106,9 @@ const BoundingCroppedImage = ({
       return 0;
     };
     requestAnimationFrame(() => {
-      const container = matches ? infoResultElRef.current! : window;
-      const infoPosition = matches ? getInfoPosition() : 0;
-      const padding = matches
+      const container = mql.matches ? infoResultElRef.current! : window;
+      const infoPosition = mql.matches ? getInfoPosition() : 0;
+      const padding = mql.matches
         ? -(theadPadding + infoPosition)
         : -(
             viewPortTopPadding +
@@ -117,7 +117,7 @@ const BoundingCroppedImage = ({
             imageResultEl!.clientHeight
           );
 
-      const destination = matches
+      const destination = mql.matches
         ? imgElRef.current?.parentElement?.parentElement?.parentElement
             ?.offsetTop!
         : imgElRef.current!;

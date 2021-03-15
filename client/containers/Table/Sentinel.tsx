@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
-import { useMatchMedia } from "../../hooks/matchMedia";
+import { useMatchMedia } from "../../hooks/useMatchMedia";
 import { RootState } from "../../store/rootReducer";
 import { hasAttributeValue } from "../../utils/hasAttributeValue";
 import { selectImageHeight } from "./imageHeightSlice";
@@ -345,6 +345,7 @@ const BarSentinel = ({ id }: { id: number }) => {
   }, [imageHeight, triggerRefresh]);
 
   useEffect(() => {
+    const mql = mqlRef.current!.minWidth_1300;
     tableElRef.current = document.querySelector(tableSelector);
     // getTheadEl({ mobile: !mqlRef.current!.matches });
     theadStaticElRef.current = tableElRef.current!.querySelector(
@@ -355,7 +356,7 @@ const BarSentinel = ({ id }: { id: number }) => {
       theadInnerSelector
     );
     // imgElRef.current = document.querySelector(imgSelector);
-    updateOnScrollRef.current = !mqlRef.current?.matches;
+    updateOnScrollRef.current = !mql.matches;
   }, []);
 
   useCreateObserver({

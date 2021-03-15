@@ -32,7 +32,7 @@ const Landing = () => {
             multicultural appearance.
           </p>
           <div className="list">
-            <p className="list-title">Upload Image by:</p>
+            <p className="list-title">Upload Image(s) by:</p>
             <ul>
               <li>Drag & Drop Files (up to 5 at time)</li>
               <li>Paste URL</li>
