@@ -10,7 +10,7 @@ export type TBoundingBox = {
 // ** when hovered it grows and reveals stats, as well download image button(maybe not)
 export type TConcept = { id: string; name: string; value: number };
 export type TDemographics = {
-  id: number;
+  id: string;
   bounding_box: TBoundingBox;
   concepts: {
     "multicultural-appearance": TConcept[];
@@ -27,3 +27,9 @@ export type TDemographicsResponse = {
   };
   data: TDemographics[];
 };
+
+export type Await<T> = T extends {
+  then(onfulfilled?: (value: infer U) => unknown): unknown;
+}
+  ? U
+  : T;

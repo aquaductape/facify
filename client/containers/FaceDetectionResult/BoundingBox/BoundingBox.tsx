@@ -7,7 +7,7 @@ import {
 } from "../ImageResult/demographicsSlice";
 
 type TBoundingBoxProps = {
-  id: number;
+  id: string;
   parentId: number;
 };
 

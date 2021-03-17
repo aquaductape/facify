@@ -2,11 +2,9 @@ import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../../store/rootReducer";
 import { TDemographics } from "../../../ts";
 
-let parentId = 0;
-let demographicId = 0;
-
-type TDemographicsDisplay = {
-  id: number;
+export type TDemographicsDisplay = {
+  id: string;
+  uri?: string;
   hoverActive: boolean;
   generalHover: boolean;
   scrollIntoView: boolean;
@@ -19,28 +17,32 @@ type TImageUrl = {
 };
 
 type TParent = {
-  id: number;
+  id: string;
   imageUrl: TImageUrl;
   name: string;
   hoverActive: boolean;
-  childIds: number[];
+  childIds: string[];
 };
 
 export type TDemographicNode = TDemographicsDisplay & TDemographics;
 
+type TDemographicNodeCollection = {
+  [key: string]: TDemographicNode;
+};
+
 type TDemographicState = {
   parents: TParent[];
-  demographicNodes: TDemographicNode[];
+  demographicNodes: TDemographicNodeCollection;
   hoverActive: boolean;
 };
 
 const initialState: TDemographicState = {
   parents: [],
-  demographicNodes: [],
+  demographicNodes: {},
   hoverActive: false,
 };
 
-export const selectDemographicsDisplay = ({ id }: { id: number }) => {
+export const selectDemographicsDisplay = ({ id }: { id: string }) => {
   return createSelector(
     (state: RootState) => state.demographics.demographicNodes,
     (result) => {
@@ -48,7 +50,7 @@ export const selectDemographicsDisplay = ({ id }: { id: number }) => {
     }
   );
 };
-export const selectDemographicsConcepts = ({ id }: { id: number }) => {
+export const selectDemographicsConcepts = ({ id }: { id: string }) => {
   return createSelector(
     (state: RootState) => state.demographics.demographicNodes,
     (result) => {
@@ -98,64 +100,21 @@ const demographicsSlice = createSlice({
   name: "demographics",
   initialState,
   reducers: {
-    addDemographicsParentAndChildren: {
-      reducer: (
-        state,
-        action: PayloadAction<{
-          data: TDemographicNode[];
-          parent: TParent;
-        }>
-      ) => {
-        const { data, parent } = action.payload;
+    addDemographicsParentAndChildren: (
+      state,
+      action: PayloadAction<{
+        parent: Omit<TParent, "childIds">;
+        data: TDemographicNode[];
+      }>
+    ) => {
+      const data = action.payload.data;
+      const parent = action.payload.parent as TParent;
 
-        parent.childIds = data.map((item) => item.id);
-
-        state.demographicNodes.push(...data);
-        state.parents.push(parent);
-      },
-      prepare: ({
-        data: _data,
-        parent: _parent,
-      }: {
-        data: Omit<TDemographicNode, "id">[];
-        parent: Omit<TParent, "id" | "childIds">;
-      }) => {
-        const data = (_data as unknown) as TDemographicNode[];
-        const parent = (_parent as unknown) as TParent;
-
-        parent.id = parentId++;
-
-        data.forEach((item) => {
-          const id = demographicId++;
-          item.id = id;
-        });
-
-        return { payload: { data, parent } };
-      },
-    },
-    addParent: {
-      reducer: (state, action: PayloadAction<TParent | TParent[]>) => {
-        const newParent = action.payload;
-        if (Array.isArray(newParent)) {
-          state.parents.push(...newParent);
-          return;
-        }
-
-        state.parents.push(newParent);
-      },
-      prepare: (_input: Omit<TParent, "id"> | Omit<TParent, "id">[]) => {
-        const input = (_input as unknown) as TParent | TParent[];
-
-        if (Array.isArray(input)) {
-          input.forEach((item) => (item.id = parentId++));
-
-          return { payload: input };
-        }
-
-        input.id = parentId++;
-
-        return { payload: input };
-      },
+      parent.childIds = data.map((item) => item.id);
+      state.parents.push(parent);
+      data.forEach((item) => {
+        state.demographicNodes[item.id] = item;
+      });
     },
     removeParentAndNodeChildren: (
       state,
@@ -164,16 +123,16 @@ const demographicsSlice = createSlice({
       const { id } = action.payload;
       const { childIds } = state.parents[id];
 
-      delete state.parents[id];
+      state.parents.splice(id, 1);
 
-      childIds.forEach((id) => {
-        delete state.demographicNodes[id];
+      childIds.forEach((childId) => {
+        delete state.demographicNodes[childId];
       });
     },
     setDemoItemHoverActive: (
       state,
       action: PayloadAction<{
-        id: number;
+        id: string;
         // parentId: number;
         active: boolean;
         // activeBy
@@ -193,6 +152,13 @@ const demographicsSlice = createSlice({
       if (scrollIntoView != null) {
         result.scrollIntoView = scrollIntoView;
       }
+    },
+    setDemoItemUri: (
+      state,
+      action: PayloadAction<{ id: number; uri: string }>
+    ) => {
+      const { id, uri } = action.payload;
+      const result = state.demographicNodes[id];
     },
     setHoverActive: (
       state,

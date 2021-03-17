@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
-import LandingPageImgExample from "../../components/Logo/svg/LandingPageImgExample";
-import LogoIcon from "../../components/Logo/svg/LogoIcon";
+import LogoIcon from "../../components/svg/LogoIcon";
 import { RootState } from "../../store/rootReducer";
+import LandingPageImgExample from "./LandingPageImgExample";
 
 const Landing = () => {
   const imageLoaded = useSelector(
@@ -13,8 +13,8 @@ const Landing = () => {
   }
 
   return (
-    <div className="container">
-      <section>
+    <div id="landing" className="container">
+      <div className="inner">
         <div className="info">
           <div className="header-title">
             <div className="header-title--logo" title="Facify">
@@ -24,9 +24,6 @@ const Landing = () => {
               Find <span className="header-title-subtext">Faces</span>
             </h1>
           </div>
-          {/* <div className="header-image" title="human face vector art">
-        <FaceDetect></FaceDetect>
-      </div> */}
           <p className="info">
             Detects not only just faces, it approximates age, gender and
             multicultural appearance.
@@ -51,10 +48,15 @@ const Landing = () => {
             Image size over 3.5 megabytes will be compressed
           </p>
         </div>
-      </section>
+      </div>
+
       <style jsx>
         {`
-          section {
+          .container {
+            background: #fff;
+          }
+
+          .inner {
             padding: 25px;
           }
 
@@ -117,17 +119,21 @@ const Landing = () => {
           @media (min-width: 420px) {
             .landing-img {
               width: 100%;
-              max-width: 700px;
+              max-width: 600px;
               margin: 0 auto;
             }
 
-            section {
+            .inner {
               font-size: 20px;
             }
           }
 
           @media (min-width: 1000px) {
-            section {
+            .landing-img {
+              max-width: 700px;
+            }
+
+            .inner {
               display: flex;
               align-items: center;
               max-width: 1000px;
@@ -165,7 +171,7 @@ const Landing = () => {
           }
 
           @media (min-width: 1300px) {
-            section {
+            .inner {
               height: 70vh;
               max-height: 800px;
               min-height: 550px;
@@ -188,7 +194,7 @@ const Landing = () => {
           }
 
           @media (min-width: 1900px) and (min-height: 850px) {
-            section {
+            .inner {
               max-width: 1200px;
             }
 

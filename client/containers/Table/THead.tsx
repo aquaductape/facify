@@ -2,18 +2,13 @@ import React, { useRef } from "react";
 import getScrollbarWidth from "../../utils/getScrollWidth";
 
 type THeadProps = {
-  id: number;
-  mobile?: boolean;
+  id: string;
 };
-const THead = ({ id, mobile }: THeadProps) => {
+
+const THead = ({ id }: THeadProps) => {
   const thead = ["Face", "Age", "Gender", "Multicultural"];
   return (
-    <div
-      // aria-hidden={!showStickyTHead}
-      className={`${
-        mobile ? `thead-sticky-mobile-${id}` : `thead-sticky-desktop-${id}`
-      } container`}
-    >
+    <div data-id-thead-sticky={id} className={`container`}>
       <div
         className="thead-container"
         data-triggered-by-info-result="false"
@@ -37,6 +32,9 @@ const THead = ({ id, mobile }: THeadProps) => {
             left: 0;
             height: 45px;
             margin-bottom: 80px;
+            clip-path: polygon(0% 100%, 0% 0%, 100% 0%, 100% 100%);
+            overflow: hidden;
+            top: 0;
             z-index: 5;
           }
 
@@ -78,46 +76,21 @@ const THead = ({ id, mobile }: THeadProps) => {
             width: 100%;
             height: 100%;
           }
+
+          @media (min-width: 1300px) {
+            .container {
+              top: 60px;
+              clip-path: polygon(0% 100%, 0% 0%, 1300px 0%, 1300px 100%);
+            }
+          }
         `}
       </style>
       {/* dynamic */}
       <style jsx>
         {`
-          .container {
-            display: ${!mobile ? "none" : "block"};
-            top: ${!mobile ? "60px" : "28px"};
-            left: ${!mobile ? "0" : "unset"};
-            width: ${!mobile
-              ? `calc(100% - ${getScrollbarWidth()}px)`
-              : "100%"};
-             {
-              /* opacity: ${"showStickyTHead" ? "1" : "0"};
-            transition: ${"showStickyTHead"
-                ? "opacity 0ms 0ms"
-                : "opacity 0ms 250ms"}; */
-            }
-
-             {
-              /* COOL THING I FOUND!! Since overflow causes problems with sticky children, you can use this clip-path to clip instead of using overflow:hidden to clip. 
-              
-              Downside: clip-path basic shape NOT supported by Edge Legacy.
-              */
-            }
-            clip-path: ${!mobile
-              ? "polygon(0% 100%, 0% 0%, 100% 0%, 100% 100%)"
-              : "polygon(0% 100%, 0% 0%, 1300px 0%, 1300px 100%)"};
-          }
-
-          .thead-container {
-             {
-              /* transform: ${"showStickyTHead"
-                ? "translateY(0)"
-                : "translateY(-125%)"}; */
-            }
-          }
           @media (min-width: 1300px) {
             .container {
-              display: ${mobile ? "none" : "block"};
+              width: ${`calc(100% - ${getScrollbarWidth()}px)`};
             }
           }
         `}

@@ -1,27 +1,23 @@
 import { useSelector, shallowEqual } from "react-redux";
 import BoundingCroppedImage from "../FaceDetectionResult/BoundingCroppedImage/BoundingCroppedImage";
-import { RootState } from "../../store/rootReducer";
 import ScrollShadow from "./ScrollShadow";
 import { HorizontalSentinel, THeadSentinel } from "./Sentinel";
 import { parseConceptValue } from "../../utils/parseConcept";
-import THead from "./THead";
 import {
   selectDemographicParentChildIds,
   selectDemographicsConcepts,
-  selectDemographicsDisplay,
 } from "../FaceDetectionResult/ImageResult/demographicsSlice";
+import { useEffect, useRef } from "react";
+import { querySelector } from "../../utils/querySelector";
 
 type TRowProps = {
-  id: number;
-  parentId: number;
+  id: string;
+  parentId: string;
+  parentIdNumber: number;
   idx: number;
 };
-const Row = ({ id, parentId, idx }: TRowProps) => {
+const Row = ({ id, parentIdNumber, parentId, idx }: TRowProps) => {
   const concepts = useSelector(selectDemographicsConcepts({ id }));
-  // const foo = useSelector(
-  //   (state: RootState) => state.demographics.demographicNodes,
-  //   shallowEqual
-  // );
 
   const {
     "age-appearence": age,
@@ -32,7 +28,12 @@ const Row = ({ id, parentId, idx }: TRowProps) => {
   return (
     <tr className="row">
       <td className="td-image">
-        <BoundingCroppedImage id={id} parentId={parentId} idx={idx} />
+        <BoundingCroppedImage
+          id={id}
+          parentId={parentId}
+          parentIdNumber={parentIdNumber}
+          idx={idx}
+        />
       </td>
       <td>
         {age.map(({ id, name, value }, idx) => (
@@ -89,17 +90,41 @@ const Row = ({ id, parentId, idx }: TRowProps) => {
   );
 };
 
-const Table = ({ id }: { id: number }) => {
+const Table = ({ id, idx }: { id: string; idx: number }) => {
+  const parentId = id;
+  const parentIdNumber = idx;
   const demographicParent = useSelector(
-    selectDemographicParentChildIds({ id })
+    selectDemographicParentChildIds({ id: idx })
   );
+  const tableContainerElRef = useRef<HTMLDivElement | null>(null);
   const thead = ["Face", "Age", "Gender", "Multicultural"];
+
+  useEffect(() => {
+    const tableContainerEl = tableContainerElRef.current!;
+    let theadEl: HTMLElement | null = null;
+
+    const run = async () => {
+      theadEl = await querySelector({
+        selector: `[data-id-thead-sticky="${id}"]`,
+      });
+    };
+
+    run();
+
+    const onScroll = () => {
+      theadEl!.scrollTo({ left: tableContainerEl.scrollLeft });
+    };
+
+    tableContainerEl.addEventListener("scroll", onScroll);
+    return () => {
+      tableContainerEl.removeEventListener("scroll", onScroll);
+    };
+  }, []);
 
   return (
     <div data-id-table={id} className="table-container">
       <ScrollShadow id={id}></ScrollShadow>
-      <div className="table-scroll-container">
-        <THead id={id} mobile={true}></THead>
+      <div className="table-scroll-container" ref={tableContainerElRef}>
         <div className="table-container-inner">
           <HorizontalSentinel id={id}></HorizontalSentinel>
           <THeadSentinel id={id}></THeadSentinel>
@@ -118,7 +143,13 @@ const Table = ({ id }: { id: number }) => {
             </thead>
             <tbody>
               {demographicParent.map((item, idx) => (
-                <Row id={item} parentId={id} idx={idx} key={idx}></Row>
+                <Row
+                  id={item}
+                  parentId={parentId}
+                  parentIdNumber={parentIdNumber}
+                  idx={idx}
+                  key={idx}
+                ></Row>
               ))}
             </tbody>
           </table>
@@ -128,6 +159,7 @@ const Table = ({ id }: { id: number }) => {
         {`
           .table-container {
             position: relative;
+            margin-top: -125px;
           }
 
           .table-scroll-container {
@@ -138,7 +170,6 @@ const Table = ({ id }: { id: number }) => {
           .table-container-inner {
             position: relative;
             min-width: 700px;
-            margin-top: -125px;
           }
 
           table {
@@ -186,7 +217,7 @@ const Table = ({ id }: { id: number }) => {
           }
 
           @media (min-width: 1300px) {
-            .table-container-inner {
+            .table-container {
               margin-top: 0;
             }
 

@@ -12,16 +12,17 @@ import {
 } from "./demographicsSlice";
 
 type TImageResultProps = {
-  id: number;
+  id: string;
+  idx: number;
 };
-const ImageResult = ({ id }: TImageResultProps) => {
+const ImageResult = ({ id, idx }: TImageResultProps) => {
   const dispatch = useDispatch();
-  const parentId = id;
+  const parentId = idx;
   const [renderBoundingBox, setRenderBoundingBox] = useState(false);
   const demographicParentChildren = useSelector(
-    selectDemographicParentChildIds({ id })
+    selectDemographicParentChildIds({ id: idx })
   );
-  const imageUrl = useSelector(selectImageUrl({ id }));
+  const imageUrl = useSelector(selectImageUrl({ id: idx }));
 
   const renderBoundingBoxRef = useRef(false);
   const imageContainerRef = useRef<HTMLDivElement>(null);
@@ -29,7 +30,6 @@ const ImageResult = ({ id }: TImageResultProps) => {
   const resizeImgRef = useRef<() => void>(
     debounce(() => {
       if (!renderBoundingBoxRef.current) return;
-      console.log("fire");
       const containerWidth = imageContainerRef.current!.clientWidth;
       const imgWidth = imgRef.current!.clientWidth;
       let imageHeight = imgRef.current!.clientHeight;
@@ -38,7 +38,6 @@ const ImageResult = ({ id }: TImageResultProps) => {
       reflow();
       imageHeight = imgRef.current!.clientHeight;
       if (imageHeight < 200) imageHeight = 200;
-      console.log({ imageHeight });
 
       dispatch(setImageHeight({ id, imageHeight }));
     }, 150)
@@ -50,7 +49,6 @@ const ImageResult = ({ id }: TImageResultProps) => {
     // const img = e.target as HTMLImageElement;
     // const { src, naturalHeight, naturalWidth } = img;
     // creates cropped image url
-    console.log("loaded!!");
 
     setRenderBoundingBox(true);
     renderBoundingBoxRef.current = true;

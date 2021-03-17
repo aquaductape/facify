@@ -1,6 +1,6 @@
 import React from "react";
 
-const Seperator = ({ id }: { id: number }) => {
+const Seperator = ({ id }: { id: string }) => {
   return (
     <div className="seperator">
       <div className="gradient light"></div>

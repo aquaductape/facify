@@ -20,8 +20,14 @@ code {
 
 button {
   border: none;
+  border-radius: 0;
   cursor: pointer;
   user-select: none;
+}
+
+input {
+  border: none;
+  border-radius: 0;
 }
 
 svg {

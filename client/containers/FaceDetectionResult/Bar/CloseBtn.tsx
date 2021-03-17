@@ -4,18 +4,20 @@ import {
   removeParentAndNodeChildren,
   selectParents,
 } from "../ImageResult/demographicsSlice";
-import { default as CloseBtnIcon } from "../../../components/Logo/svg/CloseBtn";
+import { default as CloseBtnIcon } from "../../../components/svg/CloseBtn";
 import {
   removeImageHeight,
   setTriggerRefresh,
 } from "../../Table/imageHeightSlice";
 import { reflow } from "../../../utils/reflow";
+import { theadObserver } from "../../Table/useCreateObserver";
+import { useMatchMedia } from "../../../hooks/useMatchMedia";
 
 const useBtnRemoveHover = ({
   id,
   idx,
 }: {
-  id: number;
+  id: string;
   idx: number;
 }): {
   onMouseLeave: () => void;
@@ -48,29 +50,27 @@ const useBtnRemoveHover = ({
 };
 
 type CloseBtnProps = {
-  id: number;
+  id: string;
   idx: number;
 };
 const CloseBtn = ({ id, idx }: CloseBtnProps) => {
   const dispatch = useDispatch();
   const parents = useSelector(selectParents());
 
+  const mqlRef = useMatchMedia();
+
   const isFirstItem = () => {
-    for (let i = 0; i < parents.length; i++) {
-      const parent = parents[i];
-      if (parent != null && i !== id) return false;
-      if (i === id) return true;
-    }
-    return false;
+    return parents[0].id === id;
   };
 
   const onClick = async () => {
-    const transitionSiblings = parents.slice(id + 1).filter((parent) => parent);
+    const transitionSiblings = parents.slice(idx + 1);
     const siblingsNodes = transitionSiblings.map(
       (parent) => document.getElementById(`demographic-node-${parent.id}`)!
     );
     const targetNode = document.getElementById(`demographic-node-${id}`)!;
     const neighborAfterNode = siblingsNodes[0];
+    const isLastNode = parents.length === 1;
     const mainEl = document.getElementById("main")!;
     const mainBgEl = mainEl.querySelector(".main-bg") as HTMLElement;
     const seperatorEl = neighborAfterNode
@@ -82,10 +82,75 @@ const CloseBtn = ({ id, idx }: CloseBtnProps) => {
     const targetNodeBCR = targetNode.getBoundingClientRect();
     const seperatorHeight = 80;
     const duration = 500;
+    // const easing = 'cubic-bezier(0.4, 0, 0.2, 1)'
+    const easing = "linear";
     let targetNodeHeight = Math.ceil(targetNodeBCR.height);
+
+    const animateLastNode = () =>
+      new Promise<boolean>((resolve) => {
+        const landingEl = document.getElementById("landing")!;
+        const targetNodeHeight = targetNode.clientHeight;
+        const logo = document.getElementById("logo")!;
+        const facesBoundingBoxes = document.querySelector(
+          ".faces-bounding-boxes"
+        ) as HTMLElement;
+
+        targetNode.style.position = "relative";
+        landingEl.style.display = "block";
+        landingEl.style.pointerEvents = "none";
+        landingEl.style.opacity = "0";
+        mainBgEl.style.opacity = "0";
+
+        if (mqlRef.current!.minWidth_1900_and_minHeight_850.matches) {
+          logo.style.background = "var(--blue-main)";
+          facesBoundingBoxes.style.transform = "translateX(-100%)";
+          reflow();
+          facesBoundingBoxes.style.transform = "translateX(0%)";
+          facesBoundingBoxes.style.transition = `transform ${duration}ms`;
+        } else {
+          mainEl.style.clipPath = `polygon(0% 100vh, 0% 0%, 100% 0%, 100% 100vh)`;
+        }
+
+        reflow();
+
+        const landingHeight = landingEl.clientHeight;
+
+        if (landingHeight > targetNodeHeight) {
+          targetNode.style.zIndex = "-1";
+          landingEl.style.opacity = "1";
+          landingEl.style.zIndex = "65";
+          landingEl.style.transform = "translateY(-101%)";
+          reflow();
+          landingEl.style.transform = "translateY(0%)";
+          landingEl.style.transition = `transform ${duration}ms`;
+        } else {
+          landingEl.style.opacity = "1";
+          landingEl.style.zIndex = "-1";
+          targetNode.style.transition = `transform ${duration}ms`;
+          targetNode.style.transform = "translateY(-100%)";
+        }
+
+        setTimeout(() => {
+          logo.style.background = "";
+          if (mqlRef.current?.minWidth_1900_and_minHeight_850) {
+            facesBoundingBoxes.style.transform = "";
+            facesBoundingBoxes.style.transition = "";
+          }
+          landingEl.style.transform = "";
+          landingEl.style.transition = "";
+          landingEl.style.opacity = "";
+          landingEl.style.pointerEvents = "";
+          landingEl.style.zIndex = "";
+          mainEl.style.clipPath = "";
+          mainBgEl.style.opacity = "";
+
+          resolve(true);
+        }, duration + 50);
+      });
 
     const animateNodes = () =>
       new Promise<boolean>((resolve) => {
+        neighborAfterNode.style.background = "none";
         gradientEls!.forEach((el) => {
           el.classList.toggle("active");
         });
@@ -93,18 +158,31 @@ const CloseBtn = ({ id, idx }: CloseBtnProps) => {
         mainEl.style.clipPath = "polygon(0% 100%, 0% 0%, 100% 0%, 100% 100%)";
         targetNode.style.position = "relative";
         targetNode.style.zIndex = "-1";
-        mainBgEl.style.transform = `translateY(-${targetNodeHeight}px)`;
-        mainBgEl.style.transition = `transform ${duration}ms cubic-bezier(0.4, 0, 0.2, 1)`;
+        mainBgEl.style.transition = `transform ${duration}ms ${easing}`;
 
         siblingsNodes.forEach((parent) => {
           parent.style.pointerEvents = "none";
-          parent.style.transform = `translateY(-${targetNodeHeight}px)`;
-          parent.style.transition = `transform ${duration}ms cubic-bezier(0.4, 0, 0.2, 1)`;
+          parent.style.transition = `transform ${duration}ms ${easing}`;
+        });
+
+        reflow();
+
+        requestAnimationFrame(() => {
+          mainBgEl.style.transform = `translateY(-${targetNodeHeight}px)`;
+
+          siblingsNodes.forEach((parent) => {
+            parent.style.transform = `translateY(-${targetNodeHeight}px)`;
+          });
         });
 
         setTimeout(() => {
           mainEl.style.clipPath = "";
           targetNode.style.display = "none";
+          neighborAfterNode.style.background = "";
+          // targetNode.style.pointerEvents = "";
+          // targetNode.style.opacity = "1";
+          // targetNode.style.zIndex = "";
+
           mainBgEl.style.transform = "";
           mainBgEl.style.transition = "";
 
@@ -123,32 +201,31 @@ const CloseBtn = ({ id, idx }: CloseBtnProps) => {
       });
 
     const removeSandwichedNode = async () => {
-      targetNode.style.pointerEvents = "none";
       await animateNodes();
     };
 
     const removeTailNode = () =>
       new Promise<boolean>((resolve) => {
-        const mainMarginBottom = 50;
-        const targeNodeTop = targetNodeBCR.top;
-        const viewPortHeight = window.innerHeight;
-        const scrollY = window.scrollY;
-        const translateDuration = duration;
+        // const mainMarginBottom = 50;
+        // const targeNodeTop = targetNodeBCR.top;
+        // const viewPortHeight = window.innerHeight;
+        // const scrollY = window.scrollY;
+        // const translateDuration = duration;
 
         targetNode.style.position = "relative";
         targetNode.style.zIndex = "-1";
         targetNode.style.transform = `translateY(-${targetNodeHeight}px)`;
         targetNode.style.transition = `transform ${duration}ms cubic-bezier(0.4, 0, 0.2, 1)`;
-        mainBgEl.style.transform = `translateY(-${targetNodeHeight}px)`;
-        mainBgEl.style.transition = `transform ${duration}ms cubic-bezier(0.4, 0, 0.2, 1)`;
+        mainBgEl.style.opacity = "0";
+        mainEl.style.clipPath = "polygon(0% 100%, 0% 0%, 100% 0%, 100% 100%)";
 
         setTimeout(() => {
           targetNode.style.display = "none";
-          mainBgEl.style.transform = "";
-          mainBgEl.style.transition = "";
+          mainEl.style.clipPath = "";
+          mainBgEl.style.opacity = "";
 
           resolve(true);
-        }, duration);
+        }, duration + 50);
       });
 
     const removeHeadNode = async () => {
@@ -156,23 +233,30 @@ const CloseBtn = ({ id, idx }: CloseBtnProps) => {
       await animateNodes();
     };
 
-    if (isFirstItem()) {
+    targetNode.style.pointerEvents = "none";
+
+    theadObserver.disconnect();
+
+    if (isLastNode) {
+      await animateLastNode();
+    } else if (isFirstItem()) {
       await removeHeadNode();
       seperatorEl!.style.display = "none";
     } else if (!neighborAfterNode) {
-      // too disorienting
-      // await removeTailNode();
+      await removeTailNode();
     } else {
       await removeSandwichedNode();
     }
 
-    reflow();
-    batch(() => {
-      dispatch(removeParentAndNodeChildren({ id }));
-      dispatch(removeImageHeight({ id }));
-      dispatch(setTriggerRefresh(Date.now()));
-    });
-    // console.log( isFirstItem());
+    //     reflow();
+    //
+    //     theadObserver.reconnect();
+    //
+    //     batch(() => {
+    //       dispatch(removeParentAndNodeChildren({ id: idx }));
+    //       dispatch(removeImageHeight({ id }));
+    //       dispatch(setTriggerRefresh(Date.now()));
+    //     });
   };
 
   const { onBlur, onFocus, onMouseEnter, onMouseLeave } = useBtnRemoveHover({

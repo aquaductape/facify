@@ -1,10 +1,32 @@
+import { nanoid } from "nanoid";
 import React, { useRef } from "react";
-import { postMaloneUri } from "../../../assets/postMaloneUri";
+import { batch, useDispatch } from "react-redux";
+import { useMatchMedia } from "../../hooks/useMatchMedia";
+import { TDemographicsResponse } from "../../ts";
+import dataURLtoFile from "../../utils/dataURLtoFile";
+import { JSON_Stringify_Parse } from "../../utils/jsonStringifyParse";
+import createCroppedImgUrl from "../FaceDetectionResult/BoundingCroppedImage/createCroppedImgUrl";
+import {
+  addDemographicsParentAndChildren,
+  TDemographicNode,
+} from "../FaceDetectionResult/ImageResult/demographicsSlice";
+import { addImage } from "../Table/imageHeightSlice";
+import { animateResult, startAnimate } from "../UploadImageForm/animateUpload";
+import {
+  setImageLoaded,
+  setImageStatus,
+  setUri,
+} from "../UploadImageForm/imageUrlSlice";
+import { postMaloneData } from "./postMalonData";
+import { postMaloneUri } from "./postMaloneUri";
 
 const LandingPageImgExample = () => {
+  const dispatch = useDispatch();
   const svgRef = useRef<SVGSVGElement>(null);
   const fakeUrlBarLoaderElRef = useRef<SVGRectElement>(null);
   const hasClickedRef = useRef(false);
+
+  const mqlRef = useMatchMedia();
 
   const onClick = () => {
     if (hasClickedRef.current) return;
@@ -12,7 +34,81 @@ const LandingPageImgExample = () => {
 
     fakeUrlBarLoaderElRef.current!.classList.add("active");
 
-    setTimeout(() => {}, 1500);
+    setTimeout(async () => {
+      const result = (JSON_Stringify_Parse(
+        postMaloneData
+      ) as unknown) as TDemographicsResponse;
+      const objectUrl = window.URL.createObjectURL(
+        dataURLtoFile(postMaloneUri)
+      );
+      const img = new Image();
+      img.src = objectUrl;
+
+      await new Promise((resolve) =>
+        setTimeout(
+          () =>
+            (img.onload = () => {
+              resolve(true);
+            })
+        )
+      );
+
+      startAnimate({ firstImage: true });
+
+      const data = (result.data as unknown) as TDemographicNode[];
+
+      for (const item of data) {
+        item.hoverActive = false;
+        item.scrollIntoView = false;
+        item.generalHover = false;
+        item.uri = await createCroppedImgUrl({
+          boundingBox: item.bounding_box,
+          img: {
+            src: postMaloneUri,
+            naturalHeight: img.naturalHeight,
+            naturalWidth: img.naturalWidth,
+          },
+        });
+      }
+      // return;
+
+      const name = "post-malone-dj-khaled-billboard.jpg";
+      const parentId = name + "superid";
+
+      batch(() => {
+        dispatch(setUri(objectUrl));
+        dispatch(setImageLoaded(true));
+        dispatch(setImageStatus("DONE"));
+        dispatch(addImage({ id: parentId, imageHeight: null }));
+        dispatch(
+          addDemographicsParentAndChildren({
+            parent: {
+              id: parentId,
+              name,
+              hoverActive: false,
+              imageUrl: {
+                naturalWidth: img.naturalWidth,
+                naturalHeight: img.naturalHeight,
+                uri: objectUrl,
+              },
+            },
+            data,
+          })
+        );
+      });
+
+      animateResult({
+        id: parentId,
+        mql: mqlRef.current!.minWidth_1900_and_minHeight_850,
+        firstImage: true,
+      });
+
+      setTimeout(() => {
+        hasClickedRef.current = false;
+
+        fakeUrlBarLoaderElRef.current!.classList.remove("active");
+      }, 500);
+    }, 1400);
   };
 
   return (

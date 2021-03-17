@@ -7,22 +7,28 @@ import {
   useRef,
   useState,
 } from "react";
-import { batch, useDispatch } from "react-redux";
+import { batch, useDispatch, useSelector } from "react-redux";
 import {
   demographicResult3,
   demographicsResult,
   demographResult2,
 } from "../../dummyData/demographicsResult";
 import { imageUri, imageUri3, imgUri2 } from "../../dummyData/imageUri";
-import { TDemographicsResponse } from "../../ts";
+import { useMatchMedia } from "../../hooks/useMatchMedia";
+import { RootState } from "../../store/rootReducer";
+import { TDemographics, TDemographicsResponse } from "../../ts";
 import { convertFileToBase64 } from "../../utils/convertFileToBase64";
 import dataURLtoFile from "../../utils/dataURLtoFile";
 import { JSON_Stringify_Parse } from "../../utils/jsonStringifyParse";
+import { reflow } from "../../utils/reflow";
+import createCroppedImgUrl from "../FaceDetectionResult/BoundingCroppedImage/createCroppedImgUrl";
 import {
   addDemographicsParentAndChildren,
+  setDemoItemHoverActive,
   TDemographicNode,
 } from "../FaceDetectionResult/ImageResult/demographicsSlice";
 import { addImage } from "../Table/imageHeightSlice";
+import { animateResult, startAnimate } from "./animateUpload";
 import { setImageLoaded, setImageStatus, setUri } from "./imageUrlSlice";
 import Input from "./Input";
 
@@ -31,6 +37,10 @@ const placeholderError = "URL Required*";
 const UploadImageForm = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const dispatch = useDispatch();
+  const imageLoaded = useSelector(
+    (state: RootState) => state.imageUrl.imageLoaded
+  );
+  const mqlRef = useMatchMedia();
   // dispatch()
   const [state, setState] = useState({
     urlInput: {
@@ -54,24 +64,29 @@ const UploadImageForm = () => {
           data: JSON_Stringify_Parse(demographResult2),
           name: "da-feasters",
         },
-        // {
-        //   _id: nanoid(),
-        //   imageUri: imageUri,
-        //   data: demographicsResult,
-        //   name: "GettyImages-1147443912",
-        // },
-        // {
-        //   _id: nanoid(),
-        //   imageUri: imageUri3,
-        //   data: demographicResult3,
-        //   name: "2021768",
-        // },
-        // {
-        //   _id: nanoid(),
-        //   imageUri: imgUri2,
-        //   data: JSON_Stringify_Parse(demographResult2),
-        //   name: "da-feasters",
-        // },
+        {
+          _id: nanoid(),
+          imageUri: imageUri3,
+          data: demographicResult3,
+          name: "2021768",
+        },
+        {
+          _id: nanoid(),
+          imageUri: imageUri,
+          data: demographicsResult,
+          name: "GettyImages-1147443912",
+        },
+        {
+          _id: nanoid(),
+          imageUri: imgUri2,
+          data: {
+            data: JSON_Stringify_Parse(demographResult2).data.map((item) => ({
+              ...item,
+              id: item.id + "2",
+            })),
+          },
+          name: "da-feasters",
+        },
       ];
 
       for (const { _id, data, imageUri, name } of items) {
@@ -87,23 +102,34 @@ const UploadImageForm = () => {
               })
           )
         );
+
         const result = (data.data as unknown) as TDemographicNode[];
-        result.forEach((item) => {
+
+        for (const item of result) {
           item.hoverActive = false;
           item.scrollIntoView = false;
           item.generalHover = false;
-        });
+          item.uri = await createCroppedImgUrl({
+            boundingBox: item.bounding_box,
+            img: {
+              src: imageUri,
+              naturalHeight: img.naturalHeight,
+              naturalWidth: img.naturalWidth,
+            },
+          });
+        }
+
         const base64 = imageUri;
-        console.log("fire");
 
         batch(() => {
           // dispatch(setUri(objectUrl));
           dispatch(setImageLoaded(true));
           dispatch(setImageStatus("DONE"));
-          dispatch(addImage({ input: { imageHeight: null } }));
+          dispatch(addImage({ id: _id, imageHeight: null }));
           dispatch(
             addDemographicsParentAndChildren({
               parent: {
+                id: _id,
                 name,
                 hoverActive: false,
                 imageUrl: {
@@ -121,15 +147,7 @@ const UploadImageForm = () => {
 
     setTimeout(() => {
       run();
-    }, 1500);
-
-    // result is visibly hidden, still has geometry
-    // after result renders
-    // get Landing page height
-    // get REsult height
-    // if Landing height > Result => translate Landing up
-    //  else z-index -1 on Landing and translate Result down
-    // remove Landing page
+    }, 500);
   }, []);
 
   const onImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -170,23 +188,35 @@ const UploadImageForm = () => {
             })
         )
       );
+
       const data = (result.data as unknown) as TDemographicNode[];
-      data.forEach((item) => {
+
+      for (const item of data) {
         item.hoverActive = false;
         item.scrollIntoView = false;
         item.generalHover = false;
-      });
-      // return;
+        item.uri = await createCroppedImgUrl({
+          boundingBox: item.bounding_box,
+          img: {
+            src: base64,
+            naturalHeight: img.naturalHeight,
+            naturalWidth: img.naturalWidth,
+          },
+        });
+      }
 
+      startAnimate({ firstImage: !imageLoaded });
+
+      const parentId = nanoid();
       batch(() => {
-        // setUr
         dispatch(setUri(base64));
         dispatch(setImageLoaded(true));
         dispatch(setImageStatus("DONE"));
-        dispatch(addImage({ input: { imageHeight: null } }));
+        dispatch(addImage({ id: parentId, imageHeight: null }));
         dispatch(
           addDemographicsParentAndChildren({
             parent: {
+              id: parentId,
               name: file.name,
               hoverActive: false,
               imageUrl: {
@@ -198,9 +228,13 @@ const UploadImageForm = () => {
             data,
           })
         );
-        // dispatch()
       });
-      console.log(result);
+
+      animateResult({
+        id: parentId,
+        mql: mqlRef.current!.minWidth_1900_and_minHeight_850,
+        firstImage: !imageLoaded,
+      });
     } catch (err) {
       // batch(() => {
       //   dispatch(setImageStatus("DONE"));

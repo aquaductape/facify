@@ -5,8 +5,8 @@ import { BarSentinel } from "../../Table/Sentinel";
 import { selectName } from "../ImageResult/demographicsSlice";
 import CloseBtn from "./CloseBtn";
 
-const Bar = ({ id, idx }: { id: number; idx: number }) => {
-  const imageName = useSelector(selectName({ id }));
+const Bar = ({ id, idx }: { id: string; idx: number }) => {
+  const imageName = useSelector(selectName({ id: idx }));
 
   return (
     <div className="bar">
@@ -16,7 +16,7 @@ const Bar = ({ id, idx }: { id: number; idx: number }) => {
         <div className="title-name">{imageName}</div>
       </div>
       <div className="stats">
-        <Stats id={id}></Stats>
+        <Stats id={idx}></Stats>
       </div>
       <CloseBtn id={id} idx={idx}></CloseBtn>
       <style jsx>

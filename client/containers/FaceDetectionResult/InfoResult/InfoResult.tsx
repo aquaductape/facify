@@ -4,35 +4,39 @@ import THead from "../../Table/THead";
 import { InfoResultSentinel } from "../../Table/Sentinel";
 import { useEffect, useRef } from "react";
 import { useMatchMedia } from "../../../hooks/useMatchMedia";
+import { querySelector } from "../../../utils/querySelector";
 
-type TInforResultProps = { id: number };
-const InfoResult = ({ id }: TInforResultProps) => {
+type TInforResultProps = { id: string; idx: number };
+const InfoResult = ({ id, idx }: TInforResultProps) => {
   const containerElRef = useRef<HTMLDivElement | null>(null);
   const infoDemoElRef = useRef<HTMLDivElement | null>(null);
   const mqlGroup = useMatchMedia();
 
   useEffect(() => {
-    if (!mqlGroup.current!.minWidth_1300.matches) return;
+    const infoDemoEl = infoDemoElRef.current!;
 
-    setTimeout(() => {
-      const infoDemoEl = infoDemoElRef.current!;
-      const thead = containerElRef.current!.querySelector(
-        `.thead-sticky-desktop-${id}`
-      ) as HTMLDivElement;
+    if (!mqlGroup.current?.minWidth_1300.matches) return;
+
+    const run = async () => {
+      const thead = await querySelector({
+        selector: `[data-id-thead-sticky="${id}"]`,
+        parent: containerElRef.current!,
+      });
 
       if (infoDemoEl.clientHeight === infoDemoEl.scrollHeight) {
-        thead.style.width = "100%";
+        thead!.style.width = "100%";
       }
-    }, 200);
+    };
+
+    run();
   }, []);
 
   return (
     <div className="container" ref={containerElRef}>
       <InfoResultSentinel id={id}></InfoResultSentinel>
-      <THead id={id} mobile={false}></THead>
+      <THead id={id}></THead>
       <div data-id-info-result={id} className="info-demo" ref={infoDemoElRef}>
-        {/* <Stats id={id} /> */}
-        <Table id={id}></Table>
+        <Table id={id} idx={idx}></Table>
       </div>
 
       <style jsx>

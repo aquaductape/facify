@@ -12,43 +12,25 @@ import createCroppedImgUrl from "./createCroppedImgUrl";
 import smoothScrollTo from "../../../utils/smoothScrollTo";
 
 type BoundingCroppedImageProps = {
-  id: number;
-  parentId: number;
+  id: string;
+  parentId: string;
+  parentIdNumber: number;
   idx: number;
 };
 
 const BoundingCroppedImage = ({
   id,
   parentId,
+  parentIdNumber,
   idx,
 }: BoundingCroppedImageProps) => {
   const dispatch = useDispatch();
   const demographic = useSelector(selectDemographicsDisplay({ id }));
-  const imageUrl = useSelector(selectImageUrl({ id: parentId }));
+  // const imageUrl = useSelector(selectImageUrl({ id: parentId }));
 
-  const croppedImgUrlRef = useRef("");
   const infoResultElRef = useRef<HTMLTableElement | null>(null);
   const imgElRef = useRef<HTMLImageElement>(null);
   const mqlGroup = useMatchMedia();
-
-  const [renderImage, setRenderImage] = useState(false);
-
-  useEffect(() => {
-    const img = {
-      src: imageUrl.uri!,
-      naturalWidth: imageUrl.naturalWidth!,
-      naturalHeight: imageUrl.naturalHeight!,
-    };
-
-    const run = async () => {
-      croppedImgUrlRef.current = await createCroppedImgUrl({
-        boundingBox: demographic.bounding_box,
-        img,
-      });
-      setRenderImage(true);
-    };
-    run();
-  }, []);
 
   const onMouseEnter = () => {
     batch(() => {
@@ -59,7 +41,7 @@ const BoundingCroppedImage = ({
           active: true,
         })
       );
-      dispatch(setHoverActive({ id: parentId, active: true }));
+      dispatch(setHoverActive({ id: parentIdNumber, active: true }));
     });
   };
   const onMouseLeave = () => {
@@ -71,7 +53,7 @@ const BoundingCroppedImage = ({
           active: false,
         })
       );
-      dispatch(setHoverActive({ id: parentId, active: false }));
+      dispatch(setHoverActive({ id: parentIdNumber, active: false }));
     });
   };
 
@@ -131,7 +113,7 @@ const BoundingCroppedImage = ({
     });
   }, [demographic.scrollIntoView]);
 
-  return renderImage ? (
+  return (
     <div>
       <div className="img-container" style={{ height: "70px" }}>
         <div className="bg"></div>
@@ -141,7 +123,7 @@ const BoundingCroppedImage = ({
           ref={imgElRef}
           onMouseEnter={onMouseEnter}
           onMouseLeave={onMouseLeave}
-          src={croppedImgUrlRef.current}
+          src={demographic.uri}
           alt={alt}
         />
       </div>
@@ -201,7 +183,7 @@ const BoundingCroppedImage = ({
         `}
       </style>
     </div>
-  ) : null;
+  );
 };
 
 export default BoundingCroppedImage;

@@ -1,31 +1,77 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/rootReducer";
 import ImageResult from "./ImageResult/ImageResult";
 import InfoResult from "./InfoResult/InfoResult";
 import Seperator from "./Bar/Seperator";
 import Bar from "./Bar/Bar";
+import { reflow } from "../../utils/reflow";
+import { animationEnd } from "../UploadImageForm/animateUpload";
+import { nanoid } from "nanoid";
 
 type TResultProps = {
-  id: number;
+  id: string;
   idx: number;
 };
+
 const Result = React.memo(({ id, idx }: TResultProps) => {
+  const demographicNodeElRef = useRef<HTMLLIElement>(null);
+
+  useEffect(() => {
+    // if (idx === 0) {
+    //   return;
+    // }
+
+    const demographicNodeEl = demographicNodeElRef.current!;
+
+    demographicNodeEl.style.opacity = "1";
+    return;
+
+    demographicNodeEl.style.transform = "translateY(-100%)";
+    demographicNodeEl.style.position = "relative";
+    demographicNodeEl.style.zIndex = "-1";
+    reflow();
+    demographicNodeEl.style.opacity = "1";
+    demographicNodeEl.style.transition = "500ms transform";
+    demographicNodeEl.style.transform = "";
+
+    setTimeout(() => {
+      demographicNodeEl.style.position = "";
+      demographicNodeEl.style.background = "";
+      demographicNodeEl.style.zIndex = "";
+      demographicNodeEl.style.transition = "";
+
+      animationEnd({ id });
+    }, 500);
+  }, []);
   return (
-    <div id={`demographic-node-${id}`} className="container">
+    <li
+      id={`demographic-node-${id}`}
+      className="container"
+      ref={demographicNodeElRef}
+    >
       <div className="bar-container">
         {idx ? <Seperator id={id}></Seperator> : null}
         <Bar id={id} idx={idx}></Bar>
       </div>
 
       <div className="image-panel">
-        <ImageResult id={id} />
-        <InfoResult id={id} />
+        <ImageResult id={id} idx={idx} />
+        <InfoResult id={id} idx={idx} />
       </div>
 
       <style jsx>
         {`
           .container {
+            display: block;
+            padding: 0;
+            margin: 0;
+            list-style-type: none;
+            opacity: 0;
+            background: #fff;
+          }
+
+          .image-panel {
             background: #fff;
           }
 
@@ -44,7 +90,7 @@ const Result = React.memo(({ id, idx }: TResultProps) => {
           }
         `}
       </style>
-    </div>
+    </li>
   );
 });
 
@@ -58,11 +104,19 @@ const FaceDetectionResult = () => {
   // if (error) return <div>{error}</div>;
   // return null;
   return (
-    <>
-      {images.map(({ id }, idx) => (
-        <Result id={id} idx={idx} key={id}></Result>
-      ))}
-    </>
+    <ul>
+      {images.map(({ id }, idx) => {
+        return <Result id={id} idx={idx} key={id}></Result>;
+      })}
+      <style jsx>
+        {`
+          ul {
+            padding: 0;
+            margin: 0;
+          }
+        `}
+      </style>
+    </ul>
   );
 };
 

@@ -21,9 +21,10 @@ const LogoText = () => {
             font-weight: bold;
             font-size: 2rem;
             height: 25px;
-            margin: 54px 0;
+            padding: 54px 0;
             text-align: center;
             user-select: none;
+            box-sizing: content-box;
             z-index: 81;
           }
 
