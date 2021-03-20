@@ -18,14 +18,13 @@ const Result = React.memo(({ id, idx }: TResultProps) => {
   const demographicNodeElRef = useRef<HTMLLIElement>(null);
 
   useEffect(() => {
-    // if (idx === 0) {
-    //   return;
-    // }
+    if (idx === 0) {
+      return;
+    }
 
     const demographicNodeEl = demographicNodeElRef.current!;
 
     demographicNodeEl.style.opacity = "1";
-    return;
 
     demographicNodeEl.style.transform = "translateY(-100%)";
     demographicNodeEl.style.position = "relative";

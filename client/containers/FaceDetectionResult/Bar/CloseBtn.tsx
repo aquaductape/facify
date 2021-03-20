@@ -248,15 +248,15 @@ const CloseBtn = ({ id, idx }: CloseBtnProps) => {
       await removeSandwichedNode();
     }
 
-    //     reflow();
-    //
-    //     theadObserver.reconnect();
-    //
-    //     batch(() => {
-    //       dispatch(removeParentAndNodeChildren({ id: idx }));
-    //       dispatch(removeImageHeight({ id }));
-    //       dispatch(setTriggerRefresh(Date.now()));
-    //     });
+    reflow();
+
+    theadObserver.reconnect();
+
+    batch(() => {
+      dispatch(removeParentAndNodeChildren({ id: idx }));
+      dispatch(removeImageHeight({ id }));
+      dispatch(setTriggerRefresh(Date.now()));
+    });
   };
 
   const { onBlur, onFocus, onMouseEnter, onMouseLeave } = useBtnRemoveHover({

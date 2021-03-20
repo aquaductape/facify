@@ -4,13 +4,13 @@ import { RootState } from "../../store/rootReducer";
 import LandingPageImgExample from "./LandingPageImgExample";
 
 const Landing = () => {
-  const imageLoaded = useSelector(
-    (state: RootState) => state.imageUrl.imageLoaded
-  );
-
-  if (imageLoaded) {
-    return null;
-  }
+  //   const imageLoaded = useSelector(
+  //     (state: RootState) => state.imageUrl.imageLoaded
+  //   );
+  //
+  //   if (imageLoaded) {
+  //     return null;
+  //   }
 
   return (
     <div id="landing" className="container">
@@ -61,6 +61,7 @@ const Landing = () => {
           }
 
           .header-title-subtext {
+            display: block;
             color: var(--blue-main);
           }
 
@@ -68,6 +69,8 @@ const Landing = () => {
             display: flex;
             align-items: center;
             justify-content: center;
+            line-height: 30px;
+            margin-top: 15px;
             margin-bottom: 30px;
           }
 
@@ -117,6 +120,16 @@ const Landing = () => {
           }
 
           @media (min-width: 420px) {
+            .header-title-subtext {
+              display: inline;
+            }
+
+            .header-title {
+              line-height: unset;
+              margin-top: 30px;
+              margin-bottom: 30px;
+            }
+
             .landing-img {
               width: 100%;
               max-width: 600px;

@@ -1,6 +1,7 @@
 import { TBoundingBox } from "../../../ts";
 
 type CreateCroppedImg = {
+  id?: string;
   img: {
     src: string;
     naturalWidth: number;
@@ -8,7 +9,11 @@ type CreateCroppedImg = {
   };
   boundingBox: TBoundingBox;
 };
-const createCroppedImgUrl = async ({ boundingBox, img }: CreateCroppedImg) => {
+const createCroppedImgUrl = async ({
+  id,
+  boundingBox,
+  img,
+}: CreateCroppedImg) => {
   const imgNaturalWidth = img.naturalWidth;
   const imgNaturalHeight = img.naturalHeight;
 
@@ -20,11 +25,9 @@ const createCroppedImgUrl = async ({ boundingBox, img }: CreateCroppedImg) => {
   const proxy = process.env.NEXT_PUBLIC_CORS_PROXY;
   downloadedImage.crossOrigin = "Anonymous";
 
-  if (img.src.match(/^(data:image\/(png|jpeg|jpg|gif|webp);base64,|blob:)/)) {
-    downloadedImage.src = img.src;
-  } else {
-    downloadedImage.src = proxy + img.src;
-  }
+  // if (img.src.match(/^(data:image\/(png|jpeg|jpg|gif|webp);base64,|blob:)/)) {
+  downloadedImage.src = img.src;
+  // }
 
   // img = downloadedImage;
   const onLoadDownloadedImage = () =>

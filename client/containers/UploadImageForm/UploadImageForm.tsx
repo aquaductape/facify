@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
+import { CSSTransition, Transition } from "react-transition-group";
 import {
   demographicResult3,
   demographicsResult,
@@ -19,6 +20,8 @@ import { RootState } from "../../store/rootReducer";
 import { TDemographics, TDemographicsResponse } from "../../ts";
 import { convertFileToBase64 } from "../../utils/convertFileToBase64";
 import dataURLtoFile from "../../utils/dataURLtoFile";
+import { getBase64FromUrl } from "../../utils/getBase64FromUrl";
+import { getImageNameFromUrl } from "../../utils/getImageNameFromUrl";
 import { JSON_Stringify_Parse } from "../../utils/jsonStringifyParse";
 import { reflow } from "../../utils/reflow";
 import createCroppedImgUrl from "../FaceDetectionResult/BoundingCroppedImage/createCroppedImgUrl";
@@ -31,6 +34,7 @@ import { addImage } from "../Table/imageHeightSlice";
 import { animateResult, startAnimate } from "./animateUpload";
 import { setImageLoaded, setImageStatus, setUri } from "./imageUrlSlice";
 import Input from "./Input";
+import Loader from "./Loader";
 
 const placeholderError = "URL Required*";
 
@@ -41,7 +45,7 @@ const UploadImageForm = () => {
     (state: RootState) => state.imageUrl.imageLoaded
   );
   const mqlRef = useMatchMedia();
-  // dispatch()
+  const [showLoader, setShowLoader] = useState(false);
   const [state, setState] = useState({
     urlInput: {
       value: "",
@@ -53,102 +57,201 @@ const UploadImageForm = () => {
     },
   });
 
-  useEffect(() => {
-    const run = async () => {
-      // const id = nanoid();
+  const onCancel = () => {
+    setShowLoader(false);
+  };
 
-      const items = [
-        {
-          _id: nanoid(),
-          imageUri: imgUri2,
-          data: JSON_Stringify_Parse(demographResult2),
-          name: "da-feasters",
-        },
-        {
-          _id: nanoid(),
-          imageUri: imageUri3,
-          data: demographicResult3,
-          name: "2021768",
-        },
-        {
-          _id: nanoid(),
-          imageUri: imageUri,
-          data: demographicsResult,
-          name: "GettyImages-1147443912",
-        },
-        {
-          _id: nanoid(),
-          imageUri: imgUri2,
-          data: {
-            data: JSON_Stringify_Parse(demographResult2).data.map((item) => ({
-              ...item,
-              id: item.id + "2",
-            })),
-          },
-          name: "da-feasters",
-        },
-      ];
+  const postClarifaiAPI = async ({ base64 }: { base64: string }) => {
+    const res = await fetch("/api/scan-image", {
+      method: "post",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        imageBase64: base64,
+      }),
+    });
+    const result = (await res.json()) as TDemographicsResponse;
+    return result;
+  };
 
-      for (const { _id, data, imageUri, name } of items) {
-        const objectUrl = window.URL.createObjectURL(dataURLtoFile(imageUri));
-        const img = new Image();
-        img.src = objectUrl;
+  const getImageDimensions = async (url: string) => {
+    const img = new Image();
+    img.src = url;
 
-        await new Promise((resolve) =>
-          setTimeout(
-            () =>
-              (img.onload = () => {
-                resolve(true);
-              })
-          )
-        );
-
-        const result = (data.data as unknown) as TDemographicNode[];
-
-        for (const item of result) {
-          item.hoverActive = false;
-          item.scrollIntoView = false;
-          item.generalHover = false;
-          item.uri = await createCroppedImgUrl({
-            boundingBox: item.bounding_box,
-            img: {
-              src: imageUri,
-              naturalHeight: img.naturalHeight,
-              naturalWidth: img.naturalWidth,
-            },
-          });
-        }
-
-        const base64 = imageUri;
-
-        batch(() => {
-          // dispatch(setUri(objectUrl));
-          dispatch(setImageLoaded(true));
-          dispatch(setImageStatus("DONE"));
-          dispatch(addImage({ id: _id, imageHeight: null }));
-          dispatch(
-            addDemographicsParentAndChildren({
-              parent: {
-                id: _id,
-                name,
-                hoverActive: false,
-                imageUrl: {
-                  naturalWidth: img.naturalWidth,
-                  naturalHeight: img.naturalHeight,
-                  uri: objectUrl,
-                },
-              },
-              data: result,
-            })
-          );
-        });
+    return await new Promise<{ naturalHeight: number; naturalWidth: number }>(
+      (resolve) => {
+        img.onload = () => {
+          const dimensions = {
+            naturalHeight: img.naturalHeight,
+            naturalWidth: img.naturalWidth,
+          };
+          resolve(dimensions);
+        };
       }
-    };
+    );
+  };
 
-    setTimeout(() => {
-      run();
-    }, 500);
-  }, []);
+  const uploadAndAnimate = async ({
+    name,
+    id,
+    croppedUrl,
+    url,
+    data,
+    img,
+  }: {
+    id: string;
+    name: string;
+    data: TDemographicNode[];
+    url: string;
+    croppedUrl: string;
+    img: {
+      naturalHeight: number;
+      naturalWidth: number;
+    };
+  }) => {
+    for (const item of data) {
+      item.hoverActive = false;
+      item.scrollIntoView = false;
+      item.generalHover = false;
+      item.uri = await createCroppedImgUrl({
+        boundingBox: item.bounding_box,
+        img: {
+          src: croppedUrl,
+          naturalHeight: img.naturalHeight,
+          naturalWidth: img.naturalWidth,
+        },
+      });
+    }
+
+    startAnimate({ firstImage: !imageLoaded });
+
+    batch(() => {
+      dispatch(setUri(croppedUrl));
+      dispatch(setImageLoaded(true));
+      dispatch(setImageStatus("DONE"));
+      dispatch(addImage({ id, imageHeight: null }));
+      dispatch(
+        addDemographicsParentAndChildren({
+          parent: {
+            id,
+            name,
+            hoverActive: false,
+            imageUrl: {
+              naturalWidth: img.naturalWidth,
+              naturalHeight: img.naturalHeight,
+              uri: url,
+            },
+          },
+          data,
+        })
+      );
+    });
+
+    animateResult({
+      id,
+      mql: mqlRef.current!.minWidth_1900_and_minHeight_850,
+      firstImage: !imageLoaded,
+    });
+  };
+
+  //   useEffect(() => {
+  //     const run = async () => {
+  //       // const id = nanoid();
+  //
+  //       const items = [
+  //         {
+  //           _id: nanoid(),
+  //           imageUri: imgUri2,
+  //           data: JSON_Stringify_Parse(demographResult2),
+  //           name: "da-feasters",
+  //         },
+  //         {
+  //           _id: nanoid(),
+  //           imageUri: imageUri3,
+  //           data: demographicResult3,
+  //           name: "2021768",
+  //         },
+  //         {
+  //           _id: nanoid(),
+  //           imageUri: imageUri,
+  //           data: demographicsResult,
+  //           name: "GettyImages-1147443912",
+  //         },
+  //         {
+  //           _id: nanoid(),
+  //           imageUri: imgUri2,
+  //           data: {
+  //             data: JSON_Stringify_Parse(demographResult2).data.map((item) => ({
+  //               ...item,
+  //               id: item.id + "2",
+  //             })),
+  //           },
+  //           name: "da-feasters",
+  //         },
+  //       ];
+  //
+  //       for (const { _id, data, imageUri, name } of items) {
+  //         const objectUrl = window.URL.createObjectURL(dataURLtoFile(imageUri));
+  //         const img = new Image();
+  //         img.src = objectUrl;
+  //
+  //         await new Promise((resolve) =>
+  //           setTimeout(
+  //             () =>
+  //               (img.onload = () => {
+  //                 resolve(true);
+  //               })
+  //           )
+  //         );
+  //
+  //         const result = (data.data as unknown) as TDemographicNode[];
+  //
+  //         for (const item of result) {
+  //           item.hoverActive = false;
+  //           item.scrollIntoView = false;
+  //           item.generalHover = false;
+  //           item.uri = await createCroppedImgUrl({
+  //             boundingBox: item.bounding_box,
+  //             img: {
+  //               src: imageUri,
+  //               naturalHeight: img.naturalHeight,
+  //               naturalWidth: img.naturalWidth,
+  //             },
+  //           });
+  //         }
+  //
+  //         const base64 = imageUri;
+  //
+  //         batch(() => {
+  //           // dispatch(setUri(objectUrl));
+  //           dispatch(setImageLoaded(true));
+  //           dispatch(setImageStatus("DONE"));
+  //           dispatch(addImage({ id: _id, imageHeight: null }));
+  //           dispatch(
+  //             addDemographicsParentAndChildren({
+  //               parent: {
+  //                 id: _id,
+  //                 name,
+  //                 hoverActive: false,
+  //                 imageUrl: {
+  //                   naturalWidth: img.naturalWidth,
+  //                   naturalHeight: img.naturalHeight,
+  //                   uri: objectUrl,
+  //                 },
+  //               },
+  //               data: result,
+  //             })
+  //           );
+  //         });
+  //       }
+  //     };
+  //
+  //     setTimeout(() => {
+  //       run();
+  //     }, 500);
+  //   }, []);
 
   const onImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     try {
@@ -158,83 +261,23 @@ const UploadImageForm = () => {
         // throw notification error: "cannot upload more than 10 images"
         return;
       }
-      // console.log(files[0].size);
-      // return;
       const file = files![0] as File;
-      // dispatch(setImageStatus("LOADING"));
-      const base64 = await convertFileToBase64(file);
-      const res = await fetch("http://localhost:8000/scan-image", {
-        method: "post",
-        mode: "cors",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          imageBase64: base64,
-        }),
-      });
-
-      const result = (await res.json()) as TDemographicsResponse;
-      const objectUrl = window.URL.createObjectURL(file);
-      const img = new Image();
-      img.src = objectUrl;
-
-      await new Promise((resolve) =>
-        setTimeout(
-          () =>
-            (img.onload = () => {
-              resolve(true);
-            })
-        )
-      );
-
+      const { base64, file: newFile } = await convertFileToBase64(file);
+      const result = await postClarifaiAPI({ base64 });
+      const objectUrl = window.URL.createObjectURL(newFile);
+      const img = await getImageDimensions(objectUrl);
       const data = (result.data as unknown) as TDemographicNode[];
 
-      for (const item of data) {
-        item.hoverActive = false;
-        item.scrollIntoView = false;
-        item.generalHover = false;
-        item.uri = await createCroppedImgUrl({
-          boundingBox: item.bounding_box,
-          img: {
-            src: base64,
-            naturalHeight: img.naturalHeight,
-            naturalWidth: img.naturalWidth,
-          },
-        });
-      }
-
-      startAnimate({ firstImage: !imageLoaded });
-
-      const parentId = nanoid();
-      batch(() => {
-        dispatch(setUri(base64));
-        dispatch(setImageLoaded(true));
-        dispatch(setImageStatus("DONE"));
-        dispatch(addImage({ id: parentId, imageHeight: null }));
-        dispatch(
-          addDemographicsParentAndChildren({
-            parent: {
-              id: parentId,
-              name: file.name,
-              hoverActive: false,
-              imageUrl: {
-                naturalWidth: img.naturalWidth,
-                naturalHeight: img.naturalHeight,
-                uri: objectUrl,
-              },
-            },
-            data,
-          })
-        );
+      await uploadAndAnimate({
+        id: nanoid(),
+        croppedUrl: base64,
+        url: objectUrl,
+        data,
+        img,
+        name: file.name,
       });
 
-      animateResult({
-        id: parentId,
-        mql: mqlRef.current!.minWidth_1900_and_minHeight_850,
-        firstImage: !imageLoaded,
-      });
+      setShowLoader(false);
     } catch (err) {
       // batch(() => {
       //   dispatch(setImageStatus("DONE"));
@@ -243,26 +286,55 @@ const UploadImageForm = () => {
     }
   };
 
-  const onSubmitForm = (e: FormEvent<HTMLFormElement>) => {
+  const onSubmitForm = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const value = state.urlInput.value;
-    if (value.trim()) {
+    let urlValue = state.urlInput.value.trim();
+
+    if (!urlValue) {
       setState((prev) => {
         const copy = JSON_Stringify_Parse(prev);
-        copy.urlInput.placeholder = "Paste URL...";
         copy.urlInput.value = "";
-        copy.urlInput.error = false;
+        copy.urlInput.placeholder = placeholderError;
+        copy.urlInput.error = true;
         return copy;
       });
-
-      return;
     }
+
+    let { base64, sizeMB } = await getBase64FromUrl({
+      url: urlValue,
+      proxy: "/api/convert-base64",
+    });
+
+    console.log({ sizeMB });
+
+    const name = getImageNameFromUrl(urlValue);
+
+    if (sizeMB != null && sizeMB > 3.5) {
+      const result = await convertFileToBase64(dataURLtoFile(base64));
+      base64 = result.base64;
+      urlValue = window.URL.createObjectURL(result.file);
+    }
+
+    const result = await postClarifaiAPI({ base64 });
+    const data = (result.data as unknown) as TDemographicNode[];
+    const img = await getImageDimensions(urlValue);
+
+    await uploadAndAnimate({
+      id: nanoid(),
+      croppedUrl: base64,
+      url: urlValue,
+      data,
+      img,
+      name,
+    });
+
+    setShowLoader(false);
 
     setState((prev) => {
       const copy = JSON_Stringify_Parse(prev);
+      copy.urlInput.placeholder = "Paste URL...";
       copy.urlInput.value = "";
-      copy.urlInput.placeholder = placeholderError;
-      copy.urlInput.error = true;
+      copy.urlInput.error = false;
       return copy;
     });
   };
@@ -330,8 +402,21 @@ const UploadImageForm = () => {
           </button>
         </form>
       </div>
+      <Transition in={showLoader} unmountOnExit timeout={500}>
+        <div className="loader-container">
+          <Loader onCancel={onCancel}></Loader>
+        </div>
+      </Transition>
       <style jsx>
         {`
+          .loader-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+          }
+
           .input-group {
             position: sticky;
             top: 15px;
