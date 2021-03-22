@@ -34,7 +34,7 @@ import { addImage } from "../Table/imageHeightSlice";
 import { animateResult, startAnimate } from "./animateUpload";
 import FormTextInput from "./FormTextInput/FormTextInput";
 import { setImageLoaded, setImageStatus, setUri } from "./imageUrlSlice";
-import Input from "./FormTextInput/Input";
+import Input from "./FormTextInput/InputBox";
 import Loader from "./Loader";
 
 const placeholderError = "URL Required*";
@@ -51,9 +51,6 @@ const UploadImageForm = () => {
       value: "",
       placeholder: "Past URL ...",
       error: false,
-    },
-    submitBtn: {
-      hover: false,
     },
   });
 

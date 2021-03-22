@@ -1,6 +1,6 @@
-import { SetStateAction, useRef } from "react";
+import { SetStateAction, useRef, useState } from "react";
 import { JSON_Stringify_Parse } from "../../../utils/jsonStringifyParse";
-import Input from "./Input";
+import Input from "./InputBox";
 
 type TFormTextInputProps = {
   uploadState: {
@@ -9,9 +9,6 @@ type TFormTextInputProps = {
       placeholder: string;
       error: boolean;
     };
-    submitBtn: {
-      hover: boolean;
-    };
   };
   setUploadState: React.Dispatch<
     SetStateAction<{
@@ -19,9 +16,6 @@ type TFormTextInputProps = {
         value: string;
         placeholder: string;
         error: boolean;
-      };
-      submitBtn: {
-        hover: boolean;
       };
     }>
   >;
@@ -34,16 +28,14 @@ const FormTextInput = ({
   uploadState,
 }: TFormTextInputProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [submitBtnHover, setSubmitBtnHover] = useState(false);
 
   const onSubmitBtnMouseEvents = (isMouseenter: boolean) => {
     if (uploadState.urlInput.error) isMouseenter = false;
-    if (uploadState.submitBtn.hover === isMouseenter) return;
+    // if (uploadState.submitBtn.hover === isMouseenter) return;
+    if (submitBtnHover === isMouseenter) return;
 
-    setUploadState((prev) => {
-      const copy = JSON_Stringify_Parse(prev);
-      copy.submitBtn.hover = isMouseenter;
-      return copy;
-    });
+    setSubmitBtnHover(isMouseenter);
   };
 
   const onInputChange = (e: InputEvent) => {
@@ -65,16 +57,17 @@ const FormTextInput = ({
       aria-label="Paste Image URL"
     >
       <Input
-        ref={inputRef}
         onInputChange={onInputChange}
         placeholder={uploadState.urlInput.placeholder}
         value={uploadState.urlInput.value}
         error={uploadState.urlInput.error}
-        submitBtnHover={uploadState.submitBtn.hover}
+        submitBtnHover={submitBtnHover}
       ></Input>
       <button
         onMouseEnter={() => onSubmitBtnMouseEvents(true)}
         onMouseLeave={() => onSubmitBtnMouseEvents(false)}
+        onFocus={() => onSubmitBtnMouseEvents(true)}
+        onBlur={() => onSubmitBtnMouseEvents(false)}
         className="detect-button"
         type="submit"
       >

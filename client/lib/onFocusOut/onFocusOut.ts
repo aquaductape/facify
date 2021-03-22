@@ -5,8 +5,10 @@ interface IOnFocusOut {
    * button that toggles dropdown/menu
    *
    * if dropdown is not a descendant of button then provide dropdown's selector in "allow" property. Or use "onStart" callback
+   *
+   * If you don't want to use a button, use `false`
    */
-  button: Element;
+  button: Element | false;
   /**
    * runs callback immediately
    */
@@ -62,6 +64,7 @@ interface IOnFocusOut {
 
 type ICustomEvent = {
   firedByReselectButton: boolean;
+  firedByEscape: boolean;
   event: MouseEvent | TouchEvent | KeyboardEvent;
   element?: Element | null;
   parentOfRemovedElement?: Element | null;
@@ -71,7 +74,7 @@ type ICustomEvent = {
 
 type ICallBackList = {
   id: string;
-  button: HTMLElement;
+  button: HTMLElement | false;
   stopWhenTargetIsRemoved: boolean;
   isInit: () => boolean;
   allow: (string | HTMLElement)[];
@@ -153,7 +156,7 @@ export default function onFocusOut({
     },
   };
 
-  if (reSelectButton({ button, toggle, customEvent })) {
+  if (reSelectButton({ id, button, toggle, customEvent })) {
     // TODO: should return null if there are no listeners
     return manualExit; // returns a reference, in case you want to manually remove the listeners
   }
@@ -245,13 +248,17 @@ export default function onFocusOut({
       event: e,
       runAllExits: runAllExitsAndDestroy,
       firedByReselectButton: false,
+      firedByEscape: true,
     };
 
     if (e.key.match(/escape/i)) {
       const idx = listeners.length - 1;
       const { id, button, onExit } = listeners[idx];
       onExit(customEvent);
-      button.focus();
+
+      if (button) {
+        button.focus();
+      }
 
       customEvent.parentOfRemovedElement = null;
 
@@ -275,7 +282,7 @@ export default function onFocusOut({
       // if (stopWhenTargetIsRemoved && !clickedTarget.isConnected) return null;
 
       // allow focus on dropdown button
-      if (button.contains(clickedTarget)) continue;
+      if (button !== false && button.contains(clickedTarget)) continue;
       if (onStart && onStart(customEvent)) continue;
       if (
         allow.some((selector) => {
@@ -321,7 +328,7 @@ export default function onFocusOut({
       // if (stopWhenTargetIsRemoved && !clickedTarget.isConnected) return null;
 
       // allow focus on dropdown button
-      if (button.contains(clickedTarget)) continue;
+      if (button !== false && button.contains(clickedTarget)) continue;
       if (onStart && onStart(customEvent)) continue;
       if (
         allow.some((selector) => {
@@ -386,8 +393,8 @@ const addGlobalListener = () => {
 };
 
 // TODO replace to remove with id instead
-const findButton = (element: Element) => {
-  return listeners.findIndex((listener) => listener.button.contains(element));
+const findButton = (id: string) => {
+  return listeners.findIndex((listener) => listener.id === id);
 };
 
 const removeListenersSliceFromIdx = (idx: number) => {
@@ -399,15 +406,17 @@ const clickEventFiredByKeyboard = (e: MouseEvent) => {
 };
 
 const reSelectButton = ({
+  id,
   button,
   toggle,
   customEvent,
 }: {
-  button: Element;
+  id: string;
+  button: Element | false;
   toggle: boolean;
   customEvent: ICustomEvent;
 }) => {
-  const buttonIdx = findButton(button);
+  const buttonIdx = findButton(id);
   if (buttonIdx > -1) {
     if (!toggle) return true;
     customEvent.firedByReselectButton = true;

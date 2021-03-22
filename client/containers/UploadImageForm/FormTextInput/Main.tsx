@@ -1,7 +1,10 @@
 import { nanoid } from "nanoid";
 import { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import CloseBtn from "../../../components/svg/CloseBtn";
+import { RootState } from "../../../store/rootReducer";
 import { JSON_Stringify_Parse } from "../../../utils/jsonStringifyParse";
+import { removeUrlItem, setUrlItemError } from "../formSlice";
 
 type TURLItemProps = TURLItem & {
   onRemove: (id: string) => void;
@@ -29,6 +32,7 @@ const URLItem = ({ id, content, error, onError, onRemove }: TURLItemProps) => {
       <div className="content">{displayURL}</div>
       <button
         className="url-item__close-btn"
+        tabIndex={-1}
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
@@ -57,7 +61,7 @@ const URLItem = ({ id, content, error, onError, onRemove }: TURLItemProps) => {
             display: flex;
             align-items: center;
             width: 40px;
-            padding: 5px;
+            padding: 12px;
             margin: 0 2px;
             margin-left: auto;
             color: inherit;
@@ -71,11 +75,12 @@ const URLItem = ({ id, content, error, onError, onRemove }: TURLItemProps) => {
           }
 
           .image-container {
-            overflow: hidden;
             flex-shrink: 0;
             display: flex;
             align-items: center;
             height: 100%;
+            filter: drop-shadow(2px 2px 0px #002f9d);
+            overflow: hidden;
           }
 
           .image {
@@ -102,33 +107,10 @@ type TMainProps = {
   onCloseInput: () => void;
 };
 const Main = ({ onCloseInput }: TMainProps) => {
+  const dispatch = useDispatch();
   const urlsElRef = useRef<HTMLUListElement | null>(null);
-  const [urls, setUrls] = useState<TURLItem[]>([
-    // {
-    //   id: nanoid(),
-    //   content:
-    //     "https://static.billboard.com/files/media/post-malone-dj-khaled-2018-billboard-1548-768x433.jpg",
-    //   error: false,
-    // },
-    // { id: nanoid(), content: "https://mgur.com/nt0RgAH.jpg", error: false },
-    // { id: nanoid(), content: "https://i.imgur.com/nt0RgAH.jpg", error: false },
-  ]);
-
-  //   useEffect(() => {
-  //     setTimeout(() => {
-  //       setUrls((prev) => {
-  //         const copy = JSON_Stringify_Parse(prev);
-  //         copy.push({
-  //           id: nanoid(),
-  //           content:
-  //             "https://upload.wikimedia.org/wikipedia/commons/8/85/Elon_Musk_Royal_Society_%28crop1%29.jpg",
-  //           error: false,
-  //         });
-  //
-  //         return copy;
-  //       });
-  //     }, 3000);
-  //   }, []);
+  const urls = useSelector((state: RootState) => state.form.urlItems);
+  // https://i.imgur.com/nt0RgAH.jpg https://upload.wikimedia.org/wikipedia/commons/8/85/Elon_Musk_Royal_Society_%28crop1%29.jpg https://static.tvtropes.org/pmwiki/pub/images/aubrey_plaza.jpg
 
   const onRemoveUrlList = (id: string) => {
     const el = urlsElRef.current!.querySelector(
@@ -142,22 +124,12 @@ const Main = ({ onCloseInput }: TMainProps) => {
     el.style.overflow = "hidden";
 
     setTimeout(() => {
-      setUrls((prev) => {
-        const copy = JSON_Stringify_Parse(prev);
-        const foundIndex = copy.findIndex((item) => item.id === id);
-        copy.splice(foundIndex, 1);
-        return copy;
-      });
+      dispatch(removeUrlItem({ id }));
     }, 100);
   };
 
   const onError = (id: string) => {
-    setUrls((prev) => {
-      const copy = JSON_Stringify_Parse(prev);
-      const item = copy.find((item) => item.id === id)!;
-      item.error = true;
-      return copy;
-    });
+    dispatch(setUrlItemError({ id, error: true }));
   };
 
   const onClick = (e: React.MouseEvent) => {
@@ -169,7 +141,7 @@ const Main = ({ onCloseInput }: TMainProps) => {
   return (
     <div className="main">
       <div className="bar">
-        <button className="close-btn" onClick={onClick}>
+        <button className="close-btn" tabIndex={-1} onClick={onClick}>
           <CloseBtn></CloseBtn>
         </button>
         <div className="title">
@@ -185,6 +157,7 @@ const Main = ({ onCloseInput }: TMainProps) => {
             error={error}
             onError={onError}
             onRemove={onRemoveUrlList}
+            key={id}
           ></URLItem>
         ))}
       </ul>
@@ -216,7 +189,9 @@ const Main = ({ onCloseInput }: TMainProps) => {
           flex-shrink: 0;
           display: flex;
           align-item: center;
-          width: 45px;
+          width: 40px;
+          padding: 8px;
+          background: #ececec;
         }
 
         .title {
