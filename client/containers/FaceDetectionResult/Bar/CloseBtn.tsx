@@ -266,6 +266,7 @@ const CloseBtn = ({ id, idx }: CloseBtnProps) => {
   return (
     <button
       className="btn-remove"
+      aria-label="remove image section result"
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       onFocus={onFocus}
@@ -280,6 +281,7 @@ const CloseBtn = ({ id, idx }: CloseBtnProps) => {
             width: 45px;
             background: #efefef;
             border: 3px solid #efefef;
+            padding: 10px;
             outline: none;
             transition: border-color 250ms;
           }

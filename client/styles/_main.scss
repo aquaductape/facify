@@ -45,6 +45,18 @@ body {
   font-size: 3vmin;
 }
 
+@keyframes Shake {
+  0% {
+    transform: translateX(0px);
+  }
+  50% {
+    transform: translateX(10px);
+  }
+  100% {
+    transform: translateX(0px);
+  }
+}
+
 @media (min-width: 768px) {
   .App {
     padding: 0 50px;

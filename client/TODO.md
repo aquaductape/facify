@@ -13,3 +13,7 @@
 7. When removing demograhicNode use translate effect. Get removing target top position > remove observers > target pointer events none > translate
 8. Predict image size on resizing between 1300px. Layout thrashing.
 9. Have table of contents on the right side. On mobile either have a nav icon on the viewport's bottom right, or have a nav icon on item utility panel.
+
+### Note
+
+1. InputBox inner buttons are actually just divs, I can get away with this since those buttons are not meant to be focusable in the first place, this a scuffed version of Tagify or what StackOverflow uses and they follow the same behavior. This also prevents buttons to be actived inside form event, to clarify, when you press enter, it bubbles to the closest button and that button fires.

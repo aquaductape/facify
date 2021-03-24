@@ -4,25 +4,27 @@ import { nanoid } from "nanoid";
 export type TImageItem = {};
 type TURLItem = { id: string; content: string; error: boolean };
 type TFormState = {
-  inputValue: string;
+  inputResult: TURLItem[];
+  error: boolean;
   urlItems: TURLItem[];
 };
 
 const initialState: TFormState = {
-  inputValue: "",
+  error: false,
+  inputResult: [],
   urlItems: [
-    { id: nanoid(), content: "https://i.imgur.com/nt0RgAH.jpg", error: false },
-    {
-      id: nanoid(),
-      content:
-        "https://upload.wikimedia.org/wikipedia/commons/8/85/Elon_Musk_Royal_Society_%28crop1%29.jpg",
-      error: false,
-    },
-    {
-      id: nanoid(),
-      content: "https://static.tvtropes.org/pmwiki/pub/images/aubrey_plaza.jpg",
-      error: false,
-    },
+    // { id: nanoid(), content: "https://i.imgur.com/nt0RgAH.jpg", error: false },
+    // {
+    //   id: nanoid(),
+    //   content:
+    //     "https://upload.wikimedia.org/wikipedia/commons/8/85/Elon_Musk_Royal_Society_%28crop1%29.jpg",
+    //   error: false,
+    // },
+    // {
+    //   id: nanoid(),
+    //   content: "https://static.tvtropes.org/pmwiki/pub/images/aubrey_plaza.jpg",
+    //   error: false,
+    // },
   ],
 };
 
@@ -54,8 +56,12 @@ const formSlice = createSlice({
       const item = state.urlItems.find((item) => item.id === id)!;
       item.error = error;
     },
-    setInputValue: (state, action: PayloadAction<string>) => {
-      state.inputValue = action.payload;
+    setInputValueFromUrlItems: (state) => {
+      state.inputResult = state.urlItems;
+    },
+    clearAllFormValues: (state) => {
+      state.inputResult = [];
+      state.urlItems = [];
     },
   },
 });
@@ -64,6 +70,7 @@ export const {
   addUrlItem,
   removeUrlItem,
   setUrlItemError,
-  setInputValue,
+  setInputValueFromUrlItems,
+  clearAllFormValues,
 } = formSlice.actions;
 export default formSlice.reducer;

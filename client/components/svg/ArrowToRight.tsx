@@ -11,7 +11,7 @@ const ArrowToRight = () => {
         fill="none"
         stroke="currentColor"
         strokeWidth=".58"
-        stroke-linecap="square"
+        strokeLinecap="square"
       />
     </svg>
   );

@@ -6,15 +6,19 @@ import { RootState } from "../../../store/rootReducer";
 import { JSON_Stringify_Parse } from "../../../utils/jsonStringifyParse";
 import { removeUrlItem, setUrlItemError } from "../formSlice";
 
-type TURLItemProps = TURLItem & {
+type TURLTagProps = TURLTag & {
   onRemove: (id: string) => void;
   onError: (id: string) => void;
 };
-const URLItem = ({ id, content, error, onError, onRemove }: TURLItemProps) => {
+const URLTags = ({ id, content, error, onError, onRemove }: TURLTagProps) => {
   const displayURL = content.replace(/(https:\/\/|http:\/\/)/g, "");
 
   return (
-    <li data-id-url-item={id} className="url-item" key={id}>
+    <li
+      data-id-url-item={id}
+      className={`url-item ${error ? "error" : ""}`}
+      key={id}
+    >
       <div className="image-container">
         <div className="image">
           {error ? (
@@ -30,42 +34,55 @@ const URLItem = ({ id, content, error, onError, onRemove }: TURLItemProps) => {
         </div>
       </div>
       <div className="content">{displayURL}</div>
-      <button
+      <div
         className="url-item__close-btn"
-        tabIndex={-1}
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
+        role="button"
+        aria-label="remove url tag"
+        onClick={() => {
+          // e.preventDefault();
+          // e.stopPropagation();
           onRemove(id);
         }}
       >
         <CloseBtn></CloseBtn>
-      </button>
+      </div>
       <style jsx>
         {`
           .url-item {
             display: flex;
             align-items: center;
+            flex: 1 0 auto;
             height: 45px;
             padding: 8px;
             margin-top: 10px;
             background: #cedaff;
             color: #002f9d;
             list-style-type: none;
-            flex: 1 0 auto;
+            font-size: 15px;
             transition: all 100ms linear, opacity 50ms linear;
           }
 
           .url-item__close-btn {
             flex-shrink: 0;
+            position: relative;
+            left: 8px;
             display: flex;
             align-items: center;
             width: 40px;
             padding: 12px;
-            margin: 0 2px;
+            height: 45px;
+            margin: 0;
             margin-left: auto;
             color: inherit;
             background: inherit;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 250ms, color 250ms;
+          }
+
+          .url-item__close-btn:hover {
+            background: #6f8bdc;
+            color: #fff;
           }
 
           .content {
@@ -95,18 +112,31 @@ const URLItem = ({ id, content, error, onError, onRemove }: TURLItemProps) => {
             width: 100%;
             height: 100%;
           }
+
+          .url-item.error {
+            background: #ffcece;
+            color: #550000;
+          }
+
+          .url-item.error .url-item__close-btn:hover {
+            background: #dc6f6f;
+            color: #fff;
+          }
+
+          @media (min-width: 500px) {
+            .url-item {
+              font-size: 18px;
+            }
+          }
         `}
       </style>
     </li>
   );
 };
 
-type TURLItem = { id: string; content: string; error: boolean };
+type TURLTag = { id: string; content: string; error: boolean };
 
-type TMainProps = {
-  onCloseInput: () => void;
-};
-const Main = ({ onCloseInput }: TMainProps) => {
+const Main = () => {
   const dispatch = useDispatch();
   const urlsElRef = useRef<HTMLUListElement | null>(null);
   const urls = useSelector((state: RootState) => state.form.urlItems);
@@ -132,18 +162,16 @@ const Main = ({ onCloseInput }: TMainProps) => {
     dispatch(setUrlItemError({ id, error: true }));
   };
 
-  const onClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    onCloseInput();
-  };
-
   return (
     <div className="main">
       <div className="bar">
-        <button className="close-btn" tabIndex={-1} onClick={onClick}>
+        <div
+          className="close-btn"
+          role="button"
+          aria-label="collapse input box"
+        >
           <CloseBtn></CloseBtn>
-        </button>
+        </div>
         <div className="title">
           <div className="title-sub-1"> To paste multiple URLs, </div>{" "}
           <span className="title-sub-2">separate by Space</span>
@@ -151,14 +179,14 @@ const Main = ({ onCloseInput }: TMainProps) => {
       </div>
       <ul ref={urlsElRef} className="urls">
         {urls.map(({ id, content, error }) => (
-          <URLItem
+          <URLTags
             id={id}
             content={content}
             error={error}
             onError={onError}
             onRemove={onRemoveUrlList}
             key={id}
-          ></URLItem>
+          ></URLTags>
         ))}
       </ul>
       <style jsx>{`
@@ -192,6 +220,14 @@ const Main = ({ onCloseInput }: TMainProps) => {
           width: 40px;
           padding: 8px;
           background: #ececec;
+          cursor: pointer;
+          user-select: none;
+          transition: background-color 250ms, color 250ms;
+        }
+
+        .close-btn:hover {
+          background: #102466;
+          color: #fff;
         }
 
         .title {

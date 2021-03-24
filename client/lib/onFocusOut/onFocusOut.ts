@@ -1,4 +1,4 @@
-import { IOS, IOS13 } from "./browserInfo";
+import { FireFox, IOS, IOS13 } from "./browserInfo";
 
 interface IOnFocusOut {
   /**
@@ -18,18 +18,18 @@ interface IOnFocusOut {
    *
    * runs when Escape is pressed or focused outside of intented target
    */
-  onExit: (customE?: ICustomEvent) => void;
+  onExit: (customE?: OnFocusOutEvent) => void;
   /**
    * runs when click or keydown event starts. Is run before `allow` or `not` selectors are evaluated
    *
-   * if callback returns false, onExit runs
+   * if callback returns false, default is run such that target will by checked by `allow` or `not` selectors.
    *
-   * if callback returns true, onExit is bypassed
+   * if callback returns true, onExit is bypassed and overall run stops
    *
    * callback parameter holds a custom Event, that does have native event property "event"
    *
    */
-  onStart?: (customE: ICustomEvent) => boolean;
+  onStart?: (customE: OnFocusOutEvent) => boolean;
   /**
    * list to allow focus on
    *
@@ -62,7 +62,7 @@ interface IOnFocusOut {
   event?: Event;
 }
 
-type ICustomEvent = {
+export type OnFocusOutEvent = {
   firedByReselectButton: boolean;
   firedByEscape: boolean;
   event: MouseEvent | TouchEvent | KeyboardEvent;
@@ -79,8 +79,8 @@ type ICallBackList = {
   isInit: () => boolean;
   allow: (string | HTMLElement)[];
   not: (string | HTMLElement)[];
-  onExit: (customE?: ICustomEvent) => void;
-  onStart?: (customE: ICustomEvent) => boolean;
+  onExit: (customE?: OnFocusOutEvent) => void;
+  onStart?: (customE: OnFocusOutEvent) => boolean;
 };
 
 type IGlobalListener = {
@@ -104,7 +104,7 @@ type IGlobalListener = {
 
 export type TManualExit = {
   runAllExits: () => void;
-  runExit: (e?: ICustomEvent) => void;
+  runExit: (e?: OnFocusOutEvent) => void;
 };
 
 if (IOS && !IOS13) {
@@ -141,7 +141,7 @@ export default function onFocusOut({
   event,
 }: IOnFocusOut) {
   const id = uuid();
-  const customEvent = <ICustomEvent>{
+  const customEvent = <OnFocusOutEvent>{
     runAllExits: runAllExitsAndDestroy,
     event,
   };
@@ -165,6 +165,11 @@ export default function onFocusOut({
   run();
 
   let init = true;
+  if (FireFox) {
+    // TODO when button is false, onClick init doesn't bubble up, or theres no click event, not sure
+    init = button !== false;
+  }
+
   const isInit = () => {
     if (init) {
       init = false;
@@ -191,7 +196,7 @@ export default function onFocusOut({
   globalListener.onClick = (e: TouchEvent | MouseEvent) => {
     const clickedTarget = e.target as HTMLElement;
     const listenersLength = listeners.length;
-    const customEvent = <ICustomEvent>{
+    const customEvent = <OnFocusOutEvent>{
       event: e,
       runAllExits: runAllExitsAndDestroy,
       firedByReselectButton: false,
@@ -244,7 +249,7 @@ export default function onFocusOut({
   globalListener.onKeyDown = (e: KeyboardEvent) => {
     const clickedTarget = e.target as HTMLElement;
     const listenersLength = listeners.length;
-    const customEvent = <ICustomEvent>{
+    const customEvent = <OnFocusOutEvent>{
       event: e,
       runAllExits: runAllExitsAndDestroy,
       firedByReselectButton: false,
@@ -303,12 +308,11 @@ export default function onFocusOut({
   globalListener.onKeyUp = (e: KeyboardEvent) => {
     const clickedTarget = e.target as HTMLElement;
     const listenersLength = listeners.length;
-    const customEvent = <ICustomEvent>{
+    const customEvent = <OnFocusOutEvent>{
       event: e,
       runAllExits: runAllExitsAndDestroy,
       firedByReselectButton: false,
     };
-    // // console.log("keyup", clickedTarget);
 
     if (!e.key.match(/tab/i)) return null;
 
@@ -414,7 +418,7 @@ const reSelectButton = ({
   id: string;
   button: Element | false;
   toggle: boolean;
-  customEvent: ICustomEvent;
+  customEvent: OnFocusOutEvent;
 }) => {
   const buttonIdx = findButton(id);
   if (buttonIdx > -1) {
