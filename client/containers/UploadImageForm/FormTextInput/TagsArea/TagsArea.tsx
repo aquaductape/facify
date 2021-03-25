@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { CSSTransition, TransitionGroup } from "react-transition-group";
 import MiniImage from "../../../../components/MiniImage";
 import CloseBtn from "../../../../components/svg/CloseBtn";
 import { RootState } from "../../../../store/rootReducer";
@@ -15,9 +16,8 @@ const URLTags = ({ id, content, error, onError, onRemove }: TURLTagProps) => {
 
   return (
     <li
-      data-id-url-item={id}
+      // data-id-url-item={id}
       className={`url-item ${error ? "error" : ""}`}
-      key={id}
     >
       <MiniImage
         error={error}
@@ -50,13 +50,48 @@ const URLTags = ({ id, content, error, onError, onRemove }: TURLTagProps) => {
             display: flex;
             align-items: center;
             flex: 1 0 auto;
-            height: 45px;
-            padding: 8px;
-            margin-top: 10px;
             background: #cedaff;
             color: #002f9d;
             list-style-type: none;
             font-size: 15px;
+          }
+
+          .url-tag-enter {
+            opacity: 0;
+            height: 0;
+            padding: 0;
+            margin: 0;
+          }
+
+          .url-tag-enter-done {
+            height: 45px;
+            padding: 8px;
+            margin: 0 10px;
+            margin-top: 10px;
+          }
+
+          .url-tag-enter-active {
+            opacity: 1;
+            height: 45px;
+            padding: 8px;
+            margin: 0 10px;
+            margin-top: 10px;
+            transition: all 100ms linear, opacity 50ms 50ms linear;
+          }
+
+          .url-tag-exit {
+            opacity: 1;
+            height: 45px;
+            padding: 8px;
+            margin: 0 10px;
+            margin-top: 10px;
+          }
+
+          .url-tag-exit-active {
+            opacity: 0;
+            height: 0;
+            padding: 0;
+            margin: 0;
             transition: all 100ms linear, opacity 50ms linear;
           }
 
@@ -119,19 +154,7 @@ const TagsArea = () => {
   // https://i.imgur.com/nt0RgAH.jpg https://upload.wikimedia.org/wikipedia/commons/8/85/Elon_Musk_Royal_Society_%28crop1%29.jpg https://static.tvtropes.org/pmwiki/pub/images/aubrey_plaza.jpg
 
   const onRemoveUrlList = (id: string) => {
-    const el = urlsElRef.current!.querySelector(
-      `[data-id-url-item="${id}"]`
-    ) as HTMLElement;
-
-    el.style.height = "0";
-    el.style.padding = "0";
-    el.style.opacity = "0";
-    el.style.margin = "0";
-    el.style.overflow = "hidden";
-
-    setTimeout(() => {
-      dispatch(removeUrlItem({ id }));
-    }, 100);
+    dispatch(removeUrlItem({ id }));
   };
 
   const onError = (id: string) => {
@@ -154,26 +177,28 @@ const TagsArea = () => {
         </div>
       </div>
       <div className="urls-container">
-        {urls.length > 3 ? (
+        {urls.length > 2 ? (
           <>
             <ScrollShadow top={true}></ScrollShadow>
             <ScrollShadow top={false}></ScrollShadow>
           </>
         ) : null}
         <ul ref={urlsElRef} className="urls">
-          {urls.map(({ id, content, error }) => (
-            <URLTags
-              id={id}
-              content={content}
-              error={error}
-              onError={onError}
-              onRemove={onRemoveUrlList}
-              key={id}
-            ></URLTags>
-          ))}
+          <TransitionGroup component={null}>
+            {urls.map(({ id, content, error }) => (
+              <CSSTransition classNames="url-tag" timeout={100} key={id}>
+                <URLTags
+                  id={id}
+                  content={content}
+                  error={error}
+                  onError={onError}
+                  onRemove={onRemoveUrlList}
+                ></URLTags>
+              </CSSTransition>
+            ))}
+          </TransitionGroup>
         </ul>
       </div>
-
       <style jsx>{`
         .main {
           position: relative;
@@ -187,13 +212,13 @@ const TagsArea = () => {
         }
 
         .urls {
-          max-height: 200px;
+          max-height: 150px;
           overflow: hidden;
-          overflow-y: scroll;
+          overflow-y: auto;
           display: flex;
           flex-direction: column;
           padding: 0;
-          margin: 0 10px;
+          margin: 0;
         }
 
         .bar {
@@ -268,6 +293,14 @@ const TagsArea = () => {
           }
         }
       `}</style>
+      {/* dynamic */}
+      <style jsx>
+        {`
+          .urls-container {
+            padding-bottom: ${urls.length ? "70px" : "50px"};
+          }
+        `}
+      </style>
     </div>
   );
 };

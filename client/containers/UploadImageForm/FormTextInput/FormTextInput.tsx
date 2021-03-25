@@ -74,6 +74,7 @@ const SubmitBtn = ({
       <style jsx>
         {`
           .detect-button {
+            position: relative;
             border: none;
             padding: 10px 20px;
             color: #fff;
@@ -82,6 +83,7 @@ const SubmitBtn = ({
             font-size: 1rem;
             cursor: pointer;
             transition: 250ms background-color, 250ms color;
+            z-index: 10;
           }
 
           .detect-button:hover {

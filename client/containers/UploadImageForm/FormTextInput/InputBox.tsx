@@ -33,7 +33,7 @@ const Input = ({ submitHoverRef, isOpenRef, displayErrorRef }: InputProps) => {
       } ${displayErrorRef.current ? "submitError" : ""}`}
     >
       <div ref={contentElRef} className="content">
-        {/* to hide during transition */}
+        <div className="shadow"></div>
         <div className="content-inner">
           <div className="border-bg">
             <div className="gradient blue"></div>
@@ -62,6 +62,20 @@ const Input = ({ submitHoverRef, isOpenRef, displayErrorRef }: InputProps) => {
         {`
           .container {
             flex-grow: 1;
+          }
+
+          .shadow {
+            display: none;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            opacity: 0;
+            transform: scaleX(0.9);
+            box-shadow: 0 0px 12px 2px black;
+            transition: opacity 50ms ease;
+            z-index: -1;
           }
 
           .content,
@@ -161,6 +175,10 @@ const Input = ({ submitHoverRef, isOpenRef, displayErrorRef }: InputProps) => {
             display: block;
           }
 
+          .container.active .shadow {
+            display: block;
+          }
+
           .container.active .content-inner {
             padding: 5px;
           }
@@ -197,6 +215,11 @@ const Input = ({ submitHoverRef, isOpenRef, displayErrorRef }: InputProps) => {
           @media (min-width: 600px) {
             .container.active .content {
               max-height: calc(100vh - 133px - 45px);
+            }
+
+            .shadow {
+              transform: scaleX(0.95);
+              box-shadow: 0 0px 15px 2px black;
             }
           }
         `}

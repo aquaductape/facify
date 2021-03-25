@@ -1,6 +1,6 @@
 import debounce from "lodash/debounce";
 import { nanoid } from "nanoid";
-import {
+import React, {
   ChangeEvent,
   ForwardedRef,
   forwardRef,
@@ -11,9 +11,16 @@ import {
 import { batch, useDispatch } from "react-redux";
 import MiniImage from "../../../../components/MiniImage";
 import ArrowToRight from "../../../../components/svg/ArrowToRight";
+import store from "../../../../store/store";
 import { JSON_Stringify_Parse } from "../../../../utils/jsonStringifyParse";
-import { addUrlItem, setUrlItemError } from "../../formSlice";
+import { addUrlItem, removeUrlItem, setUrlItemError } from "../../formSlice";
 import Input from "./Input";
+import UtilBar from "./UtilBar";
+
+let keyDownProps: { key: string; paste: boolean } = {
+  key: "",
+  paste: false,
+};
 
 type TInputBoxInner = {
   isOpenRef: React.MutableRefObject<boolean>;
@@ -35,10 +42,9 @@ const InputBoxInner = ({
   const [imgError, setImgError] = useState(false);
 
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+    const value = e.target.value.trim();
 
-    // setValue(value);
-
+    e.target.value = value;
     onInputUrls(e);
 
     if (hasSubmitRef.current) {
@@ -94,12 +100,15 @@ const InputBoxInner = ({
       });
     });
   };
+
   const onInputUrls = (e: ChangeEvent<HTMLInputElement>) => {
+    const { key, paste } = keyDownProps;
     const value = e.target.value;
+
     const hasSpace = value.match(/\s/);
     const urls = value.split(" ").filter((item) => item);
 
-    if (urls.length && hasSpace) {
+    if ((urls.length && hasSpace && paste) || (key === " " && value)) {
       hasSubmitRef.current = true;
       e.target.value = "";
       setImgUrl("");
@@ -115,7 +124,58 @@ const InputBoxInner = ({
       // a chance submission occurs during debounce, therefore a valid url will still
       // be marked as invalid, which will have a stuck invalid tag. This line covers that basis
       checkDebouncedUrls(urlItems);
+      return;
     }
+  };
+
+  const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const target = e.target as HTMLInputElement;
+    const caretPosition = target.selectionStart;
+    const value = target.value.trim();
+    const vpressed = /v/i.test(e.key);
+    const paste =
+      (vpressed && e.ctrlKey) ||
+      (vpressed && e.metaKey) ||
+      /insert/i.test(e.key);
+    const selectAll = /a/.test(e.key) && e.ctrlKey;
+
+    keyDownProps = { key: e.key, paste };
+
+    if (e.key.match(/backspace/i) && caretPosition === 0) {
+      const urlItems = store.getState().form.urlItems;
+      const lastItem = urlItems[urlItems.length - 1];
+
+      if (!lastItem) return;
+      e.preventDefault();
+      e.stopPropagation();
+
+      const content = lastItem.content;
+      target.value = content + (value ? " " + value : "");
+      target.setSelectionRange(content.length, content.length);
+      dispatch(removeUrlItem({ type: "pop" }));
+      return;
+    }
+
+    if (selectAll) {
+      const urlItems = store.getState().form.urlItems;
+      const reducedContent = urlItems.reduce(
+        (acc, curr, idx) => acc + (idx ? " " : "") + curr.content,
+        ""
+      );
+
+      if (!reducedContent) return;
+
+      target.value = reducedContent + (value ? " " + value : "");
+      target.setSelectionRange(0, target.value.length);
+
+      dispatch(removeUrlItem({ type: "all" }));
+
+      return;
+    }
+  };
+
+  const onKeyUp = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // @ts-ignore
   };
 
   useEffect(() => {
@@ -127,22 +187,29 @@ const InputBoxInner = ({
 
   return (
     <div className={`input-box-inner ${isOpenRef.current ? "active" : ""}`}>
+      <div className="utilbar-container">
+        <UtilBar imgError={imgError} isOpenRef={isOpenRef}></UtilBar>
+      </div>
       <div className="result">
         {imgUrl ? (
           <MiniImage
             url={imgUrl}
             error={imgError}
             onError={onImgError}
+            maxWidth={25}
             margin={"0"}
           ></MiniImage>
         ) : (
-          <div className="arrow">
+          <div id="input-arrow" className="arrow">
             <ArrowToRight></ArrowToRight>
           </div>
         )}
       </div>
       <Input
         onChange={onChange}
+        // onChange={() => {}}
+        onKeyDown={onKeyDown}
+        onKeyUp={onKeyUp}
         isOpenRef={isOpenRef}
         displayErrorRef={displayErrorRef}
         containerElRef={containerElRef}
@@ -156,6 +223,11 @@ const InputBoxInner = ({
             height: 100%;
             pointer-events: none;
           }
+
+          .utilbar-container {
+            display: none;
+          }
+
           .result {
             display: none;
             position: absolute;
@@ -175,6 +247,12 @@ const InputBoxInner = ({
           }
 
           .input-box-inner.active .result {
+            display: flex;
+            align-items: center;
+            z-index: 5;
+          }
+
+          .input-box-inner.active .utilbar-container {
             display: block;
           }
         `}

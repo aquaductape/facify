@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { JSON_Stringify_Parse } from "../../utils/jsonStringifyParse";
 
 export type TImageItem = {};
 type TURLItem = { id: string; content: string; error: boolean };
@@ -41,9 +42,20 @@ const formSlice = createSlice({
 
       state.urlItems.push(result);
     },
-    removeUrlItem: (state, action: PayloadAction<{ id: string }>) => {
-      const { id } = action.payload;
+    removeUrlItem: (
+      state,
+      action: PayloadAction<{ id?: string; type?: "pop" | "all" }>
+    ) => {
+      const { id, type } = action.payload;
 
+      if (type === "pop") {
+        state.urlItems.pop();
+        return;
+      }
+      if (type === "all") {
+        state.urlItems = [];
+        return;
+      }
       const foundIdx = state.urlItems.findIndex((item) => item.id === id);
       state.urlItems.splice(foundIdx, 1);
     },
@@ -59,10 +71,14 @@ const formSlice = createSlice({
     setInputValueFromUrlItems: (state) => {
       state.inputResult = state.urlItems;
     },
+    removeInvalidUrlItems: (state) => {
+      state.urlItems = state.urlItems.filter(({ error }) => !error);
+    },
     clearAllFormValues: (state) => {
       state.inputResult = [];
       state.urlItems = [];
     },
+    // this is not how you should use redux
   },
 });
 
@@ -72,5 +88,6 @@ export const {
   setUrlItemError,
   setInputValueFromUrlItems,
   clearAllFormValues,
+  removeInvalidUrlItems,
 } = formSlice.actions;
 export default formSlice.reducer;

@@ -16,6 +16,8 @@ type TInputProps = {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   imgError: boolean;
   setImgUrl: React.Dispatch<React.SetStateAction<string>>;
+  onKeyDown: React.KeyboardEventHandler<HTMLInputElement>;
+  onKeyUp: React.KeyboardEventHandler<HTMLInputElement>;
 };
 
 let submitBtnActivated = false;
@@ -27,6 +29,8 @@ const Input = ({
   imgError,
   onChange,
   setImgUrl,
+  onKeyDown,
+  onKeyUp,
 }: TInputProps) => {
   const dispatch = useDispatch();
   const urlItems = useSelector((state: RootState) => state.form.urlItems);
@@ -61,16 +65,27 @@ const Input = ({
     if (!value && !urlItems.length) {
       // display "Cannot submit empty value"
       // setDisplayTextResult("Cannot submit empty value")
+      const inputArrowEl = document.getElementById("input-arrow")!;
+
+      inputElRef.current?.focus();
+      inputArrowEl.style.animation = "Shake-Center 300ms ease-in-out 2";
+
+      setTimeout(() => {
+        inputArrowEl.style.animation = "";
+      }, 600);
       return false;
     }
+
+    // why won't you validate error items?
+    // because currently they can't be interacted by screen reader or keyboard
 
     // one of the url items are invalid
-    if (!urlItemsValid()) {
-      return false;
-    }
+    // if (!urlItemsValid()) {
+    //   return false;
+    // }
 
     // there's a value but it is invalid
-    if (value && imgError) {
+    if (value && imgError && !urlItems.length) {
       return false;
     }
 
@@ -139,7 +154,11 @@ const Input = ({
       const inputBoxInnerEl = inputFormElRef.current!.querySelector(
         ".input-box-inner"
       ) as HTMLElement;
+      const utilbarEl = inputBoxInnerEl.querySelector(
+        ".utilbar-container"
+      ) as HTMLElement;
       const titleEl = contentBarEl.querySelector(".title") as HTMLElement;
+      const shadowEl = contentEl.querySelector(".shadow") as HTMLElement;
       const formWidth = inputFormElRef.current!.clientWidth;
       const inputEl = inputElRef.current!;
       const parentMainBarWidth = parentMainBarInputElRef.current!.clientWidth;
@@ -150,9 +169,11 @@ const Input = ({
       inputEl.classList.add("active");
 
       contentEl.style.width = `${formWidth + borderColumnWidth}px`;
+      utilbarEl.style.opacity = "0";
       contentEl.style.minHeight = "unset";
       contentBarEl.style.height = "35px";
       titleEl.style.opacity = "0";
+      inputEl.style.zIndex = "8";
       inputEl.focus();
 
       reflow();
@@ -161,7 +182,9 @@ const Input = ({
       contentBarEl.style.transition = "height 50ms 50ms linear";
       contentEl.style.transition = "height 100ms linear, width 100ms linear";
       titleEl.style.transition = "opacity 100ms 50ms linear";
+      shadowEl.style.transition = "opacity 200ms 100ms ease";
 
+      shadowEl.style.opacity = "1";
       inputEl.style.left = "40px";
       titleEl.style.opacity = "1";
       contentBarEl.style.height = "";
@@ -169,6 +192,8 @@ const Input = ({
       contentEl.style.height = `${contentElHeightRef.current}px`;
 
       setTimeout(() => {
+        utilbarEl.style.opacity = "";
+        inputEl.style.zIndex = "";
         inputEl.style.transition = "";
         contentEl.style.height = "auto";
         contentEl.style.width = "";
@@ -205,8 +230,12 @@ const Input = ({
 
     const contentEl = contentElRef.current!;
     const contentBarEl = contentEl.querySelector(".bar") as HTMLElement;
+    const shadowEl = contentEl.querySelector(".shadow") as HTMLElement;
     const inputBoxInnerEl = inputFormElRef.current!.querySelector(
       ".input-box-inner"
+    ) as HTMLElement;
+    const utilbarEl = inputBoxInnerEl.querySelector(
+      ".utilbar-container"
     ) as HTMLElement;
     const titleEl = contentBarEl.querySelector(".title") as HTMLElement;
     const inputEl = inputElRef.current!;
@@ -216,28 +245,35 @@ const Input = ({
     const inputValue = inputEl.value.trim();
     contentElHeightRef.current = contentEl.clientHeight + (inputValue ? 55 : 0);
 
+    inputEl.style.zIndex = "8";
     titleEl.style.opacity = "1";
     contentEl.style.width = `${parentMainBarWidth}px`;
     contentEl.style.height = `${contentElHeightRef.current}px`;
 
     reflow();
 
+    utilbarEl.style.opacity = "0";
     inputEl.style.left = "";
     contentEl.style.width = `${formWidth + borderColumnWidth}px`;
     contentEl.style.height = `45px`;
     contentEl.style.minHeight = "unset";
     contentBarEl.style.height = "35px";
     titleEl.style.opacity = "0";
+    shadowEl.style.opacity = "0";
+
     contentBarEl.style.transition = "height 50ms linear";
     contentEl.style.transition = "height 100ms linear, width 100ms linear";
     titleEl.style.transition = "opacity 50ms linear";
+    shadowEl.style.transition = "";
 
     setTimeout(() => {
+      inputEl.style.zIndex = "";
       contentEl.style.height = "";
       contentEl.style.width = "";
       contentEl.style.minHeight = "";
       contentEl.style.transition = "";
       contentBarEl.style.transition = "";
+      utilbarEl.style.opacity = "";
       containerElRef.current!.classList.remove("active");
       inputBoxInnerEl.classList.remove("active");
       inputEl.classList.remove("active");
@@ -262,7 +298,8 @@ const Input = ({
         ref={inputElRef}
         spellCheck="false"
         // onClick={onOpenInput}
-
+        onKeyDown={onKeyDown}
+        onKeyUp={onKeyUp}
         onFocus={onOpenInput}
         onChange={onChange}
         className={`${isOpenRef.current ? "active" : ""} ${

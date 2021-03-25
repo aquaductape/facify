@@ -56,6 +56,23 @@ body {
     transform: translateX(0px);
   }
 }
+@keyframes Shake-Center {
+  0% {
+    transform: translateX(0px);
+  }
+  25% {
+    transform: translateX(-8px);
+  }
+  50% {
+    transform: translateX(0px);
+  }
+  75% {
+    transform: translateX(8px);
+  }
+  100% {
+    transform: translateX(0px);
+  }
+}
 
 @media (min-width: 768px) {
   .App {

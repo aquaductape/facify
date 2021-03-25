@@ -4,12 +4,12 @@ type TScrollShadowProps = {
 };
 const ScrollShadow = ({ top }: TScrollShadowProps) => {
   let height = 25;
-  let position = top ? "top: 0;" : `top: ${200 - height + 5}px;`;
+  let position = top ? "top: 0;" : `top: ${150 - height + 5}px;`;
   height = top ? height : 20;
 
   const linearGradient = top
-    ? "linear-gradient(180deg,#00000032,transparent);"
-    : "linear-gradient(0deg,#00000032,transparent);";
+    ? "linear-gradient(180deg,#00000022,transparent);"
+    : "linear-gradient(0deg,#00000022,transparent);";
   const radialGradient = top
     ? "radial-gradient( ellipse at 50% 0%, #00000040, transparent 150px)"
     : "radial-gradient( ellipse at 50% 100%, #00000040, transparent 150px)";
