@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { nanoid } from "nanoid";
 
 export type TImageItem = {};
 type TURLItem = { id: string; content: string; error: boolean };
@@ -9,6 +8,7 @@ type TFormState = {
   urlItems: TURLItem[];
 };
 
+// https://i.imgur.com/nt0RgAH.jpg https://upload.wikimedia.org/wikipedia/commons/8/85/Elon_Musk_Royal_Society_%28crop1%29.jpg https://static.tvtropes.org/pmwiki/pub/images/aubrey_plaza.jpg
 const initialState: TFormState = {
   error: false,
   inputResult: [],

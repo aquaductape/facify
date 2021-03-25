@@ -132,10 +132,13 @@ const CloseBtn = ({ id, idx }: CloseBtnProps) => {
 
         setTimeout(() => {
           logo.style.background = "";
+
           if (mqlRef.current?.minWidth_1900_and_minHeight_850) {
             facesBoundingBoxes.style.transform = "";
             facesBoundingBoxes.style.transition = "";
           }
+
+          landingEl.style.position = "";
           landingEl.style.transform = "";
           landingEl.style.transition = "";
           landingEl.style.opacity = "";

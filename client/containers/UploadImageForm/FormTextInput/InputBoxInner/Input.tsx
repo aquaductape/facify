@@ -38,15 +38,17 @@ const Input = ({
   const onFocusOutStartRef = useRef<((e: OnFocusOutEvent) => boolean) | null>(
     null
   );
+  const onCloseInputRef = useRef<(() => void) | null>(null);
 
-  const onClosedInput = () => {
+  const onCloseInputEnd = () => {
     const inputEl = inputElRef.current!;
     const value = inputEl.value.trim();
     // reset
     inputEl.value = "";
+    console.log({ imgError });
 
     if (value) {
-      dispatch(addUrlItem({ id: nanoid(), content: value, error: false }));
+      dispatch(addUrlItem({ id: nanoid(), content: value, error: imgError }));
     }
   };
 
@@ -80,20 +82,19 @@ const Input = ({
     const value = inputEl.value.trim();
     // reset
     inputEl.value = "";
+    console.log({ urlItems, value });
+
+    contentElHeightRef.current = 100;
 
     if (value) {
       dispatch(addUrlItem({ id: nanoid(), content: value, error: false }));
-
-      if (submitBtnActivated) {
-        setTimeout(() => {
-          dispatch(setInputValueFromUrlItems());
-          setImgUrl("");
-        }, 100);
-      }
-      return;
     }
 
-    // error
+    if (submitBtnActivated) {
+      setTimeout(() => {
+        dispatch(setInputValueFromUrlItems());
+      }, 100);
+    }
   };
 
   const onFocusOutStart = (e: OnFocusOutEvent) => {
@@ -104,7 +105,6 @@ const Input = ({
       if (!submitValuesValid()) {
         return true;
       }
-
       submitBtnActivated = true;
     }
 
@@ -113,10 +113,11 @@ const Input = ({
 
   const onCloseEnd = () => {
     // submitBtnActivated
+    setImgUrl("");
     if (submitBtnActivated) {
       onSubmit();
     } else {
-      onClosedInput();
+      onCloseInputEnd();
     }
 
     submitBtnActivated = false;
@@ -191,7 +192,7 @@ const Input = ({
           input.blur();
         }
 
-        onCloseInput();
+        onCloseInputRef.current!();
       },
     });
   };
@@ -212,13 +213,8 @@ const Input = ({
     const formWidth = inputFormElRef.current!.clientWidth;
     const parentMainBarWidth = parentMainBarInputElRef.current!.clientWidth;
     const borderColumnWidth = 5;
-    contentElHeightRef.current = contentEl.clientHeight;
-
-    // how to dispatch on Enter
-    // don't have submit event, instead listen to enter event in this component.
-    // since you have a form value that's selected on UploadImageForm, have a useEffect to listen to it.
-
-    // already dispatched upon Enter
+    const inputValue = inputEl.value.trim();
+    contentElHeightRef.current = contentEl.clientHeight + (inputValue ? 55 : 0);
 
     titleEl.style.opacity = "1";
     contentEl.style.width = `${parentMainBarWidth}px`;
@@ -257,7 +253,8 @@ const Input = ({
 
   useEffect(() => {
     onFocusOutStartRef.current = onFocusOutStart;
-  }, [imgError, urlItems.length]);
+    onCloseInputRef.current = onCloseInput;
+  });
 
   return (
     <>

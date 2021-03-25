@@ -5,7 +5,7 @@ import { RootState } from "../../../store/rootReducer";
 const InputMiniTags = () => {
   const urls = useSelector((state: RootState) => state.form.urlItems);
 
-  const urlItemsValid = () => urls.every((item) => item.error);
+  const urlItemsValid = () => urls.every((item) => !item.error);
   return (
     <div aria-hidden="true" className="container">
       <div className="content">
@@ -22,7 +22,7 @@ const InputMiniTags = () => {
           })}
         </div>
         {urls.length ? (
-          <div className={`url-count ${urlItemsValid() ? "error" : ""}`}>
+          <div className={`url-count ${!urlItemsValid() ? "error" : ""}`}>
             {urls.length}
           </div>
         ) : null}

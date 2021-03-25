@@ -49,7 +49,7 @@ export const uploadAndAnimate = async ({
     });
   }
 
-  startAnimate({ firstImage: !imageLoaded });
+  await startAnimate({ firstImage: !imageLoaded });
 
   batch(() => {
     dispatch(setUri(croppedUrl));

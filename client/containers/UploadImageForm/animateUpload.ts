@@ -1,25 +1,48 @@
 import { reflow } from "../../utils/reflow";
+import smoothScrollTo from "../../utils/smoothScrollTo";
 
 type TStartAnimate = {
   firstImage: boolean;
 };
-export const startAnimate = ({ firstImage }: TStartAnimate) => {
-  const landingEl = document.getElementById("landing")!;
-  const mainEl = document.getElementById("main")!;
-  const mainBgEl = mainEl.querySelector(".main-bg") as HTMLElement;
+export const startAnimate = ({ firstImage }: TStartAnimate) =>
+  new Promise<boolean>((resolve) => {
+    const landingEl = document.getElementById("landing")!;
+    const mainEl = document.getElementById("main")!;
+    const mainBgEl = mainEl.querySelector(".main-bg") as HTMLElement;
+    const viewportHeight = window.innerHeight;
+    const scrollHeight = document.body.scrollHeight;
 
-  landingEl.style.position = "absolute";
-  landingEl.style.top = "0";
-  landingEl.style.left = "0";
-  landingEl.style.width = "100%";
-  landingEl.style.height = "auto";
-  mainBgEl.style.opacity = "0";
-  mainBgEl.style.height = `${mainBgEl.clientHeight}px`;
+    const isContentOverflow = scrollHeight > viewportHeight;
 
-  if (!firstImage) {
-    mainEl.style.clipPath = "polygon(0% 100%, 0% 0%, 100% 0%, 100% 100%)";
-  }
-};
+    const run = () => {
+      landingEl.style.position = "absolute";
+      landingEl.style.top = "0";
+      landingEl.style.left = "0";
+      landingEl.style.width = "100%";
+      landingEl.style.height = "auto";
+      mainBgEl.style.opacity = "0";
+      mainBgEl.style.height = `${mainBgEl.clientHeight}px`;
+
+      if (!firstImage) {
+        mainEl.style.clipPath = "polygon(0% 100%, 0% 0%, 100% 0%, 100% 100%)";
+      }
+
+      resolve(true);
+    };
+
+    if (firstImage && isContentOverflow) {
+      smoothScrollTo({
+        destination: 0,
+        duration: 180,
+        onEnd: () => {
+          run();
+        },
+      });
+      return;
+    }
+
+    run();
+  });
 
 type TAnimationEnd = {
   id: string;

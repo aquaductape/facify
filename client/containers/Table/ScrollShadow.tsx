@@ -30,16 +30,6 @@ const ScrollShadow = ({ id }: { id: string }) => {
           }
         `}
       </style>
-      {/* dynamic */}
-      <style jsx>
-        {`
-          .scroll-shadow {
-             {
-              /* opacity: ${"scrollShadow" ? "1" : "0"}; */
-            }
-          }
-        `}
-      </style>
     </div>
   );
 };

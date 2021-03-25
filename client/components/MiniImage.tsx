@@ -1,3 +1,5 @@
+import ErrorCircle from "./svg/ErrorCircle";
+
 type TMiniImageProps = {
   url: string;
   error: boolean;
@@ -9,8 +11,8 @@ type TMiniImageProps = {
 };
 const MiniImage = ({
   error,
-  onError,
   url,
+  onError,
   maxHeight = 25,
   maxWidth = 35,
   isUrlTag = false,
@@ -19,7 +21,9 @@ const MiniImage = ({
   return (
     <div className="container">
       {error ? (
-        <div>Bad</div>
+        <div className="error">
+          <ErrorCircle></ErrorCircle>
+        </div>
       ) : (
         <div className="image-container">
           <div className="image">
@@ -34,6 +38,12 @@ const MiniImage = ({
       )}
 
       <style jsx>{`
+        .error {
+          color: #f00;
+          width: 25px;
+          height: 25px;
+        }
+
         .image-container {
           flex-shrink: 0;
           display: flex;
@@ -55,6 +65,22 @@ const MiniImage = ({
       {/* dynamic */}
       <style jsx>
         {`
+          img {
+            max-width: ${maxWidth}px;
+            max-height: ${maxHeight}px;
+          }
+
+          .container {
+            margin: ${margin};
+            ${isUrlTag ? `height: 100%;` : ""}
+            ${error
+              ? `
+              display: flex;
+              align-items: center;
+              `
+              : ""}
+          }
+
           .image {
             ${isUrlTag
               ? `
@@ -63,14 +89,6 @@ const MiniImage = ({
               margin: 0 5px;
               `
               : ""}
-          }
-          img {
-            max-width: ${maxWidth}px;
-            max-height: ${maxHeight}px;
-          }
-
-          .container {
-            margin: ${margin};
           }
 
           img {
@@ -81,6 +99,31 @@ const MiniImage = ({
               height: 100%;
               `
               : ""}
+          }
+          .error {
+            ${isUrlTag
+              ? `
+            margin: 0 5px;
+            width: 35px;
+            `
+              : ""}
+          }
+
+          @media (min-width: 500px) {
+            .image {
+              ${isUrlTag
+                ? `
+              margin-right: 10px;
+              `
+                : ""}
+            }
+            .error {
+              ${isUrlTag
+                ? `
+              margin-right: 10px;
+              `
+                : ""}
+            }
           }
         `}
       </style>

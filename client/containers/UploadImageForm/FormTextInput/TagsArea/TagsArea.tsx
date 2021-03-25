@@ -1,10 +1,10 @@
-import { nanoid } from "nanoid";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import CloseBtn from "../../../components/svg/CloseBtn";
-import { RootState } from "../../../store/rootReducer";
-import { JSON_Stringify_Parse } from "../../../utils/jsonStringifyParse";
-import { removeUrlItem, setUrlItemError } from "../formSlice";
+import MiniImage from "../../../../components/MiniImage";
+import CloseBtn from "../../../../components/svg/CloseBtn";
+import { RootState } from "../../../../store/rootReducer";
+import { removeUrlItem, setUrlItemError } from "../../formSlice";
+import ScrollShadow from "./ScrollShadow";
 
 type TURLTagProps = TURLTag & {
   onRemove: (id: string) => void;
@@ -19,20 +19,18 @@ const URLTags = ({ id, content, error, onError, onRemove }: TURLTagProps) => {
       className={`url-item ${error ? "error" : ""}`}
       key={id}
     >
-      <div className="image-container">
-        <div className="image">
-          {error ? (
-            <div>Bad</div>
-          ) : (
-            <img
-              src={content}
-              onError={() => onError(id)}
-              aria-hidden="true"
-              alt="image base on url input"
-            />
-          )}
-        </div>
-      </div>
+      <MiniImage
+        error={error}
+        onError={() => {
+          if (error) return;
+          onError(id);
+        }}
+        url={content}
+        isUrlTag={true}
+        margin={"0"}
+        maxHeight={100}
+        maxWidth={100}
+      ></MiniImage>
       <div className="content">{displayURL}</div>
       <div
         className="url-item__close-btn"
@@ -91,28 +89,6 @@ const URLTags = ({ id, content, error, onError, onRemove }: TURLTagProps) => {
             text-overflow: ellipsis;
           }
 
-          .image-container {
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            height: 100%;
-            filter: drop-shadow(2px 2px 0px #002f9d);
-            overflow: hidden;
-          }
-
-          .image {
-            width: 35px;
-            height: 100%;
-            margin: 0 5px;
-          }
-
-          img {
-            display: block;
-            object-fit: contain;
-            width: 100%;
-            height: 100%;
-          }
-
           .url-item.error {
             background: #ffcece;
             color: #550000;
@@ -136,7 +112,7 @@ const URLTags = ({ id, content, error, onError, onRemove }: TURLTagProps) => {
 
 type TURLTag = { id: string; content: string; error: boolean };
 
-const Main = () => {
+const TagsArea = () => {
   const dispatch = useDispatch();
   const urlsElRef = useRef<HTMLUListElement | null>(null);
   const urls = useSelector((state: RootState) => state.form.urlItems);
@@ -177,18 +153,27 @@ const Main = () => {
           <span className="title-sub-2">separate by Space</span>
         </div>
       </div>
-      <ul ref={urlsElRef} className="urls">
-        {urls.map(({ id, content, error }) => (
-          <URLTags
-            id={id}
-            content={content}
-            error={error}
-            onError={onError}
-            onRemove={onRemoveUrlList}
-            key={id}
-          ></URLTags>
-        ))}
-      </ul>
+      <div className="urls-container">
+        {urls.length > 3 ? (
+          <>
+            <ScrollShadow top={true}></ScrollShadow>
+            <ScrollShadow top={false}></ScrollShadow>
+          </>
+        ) : null}
+        <ul ref={urlsElRef} className="urls">
+          {urls.map(({ id, content, error }) => (
+            <URLTags
+              id={id}
+              content={content}
+              error={error}
+              onError={onError}
+              onRemove={onRemoveUrlList}
+              key={id}
+            ></URLTags>
+          ))}
+        </ul>
+      </div>
+
       <style jsx>{`
         .main {
           position: relative;
@@ -196,12 +181,19 @@ const Main = () => {
           height: 100%;
         }
 
+        .urls-container {
+          position: relative;
+          padding-bottom: 50px;
+        }
+
         .urls {
+          max-height: 200px;
+          overflow: hidden;
+          overflow-y: scroll;
           display: flex;
           flex-direction: column;
           padding: 0;
           margin: 0 10px;
-          padding-bottom: 50px;
         }
 
         .bar {
@@ -218,7 +210,7 @@ const Main = () => {
           display: flex;
           align-item: center;
           width: 40px;
-          padding: 8px;
+          padding: 10px;
           background: #ececec;
           cursor: pointer;
           user-select: none;
@@ -280,4 +272,4 @@ const Main = () => {
   );
 };
 
-export default Main;
+export default TagsArea;

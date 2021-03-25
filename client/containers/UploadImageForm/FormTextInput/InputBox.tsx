@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import InputBoxInner from "./InputBoxInner/InputBoxInner";
 import InputMiniTags from "./InputMiniTags";
-import Main from "./Main";
+import TagsArea from "./TagsArea/TagsArea";
 
 type InputProps = {
   // inputValueRef
@@ -42,7 +42,7 @@ const Input = ({ submitHoverRef, isOpenRef, displayErrorRef }: InputProps) => {
           </div>
           <div className="main-container">
             {/* <ClientOnly> */}
-            <Main></Main>
+            <TagsArea></TagsArea>
             {/* </ClientOnly> */}
           </div>
           <div className="mini-tags-container">

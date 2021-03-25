@@ -4,6 +4,7 @@ import { batch, useDispatch } from "react-redux";
 import { useMatchMedia } from "../../hooks/useMatchMedia";
 import { TDemographicsResponse } from "../../ts";
 import dataURLtoFile from "../../utils/dataURLtoFile";
+import { delayP } from "../../utils/delayP";
 import { JSON_Stringify_Parse } from "../../utils/jsonStringifyParse";
 import createCroppedImgUrl from "../FaceDetectionResult/BoundingCroppedImage/createCroppedImgUrl";
 import {
@@ -53,7 +54,7 @@ const LandingPageImgExample = () => {
         )
       );
 
-      startAnimate({ firstImage: true });
+      await startAnimate({ firstImage: true });
 
       const data = (result.data as unknown) as TDemographicNode[];
 

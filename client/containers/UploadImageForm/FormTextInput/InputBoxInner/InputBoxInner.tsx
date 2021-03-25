@@ -8,10 +8,11 @@ import {
   useRef,
   useState,
 } from "react";
-import { useDispatch } from "react-redux";
+import { batch, useDispatch } from "react-redux";
 import MiniImage from "../../../../components/MiniImage";
 import ArrowToRight from "../../../../components/svg/ArrowToRight";
-import { addUrlItem } from "../../formSlice";
+import { JSON_Stringify_Parse } from "../../../../utils/jsonStringifyParse";
+import { addUrlItem, setUrlItemError } from "../../formSlice";
 import Input from "./Input";
 
 type TInputBoxInner = {
@@ -55,7 +56,7 @@ const InputBoxInner = ({
         setImgError(false);
         setImgUrl(value);
       },
-      500,
+      750,
       { leading: true }
     )
   );
@@ -64,23 +65,56 @@ const InputBoxInner = ({
     setImgError(true);
   };
 
+  const checkDebouncedUrls = async (
+    _urls: {
+      id: string;
+      content: string;
+      error: boolean;
+    }[]
+  ) => {
+    const urls = JSON_Stringify_Parse(_urls); // input will be tainted by redux/immer, must create new objects
+
+    const loadImageSuccess = (url: string) =>
+      new Promise<boolean>((resolve) => {
+        const img = new Image();
+
+        img.src = url;
+        img.onload = () => resolve(true);
+        img.onerror = () => resolve(false);
+      });
+
+    for (const url of urls) {
+      const success = await loadImageSuccess(url.content);
+      url.error = !success;
+    }
+
+    batch(() => {
+      urls.forEach(({ id, error }) => {
+        dispatch(setUrlItemError({ id, error }));
+      });
+    });
+  };
   const onInputUrls = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     const hasSpace = value.match(/\s/);
     const urls = value.split(" ").filter((item) => item);
 
     if (urls.length && hasSpace) {
-      // setValue("");
       hasSubmitRef.current = true;
       e.target.value = "";
       setImgUrl("");
       setImgError(false);
+      const urlItems = urls.map((url) => ({
+        id: nanoid(),
+        content: url,
+        error: imgError,
+      }));
 
-      dispatch(
-        addUrlItem(
-          urls.map((url) => ({ id: nanoid(), content: url, error: false }))
-        )
-      );
+      dispatch(addUrlItem(urlItems));
+
+      // a chance submission occurs during debounce, therefore a valid url will still
+      // be marked as invalid, which will have a stuck invalid tag. This line covers that basis
+      checkDebouncedUrls(urlItems);
     }
   };
 

@@ -50,7 +50,7 @@ const smoothScrollTo = ({
     const destx = destination as number;
     let start: number | null = null;
     let end = null;
-    let x = 0;
+    let x = (null as unknown) as number;
 
     const animate = (timeStamp: number) => {
       start = timeStamp;
@@ -58,43 +58,46 @@ const smoothScrollTo = ({
       draw(timeStamp);
     };
 
+    const onStop = () => {
+      locked.x = destination as number;
+      scrollTo(destination as number);
+
+      onEnd && onEnd();
+
+      instances--;
+
+      if (!lockedProp) return;
+
+      if (typeof lockedProp === "boolean") {
+        container.removeEventListener("scroll", onLockScroll);
+      } else {
+        const { forever, release } = lockedProp;
+
+        if (forever) {
+          return;
+        }
+
+        if (release) {
+          setTimeout(() => {
+            container.removeEventListener("scroll", onLockScroll);
+          }, release);
+        } else {
+          container.removeEventListener("scroll", onLockScroll);
+        }
+      }
+      return;
+    };
     const draw = (now: number) => {
       if (instances > 1) {
         instances--;
         return;
       }
 
-      if (stop) {
-        locked.x = destination as number;
-        scrollTo(x);
-
-        onEnd && onEnd();
-
-        instances--;
-
-        if (!lockedProp) return;
-
-        if (typeof lockedProp === "boolean") {
-          container.removeEventListener("scroll", onLockScroll);
-        } else {
-          const { forever, release } = lockedProp;
-
-          if (forever) {
-            return;
-          }
-
-          if (release) {
-            setTimeout(() => {
-              container.removeEventListener("scroll", onLockScroll);
-            }, release);
-          } else {
-            container.removeEventListener("scroll", onLockScroll);
-          }
-        }
+      if (now - start! > duration) {
+        onStop();
         return;
       }
 
-      if (now - start! > duration) stop = true;
       const p = (now - start!) / duration;
       const val = easeInOutQuad(p);
       x = startx! + (destx - startx!) * val;
