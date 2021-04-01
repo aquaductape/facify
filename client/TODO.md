@@ -13,6 +13,7 @@
 7. When removing demograhicNode use translate effect. Get removing target top position > remove observers > target pointer events none > translate
 8. Predict image size on resizing between 1300px. Layout thrashing.
 9. Have table of contents on the right side. On mobile either have a nav icon on the viewport's bottom right, or have a nav icon on item utility panel.
+10. Instead of click me, use "Try Me"
 
 ### Note
 

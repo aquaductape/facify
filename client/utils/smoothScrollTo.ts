@@ -39,6 +39,7 @@ const smoothScrollTo = ({
       destination += padding;
       return;
     }
+    // TODO if parent is element, use element.scrollTop instead of window.scrollY, it broke in a particular UI scroll component
     destination =
       destination.getBoundingClientRect().top + window.scrollY + padding;
   };

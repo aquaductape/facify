@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { JSON_Stringify_Parse } from "../../utils/jsonStringifyParse";
 
 export type TImageItem = {};
-type TURLItem = { id: string; content: string; error: boolean };
+type TURLItem = { id: string; content: string; name: string; error: boolean };
 type TFormState = {
   inputResult: TURLItem[];
   error: boolean;
@@ -35,6 +35,7 @@ const formSlice = createSlice({
   reducers: {
     addUrlItem: (state, action: PayloadAction<TURLItem | TURLItem[]>) => {
       const result = action.payload;
+
       if (Array.isArray(result)) {
         state.urlItems.push(...result);
         return;

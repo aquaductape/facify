@@ -17,6 +17,7 @@ type TInputProps = {
   imgError: boolean;
   setImgUrl: React.Dispatch<React.SetStateAction<string>>;
   onKeyDown: React.KeyboardEventHandler<HTMLInputElement>;
+  onInput: React.FormEventHandler<HTMLInputElement>;
   onKeyUp: React.KeyboardEventHandler<HTMLInputElement>;
 };
 
@@ -27,6 +28,7 @@ const Input = ({
   contentElRef,
   containerElRef,
   imgError,
+  onInput,
   onChange,
   setImgUrl,
   onKeyDown,
@@ -297,11 +299,29 @@ const Input = ({
       <input
         ref={inputElRef}
         spellCheck="false"
+        onFocus={onOpenInput}
         // onClick={onOpenInput}
+        onInput={onInput}
         onKeyDown={onKeyDown}
         onKeyUp={onKeyUp}
-        onFocus={onOpenInput}
         onChange={onChange}
+        // onKeyDownCapture={(e) => console.log("keydown c", e.nativeEvent)}
+        // onKeyUpCapture={(e) => console.log("keyup c", e.nativeEvent)}
+        // onChange={(e) =>
+        //   console.log(
+        //     "change ",
+        //     //@ts-ignore
+        //     e.key
+        //   )
+        // }
+        // onChangeCapture={(e) =>
+        //   console.log(
+        //     "change c",
+        //     //@ts-ignore
+        //     e.key
+        //   )
+        // }
+        // onChange={onChange}
         className={`${isOpenRef.current ? "active" : ""} ${
           displayErrorRef.current ? "submitError" : ""
         }`}

@@ -7,14 +7,18 @@ type TImageUrlState = {
   elOnLoadStatus: "EMPTY" | "LOADING" | "DONE";
   error: string | null;
   imageLoaded: boolean;
+  currentAddedImg: { id: string; name: string } | null;
+  currentImgStatus: "EMPTY" | "COMPRESSING" | "SCANNING" | "DONE";
 };
 
 const initialState: TImageUrlState = {
   uri: null,
   imageStatus: "EMPTY",
   elOnLoadStatus: "EMPTY",
+  currentImgStatus: "EMPTY",
   error: null,
   imageLoaded: false,
+  currentAddedImg: null,
 };
 
 const imageUrlSlice = createSlice({

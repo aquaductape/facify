@@ -1,18 +1,43 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 import MiniImage from "../../../../components/MiniImage";
 import CloseBtn from "../../../../components/svg/CloseBtn";
 import { RootState } from "../../../../store/rootReducer";
+import smoothScrollTo from "../../../../utils/smoothScrollTo";
 import { removeUrlItem, setUrlItemError } from "../../formSlice";
 import ScrollShadow from "./ScrollShadow";
+import Sentinel from "./Sentinel";
 
 type TURLTagProps = TURLTag & {
   onRemove: (id: string) => void;
   onError: (id: string) => void;
+  parent: React.MutableRefObject<HTMLUListElement | null>;
+  willScrollTo: boolean;
 };
-const URLTags = ({ id, content, error, onError, onRemove }: TURLTagProps) => {
-  const displayURL = content.replace(/(https:\/\/|http:\/\/)/g, "");
+const URLTags = ({
+  id,
+  content,
+  error,
+  name,
+  parent,
+  willScrollTo,
+  onError,
+  onRemove,
+}: TURLTagProps) => {
+  // const displayURL = content.replace(/(https:\/\/|http:\/\/)/g, "");
+  const displayURL = error ? content : name;
+
+  useEffect(() => {
+    if (!willScrollTo) return;
+    setTimeout(() => {
+      smoothScrollTo({
+        destination: parent.current!.scrollHeight,
+        container: parent.current!,
+        duration: 500,
+      });
+    }, 150);
+  }, []);
 
   return (
     <li
@@ -52,6 +77,10 @@ const URLTags = ({ id, content, error, onError, onRemove }: TURLTagProps) => {
             flex: 1 0 auto;
             background: #cedaff;
             color: #002f9d;
+            height: 45px;
+            padding: 8px;
+            margin: 0 10px;
+            margin-top: 10px;
             list-style-type: none;
             font-size: 15px;
           }
@@ -145,13 +174,22 @@ const URLTags = ({ id, content, error, onError, onRemove }: TURLTagProps) => {
   );
 };
 
-type TURLTag = { id: string; content: string; error: boolean };
+type TURLTag = { id: string; content: string; name: string; error: boolean };
 
 const TagsArea = () => {
   const dispatch = useDispatch();
-  const urlsElRef = useRef<HTMLUListElement | null>(null);
+
   const urls = useSelector((state: RootState) => state.form.urlItems);
   // https://i.imgur.com/nt0RgAH.jpg https://upload.wikimedia.org/wikipedia/commons/8/85/Elon_Musk_Royal_Society_%28crop1%29.jpg https://static.tvtropes.org/pmwiki/pub/images/aubrey_plaza.jpg
+
+  const urlsElRef = useRef<HTMLUListElement | null>(null);
+  const scrollShadowElsRef = useRef<{
+    top: { current: HTMLDivElement | null };
+    bottom: { current: HTMLDivElement | null };
+  }>({
+    top: { current: null },
+    bottom: { current: null },
+  });
 
   const onRemoveUrlList = (id: string) => {
     dispatch(removeUrlItem({ id }));
@@ -179,24 +217,49 @@ const TagsArea = () => {
       <div className="urls-container">
         {urls.length > 2 ? (
           <>
-            <ScrollShadow top={true}></ScrollShadow>
-            <ScrollShadow top={false}></ScrollShadow>
+            <ScrollShadow
+              top={true}
+              scrollShadowElsRef={scrollShadowElsRef}
+            ></ScrollShadow>
+            <ScrollShadow
+              top={false}
+              scrollShadowElsRef={scrollShadowElsRef}
+            ></ScrollShadow>
           </>
         ) : null}
         <ul ref={urlsElRef} className="urls">
           <TransitionGroup component={null}>
-            {urls.map(({ id, content, error }) => (
-              <CSSTransition classNames="url-tag" timeout={100} key={id}>
-                <URLTags
-                  id={id}
-                  content={content}
-                  error={error}
-                  onError={onError}
-                  onRemove={onRemoveUrlList}
-                ></URLTags>
-              </CSSTransition>
-            ))}
+            {urls.map(({ id, content, name, error }, idx, self) => {
+              const willScrollTo = self.length > 2 && idx === self.length - 1;
+
+              return (
+                <CSSTransition classNames="url-tag" timeout={100} key={id}>
+                  <URLTags
+                    id={id}
+                    content={content}
+                    name={name}
+                    error={error}
+                    parent={urlsElRef}
+                    onError={onError}
+                    onRemove={onRemoveUrlList}
+                    willScrollTo={willScrollTo}
+                  ></URLTags>
+                </CSSTransition>
+              );
+            })}
           </TransitionGroup>
+          {urls.length > 2 ? (
+            <>
+              <Sentinel
+                top={true}
+                scrollShadowElsRef={scrollShadowElsRef}
+              ></Sentinel>
+              <Sentinel
+                top={false}
+                scrollShadowElsRef={scrollShadowElsRef}
+              ></Sentinel>
+            </>
+          ) : null}
         </ul>
       </div>
       <style jsx>{`
@@ -212,6 +275,7 @@ const TagsArea = () => {
         }
 
         .urls {
+          position: relative;
           max-height: 150px;
           overflow: hidden;
           overflow-y: auto;

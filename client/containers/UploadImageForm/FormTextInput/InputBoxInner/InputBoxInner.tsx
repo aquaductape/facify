@@ -1,17 +1,11 @@
 import debounce from "lodash/debounce";
 import { nanoid } from "nanoid";
-import React, {
-  ChangeEvent,
-  ForwardedRef,
-  forwardRef,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import { batch, useDispatch } from "react-redux";
 import MiniImage from "../../../../components/MiniImage";
 import ArrowToRight from "../../../../components/svg/ArrowToRight";
 import store from "../../../../store/store";
+import { getImageNameFromUrl } from "../../../../utils/getImageNameFromUrl";
 import { JSON_Stringify_Parse } from "../../../../utils/jsonStringifyParse";
 import { addUrlItem, removeUrlItem, setUrlItemError } from "../../formSlice";
 import Input from "./Input";
@@ -44,7 +38,6 @@ const InputBoxInner = ({
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.trim();
 
-    e.target.value = value;
     onInputUrls(e);
 
     if (hasSubmitRef.current) {
@@ -113,9 +106,11 @@ const InputBoxInner = ({
       e.target.value = "";
       setImgUrl("");
       setImgError(false);
+
       const urlItems = urls.map((url) => ({
         id: nanoid(),
         content: url,
+        name: getImageNameFromUrl(url),
         error: imgError,
       }));
 
@@ -178,6 +173,22 @@ const InputBoxInner = ({
     // @ts-ignore
   };
 
+  const onInput = (e: React.FormEvent<HTMLInputElement>) => {
+    // fire order: 1. keydown 2. oninput 3. onChange 4. keyup
+    const { key } = keyDownProps;
+    const keyIsUnidentified = !!key.match(/unidentified/i) || key === undefined;
+
+    if (keyIsUnidentified) {
+      // @ts-ignore
+      keyDownProps.key = e.nativeEvent.data as string;
+    }
+
+    // @ts-ignore
+    if (e.nativeEvent.inputType === "insertFromPaste") {
+      keyDownProps.paste = true;
+    }
+  };
+
   useEffect(() => {
     if (isOpenRef.current && !imgError) return;
 
@@ -207,7 +218,7 @@ const InputBoxInner = ({
       </div>
       <Input
         onChange={onChange}
-        // onChange={() => {}}
+        onInput={onInput}
         onKeyDown={onKeyDown}
         onKeyUp={onKeyUp}
         isOpenRef={isOpenRef}

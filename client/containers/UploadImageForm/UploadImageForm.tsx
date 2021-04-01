@@ -1,24 +1,12 @@
-import { nanoid } from "nanoid";
-import {
-  ChangeEvent,
-  FormEvent,
-  useEffect,
-  useReducer,
-  useRef,
-  useState,
-} from "react";
-import { CSSTransition, Transition } from "react-transition-group";
+import { useState } from "react";
 import FormTextInput from "./FormTextInput/FormTextInput";
-import Loader from "./Loader";
+import Loader from "./Loader/Loader";
 
 const placeholderError = "URL Required*";
 
 const UploadImageForm = () => {
   const [showLoader, setShowLoader] = useState(false);
-
-  const onCancel = () => {
-    setShowLoader(false);
-  };
+  //
 
   //   useEffect(() => {
   //     const run = async () => {
@@ -173,11 +161,7 @@ const UploadImageForm = () => {
         <div className="shared-pillar pillar-2"></div>
         <FormTextInput></FormTextInput>
       </div>
-      <Transition in={showLoader} unmountOnExit timeout={500}>
-        <div className="loader-container">
-          <Loader onCancel={onCancel}></Loader>
-        </div>
-      </Transition>
+      <Loader></Loader>
       <style jsx>
         {`
           .input-group {
@@ -190,6 +174,7 @@ const UploadImageForm = () => {
           .multifile-upload-group {
             position: relative;
             display: grid;
+            visibility: hidden;
             grid-template-columns: 1fr 5px 2fr;
             width: 100.01%;
             height: 45px;
@@ -264,14 +249,6 @@ const UploadImageForm = () => {
 
           .pillar-1 {
             display: none;
-          }
-
-          .loader-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
           }
 
           @media (min-width: 800px) {
