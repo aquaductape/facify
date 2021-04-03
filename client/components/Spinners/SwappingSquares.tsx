@@ -1,5 +1,4 @@
 const squareSize = 25;
-const color = "#fff";
 
 const SwappingSquares = () => {
   return (
@@ -30,7 +29,7 @@ const SwappingSquares = () => {
             height: calc(${squareSize}px * 0.25 / 1.3);
             width: calc(${squareSize}px * 0.25 / 1.3);
             animation-duration: 1000ms;
-            border: calc(${squareSize}px * 0.04 / 1.3) solid ${color};
+            border: calc(${squareSize}px * 0.04 / 1.3) solid currentColor;
             margin-right: auto;
             margin-left: auto;
             position: absolute;

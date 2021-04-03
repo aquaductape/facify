@@ -33,15 +33,15 @@ interface IOnFocusOut {
   /**
    * list to allow focus on
    *
-   * Example: A dropdown selector. Place a {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/closest|string selector} or Element inside allow list, so it will allow interaction
+   * Example: A dropdown selector. Place a {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/closest|string selector} or Element inside allow list, so it will allow interaction. If Element doesn't exist on intial run, then pass a callback `function` that returns the Element.
    */
-  allow?: (string | HTMLElement)[];
+  allow?: (string | HTMLElement | (() => HTMLElement))[];
   /**
    * list to run onExit when focused on
    *
-   * Place a {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/closest|string selector} or Element inside not list, so that it will run onExit on interaction. Example: A close button within a dropdown.
+   * Place a {@link https://developer.mozilla.org/en-US/docs/Web/API/Element/closest|string selector} or Element inside not list, so that it will run onExit on interaction. Example: A close button within a dropdown. If Element doesn't exist on intial run, then pass a callback `function` that returns the Element.
    */
-  not?: (string | HTMLElement)[];
+  not?: (string | HTMLElement | (() => HTMLElement))[];
   /**
    * @defaultValue `true`
    *
@@ -49,7 +49,7 @@ interface IOnFocusOut {
    *
    * if false, reclicking button will keep the dropdown open
    */
-  toggle?: boolean;
+  toggle?: boolean; // TODO, directions are misleading/false, this is about initializing on the same button, when there's already a onFocusOut active on that button
   /**
    * @defaultValue `true`
    *
@@ -72,13 +72,15 @@ export type OnFocusOutEvent = {
   runAllExits?: () => void;
 };
 
+export type OnFocusOutExit = TManualExit;
+
 type ICallBackList = {
   id: string;
   button: HTMLElement | false;
   stopWhenTargetIsRemoved: boolean;
   isInit: () => boolean;
-  allow: (string | HTMLElement)[];
-  not: (string | HTMLElement)[];
+  allow: (string | HTMLElement | (() => HTMLElement))[];
+  not: (string | HTMLElement | (() => HTMLElement))[];
   onExit: (customE?: OnFocusOutEvent) => void;
   onStart?: (customE: OnFocusOutEvent) => boolean;
 };
@@ -218,8 +220,12 @@ export default function onFocusOut({
       if (
         not.length &&
         not.some((selector) => {
-          if (typeof selector === "string")
+          if (typeof selector === "string") {
             return clickedTarget.closest(selector);
+          }
+          if (typeof selector === "function") {
+            return selector().contains(clickedTarget);
+          }
           return selector.contains(clickedTarget);
         })
       ) {
@@ -229,8 +235,12 @@ export default function onFocusOut({
       }
       if (
         allow.some((selector) => {
-          if (typeof selector === "string")
+          if (typeof selector === "string") {
             return clickedTarget.closest(selector);
+          }
+          if (typeof selector === "function") {
+            return selector().contains(clickedTarget);
+          }
           return selector.contains(clickedTarget);
         })
       )
@@ -291,8 +301,12 @@ export default function onFocusOut({
       if (onStart && onStart(customEvent)) continue;
       if (
         allow.some((selector) => {
-          if (typeof selector === "string")
+          if (typeof selector === "string") {
             return clickedTarget.closest(selector);
+          }
+          if (typeof selector === "function") {
+            return selector().contains(clickedTarget);
+          }
           return selector.contains(clickedTarget);
         })
       )
@@ -336,8 +350,12 @@ export default function onFocusOut({
       if (onStart && onStart(customEvent)) continue;
       if (
         allow.some((selector) => {
-          if (typeof selector === "string")
+          if (typeof selector === "string") {
             return clickedTarget.closest(selector);
+          }
+          if (typeof selector === "function") {
+            return selector().contains(clickedTarget);
+          }
           return selector.contains(clickedTarget);
         })
       )

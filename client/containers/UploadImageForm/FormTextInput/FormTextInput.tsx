@@ -182,6 +182,7 @@ const FormTextInput = () => {
   useEffect(() => {
     if (!formInputResult.length) return;
 
+    return;
     const run = async () => {
       const values = formInputResult.map(({ content }) => content);
 

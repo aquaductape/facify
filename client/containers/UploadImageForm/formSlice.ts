@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { nanoid } from "nanoid";
 import { JSON_Stringify_Parse } from "../../utils/jsonStringifyParse";
 
 export type TImageItem = {};
@@ -12,7 +13,11 @@ type TFormState = {
 // https://i.imgur.com/nt0RgAH.jpg https://upload.wikimedia.org/wikipedia/commons/8/85/Elon_Musk_Royal_Society_%28crop1%29.jpg https://static.tvtropes.org/pmwiki/pub/images/aubrey_plaza.jpg
 const initialState: TFormState = {
   error: false,
-  inputResult: [],
+  inputResult: [
+    { id: nanoid(), content: "", error: false, name: "post-malon.jpg" },
+    { id: nanoid(), content: "", error: false, name: "aubrey.jpg" },
+    { id: nanoid(), content: "", error: false, name: "elon.gif" },
+  ],
   urlItems: [
     // { id: nanoid(), content: "https://i.imgur.com/nt0RgAH.jpg", error: false },
     // {

@@ -7,7 +7,7 @@ type TImageUrlState = {
   elOnLoadStatus: "EMPTY" | "LOADING" | "DONE";
   error: string | null;
   imageLoaded: boolean;
-  currentAddedImg: { id: string; name: string } | null;
+  currentAddedImg: { id: string; name: string; error: boolean } | null;
   currentImgStatus: "EMPTY" | "COMPRESSING" | "SCANNING" | "DONE";
 };
 
