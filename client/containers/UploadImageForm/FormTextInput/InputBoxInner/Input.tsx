@@ -54,7 +54,9 @@ const Input = ({
     console.log({ imgError });
 
     if (value) {
-      dispatch(addUrlItem({ id: nanoid(), content: value, error: imgError }));
+      dispatch(
+        addUrlItem({ id: nanoid(), content: value, error: imgError, name: "" })
+      );
     }
   };
 
@@ -104,7 +106,9 @@ const Input = ({
     contentElHeightRef.current = 100;
 
     if (value) {
-      dispatch(addUrlItem({ id: nanoid(), content: value, error: false }));
+      dispatch(
+        addUrlItem({ id: nanoid(), content: value, error: false, name: "" })
+      );
     }
 
     if (submitBtnActivated) {
@@ -116,7 +120,16 @@ const Input = ({
 
   const onFocusOutStart = (e: OnFocusOutEvent) => {
     const submitBtnEl = document.getElementById("detect-button")!;
-    const target = e!.event.target;
+    const event = e!.event;
+    const target = event.target;
+
+    if (
+      event.type === "keyup" &&
+      // @ts-ignore
+      event.key.match(/tab/i)
+    ) {
+      return false;
+    }
 
     if (submitBtnEl === target) {
       if (!submitValuesValid()) {
@@ -305,23 +318,6 @@ const Input = ({
         onKeyDown={onKeyDown}
         onKeyUp={onKeyUp}
         onChange={onChange}
-        // onKeyDownCapture={(e) => console.log("keydown c", e.nativeEvent)}
-        // onKeyUpCapture={(e) => console.log("keyup c", e.nativeEvent)}
-        // onChange={(e) =>
-        //   console.log(
-        //     "change ",
-        //     //@ts-ignore
-        //     e.key
-        //   )
-        // }
-        // onChangeCapture={(e) =>
-        //   console.log(
-        //     "change c",
-        //     //@ts-ignore
-        //     e.key
-        //   )
-        // }
-        // onChange={onChange}
         className={`${isOpenRef.current ? "active" : ""} ${
           displayErrorRef.current ? "submitError" : ""
         }`}

@@ -1,11 +1,16 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { CSSTransition } from "react-transition-group";
+import InputCheckBox from "../../components/InputCheckBox";
+import CircleCheck from "../../components/svg/CircleCheck";
 import FormTextInput from "./FormTextInput/FormTextInput";
 import Loader from "./Loader/Loader";
 
 const placeholderError = "URL Required*";
 
 const UploadImageForm = () => {
-  const [showLoader, setShowLoader] = useState(false);
+  const [openLoader, setOpenLoader] = useState(false);
+  const [hideFormGroup, setHideFormGroup] = useState(false);
+
   //
 
   //   useEffect(() => {
@@ -138,9 +143,27 @@ const UploadImageForm = () => {
   //     }
   //   };
 
+  useEffect(() => {
+    setTimeout(() => {
+      setOpenLoader(true);
+    }, 1000);
+  }, []);
+
+  useEffect(() => {
+    if (openLoader) {
+      setTimeout(() => {
+        setHideFormGroup(true);
+      }, 200);
+    } else {
+      setHideFormGroup(false);
+    }
+  }, [openLoader]);
+
   return (
     <div id="main-bar-input" className="input-group">
-      <div className="multifile-upload-group">
+      <div
+        className={`multifile-upload-group ${hideFormGroup ? "active" : ""}`}
+      >
         {/* <BrowserView>
 						</BrowserView> */}
         <button id="webcam-button" className="input-button--webcam">
@@ -161,7 +184,14 @@ const UploadImageForm = () => {
         <div className="shared-pillar pillar-2"></div>
         <FormTextInput></FormTextInput>
       </div>
-      <Loader></Loader>
+      <CSSTransition
+        in={openLoader}
+        classNames="slide"
+        timeout={200}
+        unmountOnExit
+      >
+        <Loader setOpenLoader={setOpenLoader}></Loader>
+      </CSSTransition>
       <style jsx>
         {`
           .input-group {
@@ -174,11 +204,14 @@ const UploadImageForm = () => {
           .multifile-upload-group {
             position: relative;
             display: grid;
-            visibility: hidden;
             grid-template-columns: 1fr 5px 2fr;
             width: 100.01%;
             height: 45px;
             background: #fff;
+          }
+
+          .multifile-upload-group.active {
+            visibility: hidden;
           }
 
           .input-file--hidden {

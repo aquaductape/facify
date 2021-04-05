@@ -2,7 +2,14 @@
 // Compressing
 // bg #30117d
 
-import { useEffect, useRef, useState } from "react";
+import {
+  Dispatch,
+  MutableRefObject,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useSelector } from "react-redux";
 import { CSSTransition } from "react-transition-group";
 import SwappingSquares from "../../../components/Spinners/SwappingSquares";
@@ -10,12 +17,16 @@ import CircleCheck from "../../../components/svg/CircleCheck";
 import CircleCross from "../../../components/svg/CircleCross";
 import KebabMenu from "../../../components/svg/KebabMenu";
 import LinkIcon from "../../../components/svg/LinkIcon";
-import { loaderErrorDuration, loaderSuccessDuration } from "../../../constants";
+import {
+  loaderCountDownDisabledDuration,
+  loaderErrorDuration,
+  loaderSuccessDuration,
+} from "../../../constants";
 import onFocusOut, { OnFocusOutExit } from "../../../lib/onFocusOut/onFocusOut";
 import { RootState } from "../../../store/rootReducer";
 import { JSON_Stringify_Parse } from "../../../utils/jsonStringifyParse";
 import { reflow } from "../../../utils/reflow";
-import OptionsMenu from "./OptionsMenu";
+import DownloadMenu from "./DownloadMenu";
 
 // cancel btn color #cbc3de
 
@@ -31,17 +42,25 @@ import OptionsMenu from "./OptionsMenu";
 // Error
 type TImgStatus = "EMPTY" | "DONE" | "COMPRESSING" | "SCANNING";
 
-type TLoaderProps = {};
+type TLoaderProps = {
+  setOpenLoader: Dispatch<SetStateAction<boolean>>;
+};
+
 export type TQueue = {
   id: string;
   name: string;
   currentImgStatus: TImgStatus;
   error: boolean;
+  errorMsg: string;
   countdown: boolean;
   close: boolean;
 };
-const Loader = () => {
+
+const Loader = ({ setOpenLoader }: TLoaderProps) => {
   const inputResult = useSelector((state: RootState) => state.form.inputResult);
+  const countDownChecked = useSelector(
+    (state: RootState) => state.menu.disableNotificationCountDown
+  );
   // const currentAddedImg = useSelector(
   //   (state: RootState) => state.imageUrl.currentAddedImg
   // );
@@ -51,6 +70,7 @@ const Loader = () => {
   const [currentAddedImg, setCurrentAddedImg] = useState<{
     id: string;
     name: string;
+    errorMsg: string;
     error: boolean;
   } | null>(null);
   const [currentImgStatus, setCurrentImgStatus] = useState<
@@ -64,24 +84,28 @@ const Loader = () => {
   const countDownBarElRef = useRef<HTMLDivElement | null>(null);
   const kebabMenuBtnElRef = useRef<HTMLButtonElement | null>(null);
   const onFocusOutExitRef = useRef<OnFocusOutExit | null>(null);
+  const loadingDoneRef = useRef(false);
   const queueIdxRef = useRef(queueIdx);
   const queueRef = useRef<TQueue[]>([]);
+  const openMenuRef = useRef(openMenu);
   const countDownActivityRef = useRef<{
-    countDownEnabled: boolean;
+    enabled: boolean;
     active: boolean;
     queuing: boolean;
     timeoutId: number;
     timestamp: number;
     duration: number;
   }>({
-    countDownEnabled: true,
+    enabled: !countDownChecked,
     active: false,
     queuing: false,
     timeoutId: 0,
     timestamp: 0,
     duration: loaderErrorDuration,
   });
-  const currentResult = queue[queueIdx];
+  let currentResult = queue[queueIdx];
+
+  openMenuRef.current = openMenu;
 
   // test
   useEffect(() => {
@@ -91,6 +115,7 @@ const Loader = () => {
         const item = {
           id: resultItem.id,
           name: resultItem.name,
+          errorMsg: "",
           error: false,
         };
 
@@ -103,17 +128,16 @@ const Loader = () => {
           setCurrentAddedImg((prev) => {
             const copy = JSON_Stringify_Parse(prev)!;
             copy.error = true;
+            copy.errorMsg = `Error 1003: Image doesn't exist`;
             return copy;
           });
           setCurrentImgStatus("DONE");
 
-          console.log("error");
           cb && cb();
         }, 1000);
         return;
       }
 
-      console.log("run");
       setTimeout(() => {
         setCurrentImgStatus("COMPRESSING");
         setTimeout(() => {
@@ -131,12 +155,25 @@ const Loader = () => {
       setTimeout(() => {
         addItem(1, () => {
           setTimeout(() => {
-            addItem(2);
+            addItem(2, () => {
+              addItem(3, () => {
+                setTimeout(() => {
+                  addItem(4);
+                }, 0);
+              });
+            });
           }, 0);
         });
       }, 0);
     });
   }, []);
+
+  const getCountDownDuration = (currentQueue: TQueue) => {
+    const countDownActivity = countDownActivityRef.current;
+    if (!countDownActivity.enabled) return loaderCountDownDisabledDuration;
+
+    return currentQueue.error ? loaderErrorDuration : loaderSuccessDuration;
+  };
 
   const runningQueue = () => {
     const countDownActivity = countDownActivityRef.current;
@@ -144,13 +181,14 @@ const Loader = () => {
 
     if (!currentQueue || queueIdxRef.current === inputResult.length - 1) {
       countDownActivity.queuing = false;
+
+      queuingDone();
+
       return;
     }
 
-    countDownActivity.duration = currentQueue.error
-      ? loaderErrorDuration
-      : loaderSuccessDuration;
-    console.log(currentQueue, countDownActivity.duration);
+    countDownActivity.duration = getCountDownDuration(currentQueue);
+
     countDownActivity.active = true;
     countDownActivity.queuing = true;
 
@@ -167,14 +205,8 @@ const Loader = () => {
       countDownActivity.timestamp = Date.now();
 
       if (thisCurrentQueue) {
-        countDownActivity.duration = thisCurrentQueue.error
-          ? loaderErrorDuration
-          : loaderSuccessDuration;
+        countDownActivity.duration = getCountDownDuration(thisCurrentQueue);
       }
-      console.log(
-        queueRef.current[queueIdxRef.current],
-        countDownActivity.duration
-      );
       // if (currentQueue.name === "aubrey.jpg") debugger;
       refreshCountDownBarDisplay();
       // debugger;
@@ -185,27 +217,47 @@ const Loader = () => {
         queueIdxRef.current === inputResult.length - 1
       ) {
         countDownActivity.queuing = false;
-        loadingDone();
-        // have func for isLast
+
+        queuingDone();
         return;
       }
-      // have this with own func
       runningQueue();
     }, countDownActivity.duration);
   };
 
-  const loadingDone = () => {
-    if (queueIdxRef.current !== inputResult.length - 1) return;
+  const queuingDone = () => {
+    const countDownActivity = countDownActivityRef.current;
+    const currentQueue = queueRef.current[queueIdxRef.current];
+
+    if (
+      queueIdxRef.current !== inputResult.length - 1 ||
+      currentQueue.currentImgStatus !== "DONE" ||
+      openMenuRef.current
+    ) {
+      return;
+    }
+
+    setTimeout(() => {
+      loadingDoneRef.current = true;
+      if (openMenuRef.current) return;
+
+      setOpenLoader(false);
+    }, countDownActivity.duration);
   };
 
   /** is needed when success queues are displayed back to back, since the css classes won't change, the countdown bar will never be reset */
   const refreshCountDownBarDisplay = () => {
+    const countDownActivity = countDownActivityRef.current!;
+    if (!countDownActivity.enabled) {
+      return;
+    }
+
     const countDownBarEl = countDownBarElRef.current!;
     countDownBarEl.style.transform = "scale(1)";
     countDownBarEl.style.transition = "none";
     reflow();
     countDownBarEl.style.transform = "";
-    countDownBarEl.style.transition = `background-color 500ms, transform ${countDownActivityRef.current.duration}ms linear`;
+    countDownBarEl.style.transition = `background-color 500ms, transform ${countDownActivity.duration}ms linear`;
   };
 
   const nextQueue = () => {
@@ -226,10 +278,10 @@ const Loader = () => {
     const currentResult = copyQueue[foundIdx];
     const item = copyQueue[foundIdx];
 
-    setQueue(() => {
-      item.currentImgStatus = currentImgStatus;
-      queueRef.current = copyQueue;
+    item.currentImgStatus = currentImgStatus;
+    queueRef.current = copyQueue;
 
+    setQueue(() => {
       return copyQueue;
     });
 
@@ -258,6 +310,7 @@ const Loader = () => {
 
       if (foundItem) {
         foundItem.error = currentAddedImg.error;
+        foundItem.errorMsg = currentAddedImg.errorMsg;
         queueRef.current = copy;
         return copy;
       }
@@ -268,6 +321,7 @@ const Loader = () => {
         close: false,
         countdown: true,
         error: currentAddedImg.error,
+        errorMsg: currentAddedImg.errorMsg,
         currentImgStatus: "EMPTY" as any,
       });
       return copy;
@@ -278,7 +332,13 @@ const Loader = () => {
     queueRef.current = queue;
   }, [queue]);
 
-  if (!currentAddedImg || !currentResult) return null;
+  useEffect(() => {
+    if (countDownActivityRef.current.enabled) return;
+    countDownBarElRef.current!.style.transform = "scaleX(0)";
+    countDownBarElRef.current!.style.transition = "none";
+  }, [countDownChecked]);
+
+  if (!currentResult) currentResult = { name: "" } as any;
 
   const titleLoadingText =
     currentResult.currentImgStatus === "COMPRESSING" ||
@@ -293,7 +353,7 @@ const Loader = () => {
   };
 
   const onClickOpenMenu = () => {
-    if (openMenu) {
+    if (openMenu || loadingDoneRef.current) {
       return;
     }
 
@@ -301,86 +361,119 @@ const Loader = () => {
       button: kebabMenuBtnElRef.current!,
       allow: [() => optionsMenuElRef.current!],
       run: () => setOpenMenu(true),
-      onExit: () => setOpenMenu(false),
+      onExit: () => {
+        setOpenMenu(false);
+        if (!loadingDoneRef.current) return;
+        setTimeout(() => {
+          setOpenLoader(false);
+        }, 200);
+      },
     });
 
     onFocusOutExitRef.current = exit;
   };
 
   return (
-    <div className={`container ${containerClass()}`}>
-      <div className="inner">
-        <button
-          className={`kebab-menu ${openMenu ? "active" : ""}`}
-          onClick={onClickOpenMenu}
-          ref={kebabMenuBtnElRef}
-        >
-          <KebabMenu></KebabMenu>
-        </button>
-        <div className="notification">
-          <div className="message">
-            <div className="title">
-              {currentResult.error ? (
-                <>
-                  <div className="title-text">Error</div>
-                  <div className="icon-holder">
-                    <CircleCross></CircleCross>
-                  </div>
-                </>
-              ) : currentResult.currentImgStatus === "EMPTY" ||
-                currentResult.currentImgStatus === "COMPRESSING" ||
-                currentResult.currentImgStatus === "SCANNING" ? (
-                <>
-                  <div className="title-text">{titleLoadingText}</div>
-                  <div className="icon-holder">
-                    <SwappingSquares></SwappingSquares>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="title-text">Added</div>
-                  <div className="icon-holder">
-                    <CircleCheck></CircleCheck>
-                  </div>
-                </>
-              )}
+    <div className="container">
+      <div className="container-inner">
+        <div className={`inner ${containerClass()}`}>
+          <button
+            className={`kebab-menu ${openMenu ? "active" : ""}`}
+            onClick={onClickOpenMenu}
+            aria-label="open download images menu"
+            aria-expanded={openMenu ? "true" : "false"}
+            ref={kebabMenuBtnElRef}
+          >
+            <KebabMenu></KebabMenu>
+          </button>
+          <div className="notification">
+            <div className="message">
+              <div className="title">
+                {currentResult.error ? (
+                  <>
+                    <div className="title-text">Error</div>
+                    <div className="icon-holder">
+                      <CircleCross></CircleCross>
+                    </div>
+                  </>
+                ) : currentResult.currentImgStatus === "EMPTY" ||
+                  currentResult.currentImgStatus === "COMPRESSING" ||
+                  currentResult.currentImgStatus === "SCANNING" ? (
+                  <>
+                    <div className="title-text">{titleLoadingText}</div>
+                    <div className="icon-holder">
+                      <SwappingSquares></SwappingSquares>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="title-text">Added</div>
+                    <div className="icon-holder">
+                      <CircleCheck></CircleCheck>
+                    </div>
+                  </>
+                )}
+              </div>
+              <div className="image-name">
+                {currentResult.currentImgStatus === "DONE" &&
+                !currentResult.error ? (
+                  <span className="link-icon">
+                    <LinkIcon></LinkIcon>
+                  </span>
+                ) : null}
+                <span className="image-name-content">{currentResult.name}</span>
+              </div>
             </div>
-            <div className="image-name">
-              {currentResult.currentImgStatus === "DONE" &&
-              !currentResult.error ? (
-                <span className="link-icon">
-                  <LinkIcon></LinkIcon>
-                </span>
-              ) : null}
-              <span className="image-name-content">{currentResult.name}</span>
-            </div>
-          </div>
 
-          <div className="counter">
-            {queueIdx + 1} / {inputResult.length}
+            <div className="counter">
+              {queueIdx + 1} / {inputResult.length}
+            </div>
+            <div ref={countDownBarElRef} className="countdown-bar"></div>
           </div>
-          <div ref={countDownBarElRef} className="countdown-bar"></div>
+          <CSSTransition
+            in={openMenu}
+            classNames="slide"
+            timeout={200}
+            unmountOnExit
+          >
+            <DownloadMenu
+              queueIdx={queueIdx}
+              optionsMenuElRef={optionsMenuElRef}
+              onFocusOutExitRef={onFocusOutExitRef}
+              countDownActivityRef={countDownActivityRef}
+              openMenu={openMenu}
+              setOpenMenu={setOpenMenu}
+              queue={queue}
+              runningQueue={runningQueue}
+              setQueue={setQueue}
+            ></DownloadMenu>
+          </CSSTransition>
         </div>
-        <CSSTransition
-          in={openMenu}
-          classNames="slide"
-          timeout={200}
-          unmountOnExit
-        >
-          <OptionsMenu
-            queueIdx={queueIdx}
-            optionsMenuElRef={optionsMenuElRef}
-            onFocusOutExitRef={onFocusOutExitRef}
-            countDownActivityRef={countDownActivityRef}
-            openMenu={openMenu}
-            setOpenMenu={setOpenMenu}
-            queue={queue}
-            setQueue={setQueue}
-          ></OptionsMenu>
-        </CSSTransition>
       </div>
       <style jsx>
         {`
+          .container.slide-enter-active,
+          .container.slide-exit-active {
+            overflow: hidden;
+          }
+          .slide-enter .container-inner {
+            transform: translateY(calc(-101%));
+          }
+
+          .slide-enter-active .container-inner {
+            transform: translateY(0);
+            transition: transform 200ms;
+          }
+
+          .slide-exit .container-inner {
+            transform: translateY(0);
+          }
+
+          .slide-exit-active .container-inner {
+            transform: translateY(calc(-101%));
+            transition: transform 200ms;
+          }
+
           .container {
             position: absolute;
             top: 0;
@@ -388,6 +481,9 @@ const Loader = () => {
             width: 100%;
             height: 100%;
             z-index: 10;
+          }
+          .container-inner {
+            height: 100%;
           }
 
           .inner {
@@ -407,7 +503,13 @@ const Loader = () => {
             width: 35px;
             height: 100%;
             padding: 10px 0;
+            outline: 0;
             transition: background-color 500ms, color 500ms;
+          }
+
+          .kebab-menu[data-focus-visible-added] {
+            outline: 3px solid #000;
+            outline-offset: 2px;
           }
 
           .kebab-menu::after {
@@ -456,6 +558,7 @@ const Loader = () => {
             align-items: center;
             height: 100%;
             width: 100%;
+            overflow: hidden;
           }
 
           .title {
@@ -479,7 +582,10 @@ const Loader = () => {
 
           .countdown-bar {
             position: absolute;
-            bottom: 0;
+             {
+              /* subpixel problem in chromium edge */
+            }
+            bottom: -0.1px;
             left: 0;
             width: 100%;
             height: 4px;
@@ -501,16 +607,16 @@ const Loader = () => {
             margin-right: 5px;
           }
 
-          .container.success .inner {
+          .inner.success {
             background: #46ea8d;
             color: #000;
           }
 
-          .container.success .countdown-bar {
+          .inner.success .countdown-bar {
             background: #00875c;
           }
 
-          .container.success .icon-holder {
+          .inner.success .icon-holder {
             position: relative;
             top: -2px;
             color: #00875c;
@@ -519,35 +625,35 @@ const Loader = () => {
             width: 18px;
           }
 
-          .container.success .title-text {
+          .inner.success .title-text {
             color: #025339;
           }
 
-          .container.success .kebab-menu {
+          .inner.success .kebab-menu {
             background: #46ea8d;
             color: rgba(0, 0, 0, 0.75);
           }
 
-          .container.success .kebab-menu.active,
-          .container.success .kebab-menu:hover {
+          .inner.success .kebab-menu.active,
+          .inner.success .kebab-menu:hover {
             background: #004e53;
             color: #46ea8d;
           }
 
-          .container.success .kebab-menu::after {
+          .inner.success .kebab-menu::after {
             background: rgba(0, 0, 0, 0.5);
           }
 
-          .container.error .inner {
+          .inner.error {
             background: #fcb7b7;
             color: #000;
           }
 
-          .container.error .countdown-bar {
+          .inner.error .countdown-bar {
             background: #d20000;
           }
 
-          .container.error .icon-holder {
+          .inner.error .icon-holder {
             position: relative;
             top: -2px;
             color: #d20000;
@@ -556,16 +662,16 @@ const Loader = () => {
             width: 18px;
           }
 
-          .container.error .title-text {
+          .inner.error .title-text {
             color: rgba(0, 0, 0, 0.75);
           }
 
-          .container.error .kebab-menu {
+          .inner.error .kebab-menu {
             background: #fcb7b7;
             color: rgba(0, 0, 0, 0.75);
           }
 
-          .container.error .kebab-menu.active {
+          .inner.error .kebab-menu.active {
             background: #7a003e;
             color: #fcb7b7;
           }
@@ -620,11 +726,15 @@ const Loader = () => {
       {/* dynamic */}
       <style jsx>
         {`
-          .container.success .countdown-bar,
-          .container.error .countdown-bar {
+          .inner.success .countdown-bar,
+          .inner.error .countdown-bar {
             transform: scaleX(0);
             transition: background-color 500ms,
-              transform ${countDownActivityRef.current.duration}ms linear;
+              transform
+                ${countDownActivityRef.current.enabled
+                  ? countDownActivityRef.current.duration
+                  : 0}ms
+                linear;
           }
         `}
       </style>

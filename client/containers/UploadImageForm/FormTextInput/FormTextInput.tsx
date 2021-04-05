@@ -1,5 +1,5 @@
 import { nanoid } from "nanoid";
-import { FormEvent, useEffect, useRef, useState } from "react";
+import React, { FormEvent, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useMatchMedia } from "../../../hooks/useMatchMedia";
 import { RootState } from "../../../store/rootReducer";
@@ -109,7 +109,7 @@ const SubmitBtn = ({
 
 let clearDisplayErrorTimeout = 0;
 
-const FormTextInput = () => {
+const FormTextInput = React.memo(() => {
   const dispatch = useDispatch();
   const imageLoaded = useSelector(
     (state: RootState) => state.imageUrl.imageLoaded
@@ -221,6 +221,6 @@ const FormTextInput = () => {
       </style>
     </form>
   );
-};
+});
 
 export default FormTextInput;

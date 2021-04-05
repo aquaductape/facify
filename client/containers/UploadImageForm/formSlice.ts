@@ -2,8 +2,12 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { nanoid } from "nanoid";
 import { JSON_Stringify_Parse } from "../../utils/jsonStringifyParse";
 
-export type TImageItem = {};
-type TURLItem = { id: string; content: string; name: string; error: boolean };
+export type TURLItem = {
+  id: string;
+  content: string;
+  name: string;
+  error: boolean;
+};
 type TFormState = {
   inputResult: TURLItem[];
   error: boolean;
@@ -14,9 +18,37 @@ type TFormState = {
 const initialState: TFormState = {
   error: false,
   inputResult: [
-    { id: nanoid(), content: "", error: false, name: "post-malon.jpg" },
-    { id: nanoid(), content: "", error: false, name: "aubrey.jpg" },
-    { id: nanoid(), content: "", error: false, name: "elon.gif" },
+    {
+      id: nanoid(),
+      content: "",
+      error: false,
+      name:
+        "post-malon-superlongsuperlongsuperlongsuperlongsuperlongsuperlong.jpg",
+    },
+    {
+      id: nanoid(),
+      content: "",
+      error: false,
+      name: "aubrey-superlongsuperlongsuperlongsuperlongsuperlongsuperlong.jpg",
+    },
+    {
+      id: nanoid(),
+      content: "",
+      error: false,
+      name: "elon-superlongsuperlongsuperlongsuperlongsuperlongsuperlong.gif",
+    },
+    {
+      id: nanoid(),
+      content: "",
+      error: false,
+      name: "post-malon",
+    },
+    {
+      id: nanoid(),
+      content: "",
+      error: false,
+      name: "aubrey",
+    },
   ],
   urlItems: [
     // { id: nanoid(), content: "https://i.imgur.com/nt0RgAH.jpg", error: false },
