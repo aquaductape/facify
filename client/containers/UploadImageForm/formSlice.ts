@@ -7,6 +7,7 @@ export type TURLItem = {
   content: string;
   name: string;
   error: boolean;
+  errorMsg: string;
 };
 type TFormState = {
   inputResult: TURLItem[];
@@ -24,31 +25,35 @@ const initialState: TFormState = {
       error: false,
       name:
         "post-malon-superlongsuperlongsuperlongsuperlongsuperlongsuperlong.jpg",
+      errorMsg: "",
     },
     {
       id: nanoid(),
       content: "",
-      error: false,
+      error: true,
       name: "aubrey-superlongsuperlongsuperlongsuperlongsuperlongsuperlong.jpg",
+      errorMsg: "",
     },
     {
       id: nanoid(),
       content: "",
-      error: false,
+      error: true,
       name: "elon-superlongsuperlongsuperlongsuperlongsuperlongsuperlong.gif",
+      errorMsg: "",
     },
     {
       id: nanoid(),
       content: "",
       error: false,
       name: "post-malon",
+      errorMsg: "",
     },
-    {
-      id: nanoid(),
-      content: "",
-      error: false,
-      name: "aubrey",
-    },
+    // {
+    //   id: nanoid(),
+    //   content: "",
+    //   error: false,
+    //   name: "aubrey",
+    // },
   ],
   urlItems: [
     // { id: nanoid(), content: "https://i.imgur.com/nt0RgAH.jpg", error: false },

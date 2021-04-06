@@ -182,6 +182,8 @@ const DownloadMenuItem = ({
       return;
     }
 
+    if (currentQueue.error) debugger;
+
     countDownInitRef.current = true;
 
     const countDownBarEl = countDownBarElRef.current!;

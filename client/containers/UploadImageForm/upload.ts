@@ -9,9 +9,14 @@ import {
 } from "../FaceDetectionResult/ImageResult/demographicsSlice";
 import { addImage } from "../Table/imageHeightSlice";
 import { animateResult, startAnimate } from "./animateUpload";
-import { setImageLoaded, setImageStatus, setUri } from "./imageUrlSlice";
+import {
+  setCurrentImageStatus,
+  setImageLoaded,
+  setImageStatus,
+  setUri,
+} from "./imageUrlSlice";
 
-export const uploadAndAnimate = async ({
+export const addImageAndAnimate = async ({
   name,
   id,
   croppedUrl,
@@ -55,6 +60,7 @@ export const uploadAndAnimate = async ({
     dispatch(setUri(croppedUrl));
     dispatch(setImageLoaded(true));
     dispatch(setImageStatus("DONE"));
+    dispatch(setCurrentImageStatus("DONE"));
     dispatch(addImage({ id, imageHeight: null }));
     dispatch(
       addDemographicsParentAndChildren({
@@ -91,7 +97,10 @@ export const postClarifaiAPI = async ({ base64 }: { base64: string }) => {
       imageBase64: base64,
     }),
   });
+  console.log({ res });
   const result = (await res.json()) as TDemographicsResponse;
+  console.log({ result });
+
   return result;
 };
 

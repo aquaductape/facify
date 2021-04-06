@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
+export type TImgStatus = "EMPTY" | "DONE" | "COMPRESSING" | "SCANNING";
 export type TImageItem = {};
 type TImageUrlState = {
   uri: string | null;
@@ -7,8 +8,13 @@ type TImageUrlState = {
   elOnLoadStatus: "EMPTY" | "LOADING" | "DONE";
   error: string | null;
   imageLoaded: boolean;
-  currentAddedImg: { id: string; name: string; error: boolean } | null;
-  currentImgStatus: "EMPTY" | "COMPRESSING" | "SCANNING" | "DONE";
+  currentAddedImg: {
+    id: string;
+    name: string;
+    error: boolean;
+    errorMsg: string;
+  } | null;
+  currentImgStatus: TImgStatus;
 };
 
 const initialState: TImageUrlState = {
@@ -46,6 +52,29 @@ const imageUrlSlice = createSlice({
     setImageError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
     },
+    setCurrentImageStatus: (state, action: PayloadAction<TImgStatus>) => {
+      state.currentImgStatus = action.payload;
+    },
+    setCurrentAddedImage: (
+      state,
+      action: PayloadAction<{
+        set?: { id: string; name: string; error: boolean; errorMsg: string };
+        updateError?: string;
+      }>
+    ) => {
+      const { set, updateError } = action.payload;
+      if (set) {
+        state.currentAddedImg = set;
+        return;
+      }
+
+      if (updateError) {
+        state.currentAddedImg!.error = true;
+        state.currentAddedImg!.errorMsg = updateError;
+        return;
+      }
+      // state.currentAddedImg
+    },
   },
 });
 
@@ -55,5 +84,7 @@ export const {
   setImageStatus,
   setElOnLoadStatus,
   setImageLoaded,
+  setCurrentImageStatus,
+  setCurrentAddedImage,
 } = imageUrlSlice.actions;
 export default imageUrlSlice.reducer;

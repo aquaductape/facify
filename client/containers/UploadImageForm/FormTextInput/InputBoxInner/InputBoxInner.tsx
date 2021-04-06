@@ -10,6 +10,7 @@ import { JSON_Stringify_Parse } from "../../../../utils/jsonStringifyParse";
 import { addUrlItem, removeUrlItem, setUrlItemError } from "../../formSlice";
 import Input from "./Input";
 import UtilBar from "./UtilBar";
+import { splitValueIntoUrlItems } from "./utils";
 
 let keyDownProps: { key: string; paste: boolean } = {
   key: "",
@@ -55,7 +56,7 @@ const InputBoxInner = ({
         setImgError(false);
         setImgUrl(value);
       },
-      750,
+      500,
       { leading: true }
     )
   );
@@ -97,22 +98,16 @@ const InputBoxInner = ({
   const onInputUrls = (e: ChangeEvent<HTMLInputElement>) => {
     const { key, paste } = keyDownProps;
     const value = e.target.value;
+    let errorMsg = imgError ? "URL is invalid or image doesn't exist" : "";
 
     const hasSpace = value.match(/\s/);
-    const urls = value.split(" ").filter((item) => item);
+    const urlItems = splitValueIntoUrlItems({ value, imgError, errorMsg });
 
-    if ((urls.length && hasSpace && paste) || (key === " " && value)) {
+    if ((urlItems.length && hasSpace && paste) || (key === " " && value)) {
       hasSubmitRef.current = true;
       e.target.value = "";
       setImgUrl("");
       setImgError(false);
-
-      const urlItems = urls.map((url) => ({
-        id: nanoid(),
-        content: url,
-        name: getImageNameFromUrl(url),
-        error: imgError,
-      }));
 
       dispatch(addUrlItem(urlItems));
 

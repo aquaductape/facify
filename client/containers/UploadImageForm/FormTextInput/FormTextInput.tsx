@@ -8,11 +8,12 @@ import dataURLtoFile from "../../../utils/dataURLtoFile";
 import { getBase64FromUrl } from "../../../utils/getBase64FromUrl";
 import { getImageNameFromUrl } from "../../../utils/getImageNameFromUrl";
 import { TDemographicNode } from "../../FaceDetectionResult/ImageResult/demographicsSlice";
-import { clearAllFormValues } from "../formSlice";
+import { clearAllFormValues, TURLItem } from "../formSlice";
+import { setCurrentAddedImage, setCurrentImageStatus } from "../imageUrlSlice";
 import {
   getImageDimensions,
   postClarifaiAPI,
-  uploadAndAnimate,
+  addImageAndAnimate,
 } from "../upload";
 import Input from "./InputBox";
 
@@ -109,7 +110,10 @@ const SubmitBtn = ({
 
 let clearDisplayErrorTimeout = 0;
 
-const FormTextInput = React.memo(() => {
+type TFormTextInput = {
+  setOpenLoader: React.Dispatch<React.SetStateAction<boolean>>;
+};
+const FormTextInput = React.memo(({ setOpenLoader }: TFormTextInput) => {
   const dispatch = useDispatch();
   const imageLoaded = useSelector(
     (state: RootState) => state.imageUrl.imageLoaded
@@ -124,30 +128,64 @@ const FormTextInput = React.memo(() => {
 
   const mqlRef = useMatchMedia();
 
-  const onSubmitForm = async (urlValue: string) => {
-    let { base64, sizeMB } = await getBase64FromUrl({
-      url: urlValue,
+  const onSubmitForm = async (urlItem: TURLItem) => {
+    let urlContent = urlItem.content;
+
+    dispatch(
+      setCurrentAddedImage({
+        set: {
+          id: urlItem.id,
+          name: urlItem.name,
+          error: false,
+          errorMsg: "",
+        },
+      })
+    );
+
+    let { base64, sizeMB, error } = await getBase64FromUrl({
+      url: urlContent,
       proxy: "/api/convert-base64",
     });
 
-    console.log({ sizeMB });
-
-    const name = getImageNameFromUrl(urlValue);
-
-    if (sizeMB != null && sizeMB > 3.5) {
-      const result = await convertFileToBase64(dataURLtoFile(base64));
-      base64 = result.base64;
-      urlValue = window.URL.createObjectURL(result.file);
+    if (error) {
+      console.log("base64", { error });
+      dispatch(setCurrentImageStatus("DONE"));
+      dispatch(setCurrentAddedImage({ updateError: error }));
+      return;
     }
 
-    const result = await postClarifaiAPI({ base64 });
-    const data = (result.data as unknown) as TDemographicNode[];
-    const img = await getImageDimensions(urlValue);
+    console.log({ sizeMB });
 
-    await uploadAndAnimate({
-      id: nanoid(),
+    const name = getImageNameFromUrl(urlItem.content);
+
+    if (sizeMB != null && sizeMB > 3.5) {
+      dispatch(setCurrentImageStatus("COMPRESSING"));
+      const result = await convertFileToBase64(dataURLtoFile(base64));
+      base64 = result.base64;
+      urlContent = window.URL.createObjectURL(result.file);
+    }
+
+    dispatch(setCurrentImageStatus("SCANNING"));
+
+    const result = await postClarifaiAPI({ base64 });
+
+    if (
+      result.status.code !== 10000 && // OK
+      result.status.code !== 10010 // Mixed Success
+    ) {
+      const errorMsg = `Server Error. ${result.status.message}`;
+      dispatch(setCurrentImageStatus("DONE"));
+      dispatch(setCurrentAddedImage({ updateError: errorMsg }));
+      return;
+    }
+
+    const data = (result.data as unknown) as TDemographicNode[];
+    const img = await getImageDimensions(urlContent);
+
+    await addImageAndAnimate({
+      id: urlItem.id,
       croppedUrl: base64,
-      url: urlValue,
+      url: urlContent,
       data,
       img,
       name,
@@ -155,8 +193,6 @@ const FormTextInput = React.memo(() => {
       imageLoaded,
       mql: mqlRef.current!,
     });
-
-    // setShowLoader(false);
   };
 
   const onSubmitBtnMouseEvents = (isMouseenter: boolean) => {
@@ -181,19 +217,18 @@ const FormTextInput = React.memo(() => {
 
   useEffect(() => {
     if (!formInputResult.length) return;
-
     return;
-    const run = async () => {
-      const values = formInputResult.map(({ content }) => content);
+    setOpenLoader(true);
 
-      for (const value of values) {
-        await onSubmitForm(value);
+    const run = async () => {
+      // const values = formInputResult.map(({ content }) => content);
+
+      for (const item of formInputResult) {
+        await onSubmitForm(item);
       }
     };
 
     run();
-
-    dispatch(clearAllFormValues());
   }, [formInputResult.length]);
 
   return (

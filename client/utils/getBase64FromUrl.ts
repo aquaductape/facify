@@ -17,18 +17,26 @@ export const getBase64FromUrl = async ({
       }),
     });
     const data = await res.json();
-    return data as { base64: string; sizeMB: number | null };
+    return data as {
+      base64: string;
+      sizeMB: number | null;
+      error: string | null;
+    };
   }
 
   const data = await fetch(url);
 
   const blob = await data.blob();
-  return new Promise<{ base64: string; sizeMB: number | null }>((resolve) => {
+  return new Promise<{
+    base64: string;
+    sizeMB: number | null;
+    error: string | null;
+  }>((resolve) => {
     const reader = new FileReader();
     reader.readAsDataURL(blob);
     reader.onloadend = function () {
       const base64data = reader.result;
-      resolve({ base64: base64data as string, sizeMB: null });
+      resolve({ base64: base64data as string, sizeMB: null, error: null });
     };
   });
 };

@@ -22,7 +22,7 @@ export type TDemographics = {
 
 export type TDemographicsResponse = {
   status: {
-    code: string;
+    code: number;
     message: string;
   };
   data: TDemographics[];

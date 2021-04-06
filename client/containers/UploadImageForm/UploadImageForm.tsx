@@ -1,7 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { CSSTransition } from "react-transition-group";
-import InputCheckBox from "../../components/InputCheckBox";
-import CircleCheck from "../../components/svg/CircleCheck";
 import FormTextInput from "./FormTextInput/FormTextInput";
 import Loader from "./Loader/Loader";
 
@@ -182,7 +180,7 @@ const UploadImageForm = () => {
           Upload
         </label>
         <div className="shared-pillar pillar-2"></div>
-        <FormTextInput></FormTextInput>
+        <FormTextInput setOpenLoader={setOpenLoader}></FormTextInput>
       </div>
       <CSSTransition
         in={openLoader}

@@ -55,6 +55,8 @@ const getDemographics = (uri: string) => {
         // err doesn't have value
         const result = {
           status: {
+            // code: response.status.code,
+            // message: response.status.description,
             code: response.status.code,
             message: response.status.description,
           },
@@ -67,10 +69,16 @@ const getDemographics = (uri: string) => {
           resolve(result);
           return;
         }
-        console.log(response.status);
 
-        result.data = filterDemographics(response);
-        resolve(result);
+        try {
+          result.data = filterDemographics(response);
+          resolve(result);
+        } catch (err) {
+          // maybe this isn't wise, since this internal error is related to my server but not clarifai's
+          result.status.code = 99009;
+          result.status.message = "Internal Error";
+          resolve(result);
+        }
       }
     );
   });
@@ -136,6 +144,7 @@ const handler: NextApiHandler = async (req, res) => {
     const result = await getDemographics(imageBase64);
     res.send(result);
   } catch (err) {
+    console.log("ERROR", err);
     res.send(err);
   }
 };

@@ -7,6 +7,7 @@ import onFocusOut, {
 import { RootState } from "../../../../store/rootReducer";
 import { reflow } from "../../../../utils/reflow";
 import { addUrlItem, setInputValueFromUrlItems } from "../../formSlice";
+import { splitValueIntoUrlItems } from "./utils";
 
 type TInputProps = {
   isOpenRef: React.MutableRefObject<boolean>;
@@ -46,20 +47,6 @@ const Input = ({
   );
   const onCloseInputRef = useRef<(() => void) | null>(null);
 
-  const onCloseInputEnd = () => {
-    const inputEl = inputElRef.current!;
-    const value = inputEl.value.trim();
-    // reset
-    inputEl.value = "";
-    console.log({ imgError });
-
-    if (value) {
-      dispatch(
-        addUrlItem({ id: nanoid(), content: value, error: imgError, name: "" })
-      );
-    }
-  };
-
   const urlItemsValid = () => urlItems.every((item) => !item.error);
 
   const submitValuesValid = () => {
@@ -90,32 +77,35 @@ const Input = ({
 
     // there's a value but it is invalid
     if (value && imgError && !urlItems.length) {
+      inputElRef.current?.focus();
       return false;
     }
 
     return true;
   };
 
-  const onSubmit = () => {
+  const onCloseInputEnd = () => {
     const inputEl = inputElRef.current!;
-    const value = inputEl.value.trim();
+    const value = inputEl.value;
+    let errorMsg = imgError ? "URL is invalid or image doesn't exist" : "";
+    const urlItems = splitValueIntoUrlItems({ value, imgError, errorMsg });
     // reset
     inputEl.value = "";
-    console.log({ urlItems, value });
+    console.log({ imgError });
 
+    if (urlItems.length) {
+      dispatch(addUrlItem(urlItems));
+    }
+  };
+
+  const onSubmit = () => {
     contentElHeightRef.current = 100;
 
-    if (value) {
-      dispatch(
-        addUrlItem({ id: nanoid(), content: value, error: false, name: "" })
-      );
-    }
+    onCloseInputEnd();
 
-    if (submitBtnActivated) {
-      setTimeout(() => {
-        dispatch(setInputValueFromUrlItems());
-      }, 100);
-    }
+    setTimeout(() => {
+      dispatch(setInputValueFromUrlItems());
+    }, 100);
   };
 
   const onFocusOutStart = (e: OnFocusOutEvent) => {
