@@ -9,7 +9,10 @@ import { useSelector } from "react-redux";
 import { TManualExit } from "../../../lib/onFocusOut/onFocusOut";
 import { RootState } from "../../../store/rootReducer";
 import InputCheckBox from "./InputCheckBox";
-import DownloadMenuItem from "./DownloadMenuItem";
+import DownloadMenuItem, {
+  DownloadMenuItemsContainer,
+  TDownloadMenuItemHandler,
+} from "./DownloadMenuItem";
 import { TQueue } from "./Loader";
 
 // Disable Notification Countdown
@@ -18,11 +21,21 @@ type TDownloadMenuProps = {
   onFocusOutExitRef: MutableRefObject<TManualExit | null>;
   openMenu: boolean;
   setOpenMenu: Dispatch<SetStateAction<boolean>>;
-  queueIdx: number;
   queue: TQueue[];
-  setQueue: Dispatch<SetStateAction<TQueue[]>>;
-  runningQueue: () => void;
+  queueIdx: number;
+  goToNextRef: MutableRefObject<
+    (
+      props?:
+        | {
+            clearCurrentTimout?: boolean | undefined;
+            enableCountDown?: boolean | undefined;
+          }
+        | undefined
+    ) => void
+  >;
+  downloadMenuItemHandlerRef: MutableRefObject<TDownloadMenuItemHandler>;
   countDownActivityRef: MutableRefObject<{
+    currentImgId: string;
     enabled: boolean;
     active: boolean;
     queuing: boolean;
@@ -35,17 +48,16 @@ type TDownloadMenuProps = {
 const DownloadMenu = ({
   optionsMenuElRef,
   onFocusOutExitRef,
-  queueIdx,
   queue,
-  setQueue,
-  runningQueue,
+  queueIdx,
   openMenu,
   setOpenMenu,
+  goToNextRef,
+  downloadMenuItemHandlerRef,
   countDownActivityRef,
 }: TDownloadMenuProps) => {
-  const inputResult = useSelector((state: RootState) => state.form.inputResult);
-
   const countDownActivity = countDownActivityRef.current;
+  const goToNext = goToNextRef.current;
   const currentResult = queue[queueIdx];
 
   const currentQueueClass = ({ idx }: { idx?: number } = {}) => {
@@ -68,10 +80,10 @@ const DownloadMenu = ({
   }, [openMenu]);
 
   const onChangeCheckBox: ChangeEventHandler<HTMLInputElement> = (e) => {
-    countDownActivity.enabled = !e.target.checked;
-    window.clearTimeout(countDownActivity.timeoutId);
-    countDownActivity.timestamp = Date.now();
-    runningQueue();
+    const checkValue = !e.target.checked;
+    countDownActivity.enabled = checkValue;
+    // debugger;
+    goToNext({ clearCurrentTimout: true, enableCountDown: checkValue });
   };
 
   return (
@@ -82,22 +94,14 @@ const DownloadMenu = ({
           className={`top-border ${queueIdx === 0 ? currentQueueClass() : ""}`}
         ></div>
         <div className={`kebab-down-arrow ${currentQueueClass()}`}></div>
+
         <ul className="group">
-          {inputResult.map((item, idx) => (
-            <DownloadMenuItem
-              countDownActivityRef={countDownActivityRef}
-              item={item}
-              onFocusOutExitRef={onFocusOutExitRef}
-              openMenu={openMenu}
-              optionsMenuElRef={optionsMenuElRef}
-              queue={queue}
-              queueIdx={queueIdx}
-              setOpenMenu={setOpenMenu}
-              setQueue={setQueue}
-              idx={idx}
-              key={item.id}
-            ></DownloadMenuItem>
-          ))}
+          <DownloadMenuItemsContainer
+            countDownActivityRef={countDownActivityRef}
+            downloadMenuItemHandlerRef={downloadMenuItemHandlerRef}
+            goToNextRef={goToNextRef}
+            onFocusOutExitRef={onFocusOutExitRef}
+          ></DownloadMenuItemsContainer>
         </ul>
         <div className="options">
           <div className="input-checkbox">

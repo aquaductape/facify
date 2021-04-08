@@ -1,33 +1,55 @@
-import {
+import React, {
   CSSProperties,
-  Dispatch,
   MutableRefObject,
-  SetStateAction,
   useEffect,
   useRef,
   useState,
 } from "react";
+import { useSelector } from "react-redux";
 import SwappingSquares from "../../../components/Spinners/SwappingSquares";
 import CevronIcon from "../../../components/svg/CevronIcon";
 import CircleCheck from "../../../components/svg/CircleCheck";
 import CircleCross from "../../../components/svg/CircleCross";
 import CircleDot from "../../../components/svg/CircleDot";
 import { TManualExit } from "../../../lib/onFocusOut/onFocusOut";
+import { RootState } from "../../../store/rootReducer";
 import { reflow } from "../../../utils/reflow";
 import { TURLItem } from "../formSlice";
 import { TQueue } from "./Loader";
 
+type TDisplayCountDown = {
+  active: boolean;
+  enabled: boolean;
+};
+
+export type TDownloadMenuItemHandler = {
+  [key: string]: {
+    setDownloadQueue: React.Dispatch<React.SetStateAction<TQueue | null>>;
+    setDisplayCountDown: React.Dispatch<
+      React.SetStateAction<TDisplayCountDown>
+    >;
+    displayCountDown: TDisplayCountDown;
+    downloadQueue: TQueue | null;
+  };
+};
+
 type TDownloadMenuItemProps = {
   idx: number;
-  optionsMenuElRef: MutableRefObject<HTMLDivElement | null>;
   onFocusOutExitRef: MutableRefObject<TManualExit | null>;
-  openMenu: boolean;
-  setOpenMenu: Dispatch<SetStateAction<boolean>>;
-  queueIdx: number;
-  queue: TQueue[];
   item: TURLItem;
-  setQueue: Dispatch<SetStateAction<TQueue[]>>;
+  goToNextRef: MutableRefObject<
+    (
+      props?:
+        | {
+            clearCurrentTimout?: boolean | undefined;
+            enableCountDown?: boolean | undefined;
+          }
+        | undefined
+    ) => void
+  >;
+  downloadMenuItemHandlerRef: MutableRefObject<TDownloadMenuItemHandler>;
   countDownActivityRef: MutableRefObject<{
+    currentImgId: string;
     enabled: boolean;
     active: boolean;
     queuing: boolean;
@@ -40,29 +62,67 @@ const DownloadMenuItem = ({
   countDownActivityRef,
   idx,
   onFocusOutExitRef,
-  openMenu,
-  optionsMenuElRef,
-  queue,
-  queueIdx,
-  setOpenMenu,
-  setQueue,
+  downloadMenuItemHandlerRef,
+  goToNextRef,
   item,
 }: TDownloadMenuItemProps) => {
   const [showMore, setShowMore] = useState(false);
-  const currentQueue = queue[idx];
+  // const currentQueue = queue[idx];
   const countDownBarElRef = useRef<HTMLDivElement | null>(null);
   const countDownInitRef = useRef(false);
+  const hasRenderedRef = useRef(false);
+  const countDownBarElStyleRef = useRef<CSSProperties>({});
   const countDownActivity = countDownActivityRef.current;
-  const currentResult = queue[queueIdx];
+  // const finishedQueue = queue[queueIdx];
+  const [downloadQueue, setDownloadQueue] = useState<TQueue | null>(() => {
+    const downloadMenuItemHandler = downloadMenuItemHandlerRef.current[idx];
+    if (!downloadMenuItemHandler) return null;
+    return downloadMenuItemHandler.downloadQueue || null;
+  });
+  // const [finishedQueue, setFinishedQueue] = useState<TQueue | null>(null);
+  const [displayCountDown, setDisplayCountDown] = useState<TDisplayCountDown>(
+    () => {
+      const downloadMenuItemHandler = downloadMenuItemHandlerRef.current[idx];
+      if (!downloadMenuItemHandler) return { active: false, enabled: true };
+      return (
+        downloadMenuItemHandler.displayCountDown || {
+          active: false,
+          enabled: true,
+        }
+      );
+    }
+  );
+  const goToNext = goToNextRef.current;
 
-  const currentQueueClass = ({ idx }: { idx?: number } = {}) => {
-    if (idx != null) {
-      if (idx !== queueIdx) return "";
+  useEffect(() => {
+    const downloadMenuItem = downloadMenuItemHandlerRef.current[idx];
+
+    if (!downloadMenuItem || !downloadMenuItem.setDownloadQueue) {
+      downloadMenuItemHandlerRef.current[idx] = {
+        setDownloadQueue,
+        setDisplayCountDown,
+        displayCountDown,
+        downloadQueue: null,
+      };
+      return;
     }
 
-    if (!currentResult) return "";
-    if (currentResult.error) return "error";
-    if (currentResult.currentImgStatus === "DONE") return "success";
+    downloadMenuItemHandlerRef.current[idx] = {
+      ...downloadMenuItem,
+      setDownloadQueue,
+      setDisplayCountDown,
+    };
+
+    return () => {
+      downloadMenuItemHandlerRef.current[idx].setDisplayCountDown = null as any;
+      downloadMenuItemHandlerRef.current[idx].setDownloadQueue = null as any;
+    };
+  }, []);
+
+  const currentQueueClass = () => {
+    if (!downloadQueue || countDownActivity.currentImgId !== item.id) return "";
+    if (downloadQueue.error) return "error";
+    if (downloadQueue.currentImgStatus === "DONE") return "success";
     return "";
   };
 
@@ -75,43 +135,66 @@ const DownloadMenuItem = ({
     return result;
   };
 
-  const getCountDownElStyle = (
-    currentTimestamp: number = Date.now()
-  ): CSSProperties => {
-    if (!currentQueue) return {};
-    if (currentQueue.currentImgStatus !== "DONE") return {};
-
-    return queueIdx === idx
-      ? {
-          transition: `transform ${
-            countDownActivity.duration -
-            (currentTimestamp - countDownActivity.timestamp)
-          }ms linear`,
-        }
-      : {};
+  const stopRunningCountDown = () => {
+    if (
+      displayCountDown.enabled ||
+      !countDownActivity.active ||
+      downloadQueue?.currentImgStatus !== "DONE"
+      //  || countDownActivity.currentImgId !== item.id
+    ) {
+      return;
+    }
+    console.log("STOP");
+    countDownBarElStyleRef.current! = {};
+    countDownBarElRef.current!.style.transition = "none";
   };
 
-  const countDownElStyleRef = useRef<CSSProperties>(getCountDownElStyle());
+  const setCountDownElStyle = (): CSSProperties => {
+    if (countDownInitRef.current) {
+      stopRunningCountDown();
+      return countDownBarElStyleRef.current;
+    }
+    if (!downloadQueue) return {};
+    if (
+      downloadQueue.currentImgStatus !== "DONE" ||
+      !countDownActivity.active ||
+      !countDownActivity.enabled ||
+      countDownActivity.currentImgId !== item.id
+    ) {
+      return {};
+    }
+
+    countDownInitRef.current = true;
+
+    const currentTimestamp = Date.now();
+
+    const style = {
+      transform: `scaleX(0)`,
+      transition: `transform ${
+        countDownActivity.duration -
+        (currentTimestamp - countDownActivity.timestamp)
+      }ms linear`,
+    };
+
+    countDownBarElRef.current!.style.transform = `scaleX(${countDownBarPercent(
+      currentTimestamp
+    )})`;
+    countDownBarElRef.current!.style.transition = "none";
+    reflow();
+    countDownBarElRef.current!.style.transform = "";
+    countDownBarElRef.current!.style.transition = style.transition;
+    return style;
+  };
 
   const onBtnShowMore = () => {
     setShowMore((prev) => !prev);
   };
 
-  const stopAndRemoveCountDownDisplay = () => {
-    // console.log("reset", countDownActivityRef.current);
-    if (countDownActivityRef.current.enabled) return;
-    countDownBarElRef.current!.style.transform = "scaleX(0)";
-    countDownBarElRef.current!.style.transition = "none";
-
-    countDownElStyleRef.current = {};
-  };
-
   const renderIcon = () => {
-    // return <SwappingSquares></SwappingSquares>;
-    if (!currentQueue) {
+    if (!downloadQueue) {
       return <CircleDot></CircleDot>;
     }
-    const { currentImgStatus, error } = currentQueue;
+    const { currentImgStatus, error } = downloadQueue;
 
     if (error) {
       return <CircleCross></CircleCross>;
@@ -128,10 +211,10 @@ const DownloadMenuItem = ({
   };
 
   const iconClass = () => {
-    if (!currentQueue) {
+    if (!downloadQueue) {
       return "";
     }
-    const { currentImgStatus, error } = currentQueue;
+    const { currentImgStatus, error } = downloadQueue;
 
     if (error) {
       return "error";
@@ -149,7 +232,7 @@ const DownloadMenuItem = ({
     // better to check if li progressbar is active instead
 
     if (countDownActivity.active) {
-      window.clearTimeout(countDownActivity.timeoutId);
+      goToNext({ clearCurrentTimout: true });
       // nextQueue
       // remove countdown-bar
     }
@@ -163,59 +246,23 @@ const DownloadMenuItem = ({
   };
 
   useEffect(() => {
-    if (!currentQueue) return;
-    // if (queueIdx === 2) debugger;
-    if (queueIdx !== idx) return;
-    if (currentQueue.currentImgStatus !== "DONE") return;
-    if (countDownInitRef.current) {
-      if (!countDownActivity.enabled) {
-        stopAndRemoveCountDownDisplay();
-        countDownInitRef.current = true;
-        return;
-      }
-      return;
-    }
+    if (!hasRenderedRef.current) return;
+    setCountDownElStyle();
+  }, [downloadQueue?.currentImgStatus, displayCountDown]);
 
-    if (!countDownActivity.enabled) {
-      stopAndRemoveCountDownDisplay();
-      countDownInitRef.current = true;
-      return;
-    }
-
-    if (currentQueue.error) debugger;
-
-    countDownInitRef.current = true;
-
-    const countDownBarEl = countDownBarElRef.current!;
-    const currentTimestamp = Date.now();
-    const diff = currentTimestamp - countDownActivity.timestamp;
-
-    // if (diff > countDownActivity.duration) return;
-
-    // console.log({ diff, idx });
-
-    countDownBarEl.style.transform = `scaleX(${countDownBarPercent(
-      currentTimestamp
-    )})`;
-    countDownBarEl.style.transition = "none";
-    reflow();
-    countDownBarEl.style.transform = "scaleX(0)";
-    countDownBarEl.style.transition = `transform ${
-      countDownActivity.duration -
-      (currentTimestamp - countDownActivity.timestamp)
-    }ms linear`;
-
-    countDownElStyleRef.current = getCountDownElStyle(currentTimestamp);
-  });
+  useEffect(() => {
+    setCountDownElStyle();
+    hasRenderedRef.current = true;
+  }, []);
 
   return (
-    <li className={`queue-item ${currentQueueClass({ idx })}`} key={idx}>
+    <li className={`queue-item ${currentQueueClass()}`} key={idx}>
       <div className="main">
         <div className={`icon-holder ${iconClass()}`}>{renderIcon()}</div>
         <div className="name">{item.name}</div>
-        {currentQueue ? (
+        {downloadQueue ? (
           <div className="util">
-            {currentQueue!.error ? (
+            {downloadQueue!.error ? (
               <button
                 className={`btn btn-show-more ${showMore ? "active" : ""}`}
                 aria-expanded={showMore ? "true" : "false"}
@@ -226,7 +273,7 @@ const DownloadMenuItem = ({
                   <CevronIcon></CevronIcon>
                 </span>
               </button>
-            ) : currentQueue!.currentImgStatus === "DONE" ? (
+            ) : downloadQueue!.currentImgStatus === "DONE" ? (
               <button
                 className="btn btn-jump"
                 onClick={onJump}
@@ -239,12 +286,12 @@ const DownloadMenuItem = ({
         ) : null}
         <div
           ref={countDownBarElRef}
-          style={countDownElStyleRef.current}
+          style={countDownBarElStyleRef.current}
           className="countdown-bar"
         ></div>
       </div>
       {showMore ? (
-        <div className="more-info">{currentQueue.errorMsg}</div>
+        <div className="more-info">{downloadQueue!.errorMsg}</div>
       ) : null}
       <style jsx>
         {`
@@ -427,5 +474,41 @@ const DownloadMenuItem = ({
     </li>
   );
 };
+
+type TDownloadMenuItemsContainerProps = Pick<
+  TDownloadMenuItemProps,
+  | "countDownActivityRef"
+  | "downloadMenuItemHandlerRef"
+  | "goToNextRef"
+  | "onFocusOutExitRef"
+>;
+
+export const DownloadMenuItemsContainer = React.memo(
+  ({
+    countDownActivityRef,
+    downloadMenuItemHandlerRef,
+    goToNextRef,
+    onFocusOutExitRef,
+  }: TDownloadMenuItemsContainerProps) => {
+    const inputResult = useSelector(
+      (state: RootState) => state.form.inputResult
+    );
+    return (
+      <>
+        {inputResult.map((item, idx) => (
+          <DownloadMenuItem
+            countDownActivityRef={countDownActivityRef}
+            item={item}
+            onFocusOutExitRef={onFocusOutExitRef}
+            downloadMenuItemHandlerRef={downloadMenuItemHandlerRef}
+            goToNextRef={goToNextRef}
+            idx={idx}
+            key={item.id}
+          ></DownloadMenuItem>
+        ))}
+      </>
+    );
+  }
+);
 
 export default DownloadMenuItem;
