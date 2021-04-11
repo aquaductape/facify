@@ -11,18 +11,8 @@ type InputProps = {
 };
 
 const Input = ({ submitHoverRef, isOpenRef, displayErrorRef }: InputProps) => {
-  const [inputFocused, setInputFocused] = useState(false);
   const contentElRef = useRef<HTMLDivElement | null>(null);
   const containerElRef = useRef<HTMLDivElement | null>(null);
-
-  // const onKeyUp = (e: React.KeyboardEvent<HTMLInputElement>) => {
-  //   if (e.key !== "Tab") return;
-  //   setInputFocused(true);
-  // };
-
-  // const onBlur = () => {
-  //   setInputFocused(false);
-  // };
 
   return (
     <div

@@ -84,7 +84,7 @@ const SubmitBtn = ({
             font-size: 1rem;
             cursor: pointer;
             transition: 250ms background-color, 250ms color;
-            z-index: 10;
+            z-index: 15;
           }
 
           .detect-button:hover {

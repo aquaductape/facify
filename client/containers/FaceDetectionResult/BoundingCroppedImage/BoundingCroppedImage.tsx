@@ -107,6 +107,7 @@ const BoundingCroppedImage = ({
       smoothScrollTo({
         destination,
         duration: 500,
+        easing: "easeInOutQuad",
         padding,
         container,
       });

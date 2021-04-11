@@ -53,6 +53,11 @@ const InputBoxInner = ({
   const onInputCheckUrlDebouncedRef = useRef(
     debounce(
       (value: string) => {
+        // when there's multiple URLs present (from using Ctrl-a or Backspacing), currently there's no support to detect which URL is invalid
+        // The input string will not be validated
+        if (value.match(/\s/g)) {
+          value = "";
+        }
         setImgError(false);
         setImgUrl(value);
       },
@@ -142,7 +147,11 @@ const InputBoxInner = ({
       const content = lastItem.content;
       target.value = content + (value ? " " + value : "");
       target.setSelectionRange(content.length, content.length);
+      target.blur();
+      target.focus();
       dispatch(removeUrlItem({ type: "pop" }));
+      setImgUrl("");
+      setImgError(false);
       return;
     }
 
@@ -197,7 +206,7 @@ const InputBoxInner = ({
         <UtilBar imgError={imgError} isOpenRef={isOpenRef}></UtilBar>
       </div>
       <div className="result">
-        {imgUrl ? (
+        {imgUrl && !imgError ? (
           <MiniImage
             url={imgUrl}
             error={imgError}
@@ -242,6 +251,7 @@ const InputBoxInner = ({
             height: 35px;
             padding-left: 10px;
             bottom: 5px;
+            background: #fff;
           }
 
           .arrow {

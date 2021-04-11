@@ -1,49 +1,47 @@
-import { useEffect, useRef } from "react";
+import {
+  CSSProperties,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
+import { FixedSizeList } from "react-window";
 import MiniImage from "../../../../components/MiniImage";
 import CloseBtn from "../../../../components/svg/CloseBtn";
+import { useMatchMedia } from "../../../../hooks/useMatchMedia";
 import { RootState } from "../../../../store/rootReducer";
 import smoothScrollTo from "../../../../utils/smoothScrollTo";
-import { removeUrlItem, setUrlItemError } from "../../formSlice";
+import { removeUrlItem, setUrlItemError, TURLItem } from "../../formSlice";
 import ScrollShadow from "./ScrollShadow";
 import Sentinel from "./Sentinel";
+
+// turning off auto scroll will not be enabled since content is manually added, as well as content visuall size is already so small
 
 type TURLTagProps = TURLTag & {
   onRemove: (id: string) => void;
   onError: (id: string) => void;
   parent: React.MutableRefObject<HTMLUListElement | null>;
-  willScrollTo: boolean;
+  isScrollContainer: boolean;
+  style?: CSSProperties;
 };
+
 const URLTags = ({
   id,
   content,
   error,
   name,
   parent,
-  willScrollTo,
+  isScrollContainer,
+  style = {},
   onError,
   onRemove,
 }: TURLTagProps) => {
-  // const displayURL = content.replace(/(https:\/\/|http:\/\/)/g, "");
   const displayURL = error ? content : name;
 
-  useEffect(() => {
-    if (!willScrollTo) return;
-    setTimeout(() => {
-      smoothScrollTo({
-        destination: parent.current!.scrollHeight,
-        container: parent.current!,
-        duration: 500,
-      });
-    }, 150);
-  }, []);
-
   return (
-    <li
-      // data-id-url-item={id}
-      className={`url-item ${error ? "error" : ""}`}
-    >
+    <li data-id-url-item={id} className={`url-item ${error ? "error" : ""}`}>
       <MiniImage
         error={error}
         onError={() => {
@@ -178,11 +176,19 @@ type TURLTag = { id: string; content: string; name: string; error: boolean };
 
 const TagsArea = () => {
   const dispatch = useDispatch();
-
   const urls = useSelector((state: RootState) => state.form.urlItems);
+  const mqlRef = useMatchMedia();
+  const hasRemovedRef = useRef(false);
+  const [_, setRefreshContainer] = useState(0);
+  // const isScrollContainerRef = useRef(false);
+  const isScrollContainer =
+    mqlRef.current && mqlRef.current.minWidth_850.matches
+      ? urls.length > 5
+      : urls.length > 2;
+
   // https://i.imgur.com/nt0RgAH.jpg https://upload.wikimedia.org/wikipedia/commons/8/85/Elon_Musk_Royal_Society_%28crop1%29.jpg https://static.tvtropes.org/pmwiki/pub/images/aubrey_plaza.jpg
 
-  const urlsElRef = useRef<HTMLUListElement | null>(null);
+  const urlsContainerElRef = useRef<HTMLUListElement | null>(null);
   const scrollShadowElsRef = useRef<{
     top: { current: HTMLDivElement | null };
     bottom: { current: HTMLDivElement | null };
@@ -191,13 +197,125 @@ const TagsArea = () => {
     bottom: { current: null },
   });
 
-  const onRemoveUrlList = (id: string) => {
+  const animateExitByRemoveBtn = (id: string) => {
+    return new Promise<boolean>((resolve) => {
+      if (!isScrollContainer) return;
+      // const urlsSlice = findAndSlice((item) => item.id === id, urls)
+      const itemHeight = 55;
+      const targetIdx = urls.findIndex((item) => item.id === id);
+      const isLast = targetIdx === urls.length - 1;
+      const targetEl = urlsContainerElRef.current!.querySelector(
+        `[data-id-url-item="${id}"]`
+      ) as HTMLDivElement;
+      const urlsContainerOffsetScroll = urlsContainerElRef.current!.scrollTop;
+      const isScrollNearBottom =
+        urlsContainerOffsetScroll + itemHeight >=
+        urlsContainerElRef.current!.scrollHeight -
+          urlsContainerElRef.current!.clientHeight;
+
+      if (isLast) {
+        targetEl.style.pointerEvents = "none";
+        targetEl.style.opacity = "0";
+        targetEl.style.transition = "opacity 50ms linear";
+
+        if (!isScrollNearBottom) return;
+
+        smoothScrollTo({
+          destination: urlsContainerElRef.current!.scrollTop - itemHeight,
+          currentPosition: urlsContainerElRef.current!.scrollTop,
+          container: urlsContainerElRef.current!,
+          duration: 100,
+          easing: "linear",
+          onEnd: () => resolve(true),
+        });
+
+        return;
+      }
+
+      const urlsSlice = urls.slice(targetIdx + 1, targetIdx + 6);
+      const siblingsEl = urlsSlice.map(
+        ({ id }) =>
+          urlsContainerElRef.current!.querySelector(
+            `[data-id-url-item="${id}"]`
+          ) as HTMLDivElement
+      );
+
+      targetEl.style.pointerEvents = "none";
+      targetEl.style.opacity = "0";
+      targetEl.style.transition = "opacity 50ms linear";
+
+      siblingsEl.forEach((el) => {
+        if (!el) return;
+        el.style.position = "relative";
+        el.style.pointerEvents = "none";
+        el.style.zIndex = "1";
+        el.style.transition = "transform 100ms linear";
+        el.style.transform = "translateY(-55px)";
+      });
+
+      const onAnimationEnd = () => {
+        targetEl.parentElement!.style.display = "none";
+        resolve(true);
+      };
+
+      if (isScrollNearBottom) {
+        smoothScrollTo({
+          destination: urlsContainerElRef.current!.scrollTop - itemHeight,
+          currentPosition: urlsContainerElRef.current!.scrollTop,
+          container: urlsContainerElRef.current!,
+          duration: 100,
+          easing: "linear",
+          onEnd: onAnimationEnd,
+        });
+        return;
+      }
+
+      setTimeout(() => {
+        onAnimationEnd();
+      }, 100);
+    });
+  };
+
+  const onRemoveUrlList = async (id: string) => {
+    if (isScrollContainer) {
+      hasRemovedRef.current = true;
+    }
+
+    await animateExitByRemoveBtn(id);
+
     dispatch(removeUrlItem({ id }));
   };
 
   const onError = (id: string) => {
     dispatch(setUrlItemError({ id, error: true }));
   };
+
+  useEffect(() => {
+    // const isScrollContainerRef = mqlRef.current?.minWidth_850.matches ? urls.length > 4 : urls.length > 2;
+    const onChange = () => {
+      setRefreshContainer(Date.now());
+    };
+
+    mqlRef.current!.minWidth_850.addEventListener("change", onChange);
+
+    return () => {
+      mqlRef.current!.minWidth_850.removeEventListener("change", onChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isScrollContainer || hasRemovedRef.current) {
+      hasRemovedRef.current = false;
+      return;
+    }
+
+    smoothScrollTo({
+      destination: urlsContainerElRef.current!.scrollHeight,
+      container: urlsContainerElRef.current!,
+      easing: "easeInOutQuad",
+      duration: 500,
+    });
+  }, [urls.length]);
 
   return (
     <div className="main">
@@ -215,7 +333,7 @@ const TagsArea = () => {
         </div>
       </div>
       <div className="urls-container">
-        {urls.length > 2 ? (
+        {isScrollContainer ? (
           <>
             <ScrollShadow
               top={true}
@@ -227,40 +345,81 @@ const TagsArea = () => {
             ></ScrollShadow>
           </>
         ) : null}
-        <ul ref={urlsElRef} className="urls">
-          <TransitionGroup component={null}>
-            {urls.map(({ id, content, name, error }, idx, self) => {
-              const willScrollTo = self.length > 2 && idx === self.length - 1;
+        {!isScrollContainer ? (
+          <ul className="urls">
+            <TransitionGroup component={null}>
+              {urls.map(({ id, content, name, error }) => {
+                return (
+                  <CSSTransition
+                    classNames={isScrollContainer ? "null" : "url-tag"}
+                    timeout={100}
+                    key={id}
+                  >
+                    <URLTags
+                      id={id}
+                      content={content}
+                      name={name}
+                      error={error}
+                      parent={urlsContainerElRef}
+                      onError={onError}
+                      onRemove={onRemoveUrlList}
+                      isScrollContainer={isScrollContainer}
+                    ></URLTags>
+                  </CSSTransition>
+                );
+              })}
+            </TransitionGroup>
+          </ul>
+        ) : (
+          // @ts-ignore
+          <FixedSizeList
+            height={
+              mqlRef.current && mqlRef.current.minWidth_850.matches ? 280 : 150
+            }
+            itemCount={urls.length}
+            itemSize={55}
+            itemData={urls}
+            innerElementType={"ul"}
+            className={"fixed-list"}
+            outerRef={urlsContainerElRef}
+            // children={CloseBtn}
+            // onScroll={(foo) => {
+            //   console.log(foo.scrollOffset);
+            // }}
+          >
+            {({ data, index, style }) => {
+              const { id, content, error, name } = data[index] as TURLTag;
 
               return (
-                <CSSTransition classNames="url-tag" timeout={100} key={id}>
+                <div style={style}>
                   <URLTags
                     id={id}
                     content={content}
                     name={name}
                     error={error}
-                    parent={urlsElRef}
+                    parent={urlsContainerElRef}
                     onError={onError}
                     onRemove={onRemoveUrlList}
-                    willScrollTo={willScrollTo}
+                    isScrollContainer={isScrollContainer}
                   ></URLTags>
-                </CSSTransition>
+                </div>
               );
-            })}
-          </TransitionGroup>
-          {urls.length > 2 ? (
-            <>
-              <Sentinel
-                top={true}
-                scrollShadowElsRef={scrollShadowElsRef}
-              ></Sentinel>
-              <Sentinel
-                top={false}
-                scrollShadowElsRef={scrollShadowElsRef}
-              ></Sentinel>
-            </>
-          ) : null}
-        </ul>
+            }}
+          </FixedSizeList>
+        )}
+
+        {isScrollContainer ? (
+          <>
+            <Sentinel
+              top={true}
+              scrollShadowElsRef={scrollShadowElsRef}
+            ></Sentinel>
+            <Sentinel
+              top={false}
+              scrollShadowElsRef={scrollShadowElsRef}
+            ></Sentinel>
+          </>
+        ) : null}
       </div>
       <style jsx>{`
         .main {
@@ -274,11 +433,14 @@ const TagsArea = () => {
           padding-bottom: 50px;
         }
 
+        :global(.fixed-list ul) {
+          margin: 0;
+        }
+
         .urls {
           position: relative;
           max-height: 150px;
           overflow: hidden;
-          overflow-y: auto;
           display: flex;
           flex-direction: column;
           padding: 0;
@@ -286,6 +448,7 @@ const TagsArea = () => {
         }
 
         .bar {
+          position: relative;
           display: flex;
           justify-content: flex-start;
           align-items: center;
@@ -363,10 +526,20 @@ const TagsArea = () => {
           .urls-container {
             padding-bottom: ${urls.length ? "70px" : "50px"};
           }
+
+          .urls {
+            overflow-y: ${isScrollContainer ? "auto" : "hidden"};
+            max-height: ${mqlRef.current && mqlRef.current.minWidth_850.matches
+              ? "280px"
+              : "150px"};
+          }
         `}
       </style>
     </div>
   );
 };
+
+// max-height: 280px
+// width: 850px
 
 export default TagsArea;

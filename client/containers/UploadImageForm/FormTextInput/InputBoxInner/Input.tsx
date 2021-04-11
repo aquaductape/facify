@@ -1,4 +1,3 @@
-import { nanoid } from "nanoid";
 import React, { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import onFocusOut, {
@@ -46,6 +45,7 @@ const Input = ({
     null
   );
   const onCloseInputRef = useRef<(() => void) | null>(null);
+  const willRemoveUrlsContainer = urlItems.length >= 10;
 
   const urlItemsValid = () => urlItems.every((item) => !item.error);
 
@@ -156,6 +156,9 @@ const Input = ({
     const run = () => {
       const contentEl = contentElRef.current!;
       const contentBarEl = contentEl.querySelector(".bar") as HTMLElement;
+      const urlsContainerEl = contentEl.querySelector(
+        ".urls-container"
+      ) as HTMLElement;
       const inputBoxInnerEl = inputFormElRef.current!.querySelector(
         ".input-box-inner"
       ) as HTMLElement;
@@ -188,13 +191,18 @@ const Input = ({
       contentEl.style.transition = "height 100ms linear, width 100ms linear";
       titleEl.style.transition = "opacity 100ms 50ms linear";
       shadowEl.style.transition = "opacity 200ms 100ms ease";
+      utilbarEl.style.transition = "opacity 100ms 100ms ease";
 
+      utilbarEl.style.opacity = "1";
       shadowEl.style.opacity = "1";
       inputEl.style.left = "40px";
       titleEl.style.opacity = "1";
       contentBarEl.style.height = "";
       contentEl.style.width = `${parentMainBarWidth}px`;
       contentEl.style.height = `${contentElHeightRef.current}px`;
+      if (willRemoveUrlsContainer) {
+        urlsContainerEl.style.visibility = "hidden";
+      }
 
       setTimeout(() => {
         utilbarEl.style.opacity = "";
@@ -205,7 +213,8 @@ const Input = ({
         contentEl.style.minHeight = "";
         contentEl.style.transition = "";
         contentBarEl.style.transition = "";
-      }, 150);
+        urlsContainerEl.style.visibility = "";
+      }, 100);
     };
 
     onFocusOut({
@@ -234,6 +243,9 @@ const Input = ({
     isOpenRef.current = false;
 
     const contentEl = contentElRef.current!;
+    const urlsContainerEl = contentEl.querySelector(
+      ".urls-container"
+    ) as HTMLElement;
     const contentBarEl = contentEl.querySelector(".bar") as HTMLElement;
     const shadowEl = contentEl.querySelector(".shadow") as HTMLElement;
     const inputBoxInnerEl = inputFormElRef.current!.querySelector(
@@ -259,6 +271,11 @@ const Input = ({
 
     utilbarEl.style.opacity = "0";
     inputEl.style.left = "";
+
+    if (willRemoveUrlsContainer) {
+      urlsContainerEl.style.visibility = "hidden";
+    }
+
     contentEl.style.width = `${formWidth + borderColumnWidth}px`;
     contentEl.style.height = `45px`;
     contentEl.style.minHeight = "unset";
@@ -268,6 +285,7 @@ const Input = ({
 
     contentBarEl.style.transition = "height 50ms linear";
     contentEl.style.transition = "height 100ms linear, width 100ms linear";
+    utilbarEl.style.transition = "opacity 50ms linear";
     titleEl.style.transition = "opacity 50ms linear";
     shadowEl.style.transition = "";
 
@@ -284,7 +302,7 @@ const Input = ({
       inputEl.classList.remove("active");
 
       onCloseEnd();
-    }, 150);
+    }, 100);
   };
 
   useEffect(() => {

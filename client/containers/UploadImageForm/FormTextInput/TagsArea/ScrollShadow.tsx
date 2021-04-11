@@ -1,3 +1,5 @@
+import { useMatchMedia } from "../../../../hooks/useMatchMedia";
+
 type TScrollShadowProps = {
   top: boolean;
   scrollShadowElsRef: React.MutableRefObject<{
@@ -11,8 +13,12 @@ type TScrollShadowProps = {
   // inputErrorRef: React.MutableRefObject<boolean>;
 };
 const ScrollShadow = ({ top, scrollShadowElsRef }: TScrollShadowProps) => {
+  const mql = useMatchMedia().current!;
   let height = 25;
-  let position = top ? "top: 0;" : `top: ${150 - height + 5}px;`;
+  let containerBottomPosition = mql.minWidth_850.matches ? 280 : 150;
+  let position = top
+    ? "top: 0;"
+    : `top: ${containerBottomPosition - height + 5}px;`;
   height = top ? height : 20;
 
   const linearGradient = top

@@ -48,6 +48,7 @@ const UtilBar = ({ imgError, isOpenRef }: TUtilBarProps) => {
             display: flex;
             justify-content: center;
             align-items: center;
+            overflow: hidden;
             padding: 0 10px;
             font-size: 16px;
             z-index: 5;
@@ -63,10 +64,11 @@ const UtilBar = ({ imgError, isOpenRef }: TUtilBarProps) => {
             align-items: center;
             background: #c20000;
             color: #fff;
-            border-radius: 5px;
             margin-left: auto;
             font-size: 16px;
-            padding: 0 8px;
+            white-space: nowrap;
+            padding: 0 28px;
+            border-radius: 0;
             height: 100%;
             cursor: pointer;
             pointer-events: all;
@@ -93,6 +95,23 @@ const UtilBar = ({ imgError, isOpenRef }: TUtilBarProps) => {
             background: #ffcece;
             color: #550000;
           }
+
+          .imgError-info {
+            font-size: 13px;
+          }
+
+          @media (min-width: 320px) {
+            .imgError-info {
+              font-size: 14px;
+            }
+          }
+          @media (min-width: 360px) {
+            .imgError-info {
+              font-size: 15px;
+              position: relative;
+              top: -2px;
+            }
+          }
         `}
       </style>
       {/* dynamic */}
@@ -107,13 +126,6 @@ const UtilBar = ({ imgError, isOpenRef }: TUtilBarProps) => {
           padding: 0;
           white-space: nowrap;
           pointer-events: none;
-          `
-              : ""}
-          }
-          .imgError-info {
-            ${imgError && !urls.length
-              ? `
-              font-size: 14px;
           `
               : ""}
           }

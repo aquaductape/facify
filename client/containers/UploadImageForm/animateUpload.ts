@@ -34,6 +34,7 @@ export const startAnimate = ({ firstImage }: TStartAnimate) =>
       smoothScrollTo({
         destination: 0,
         duration: 180,
+        easing: "easeInOutQuad",
         onEnd: () => {
           run();
         },
