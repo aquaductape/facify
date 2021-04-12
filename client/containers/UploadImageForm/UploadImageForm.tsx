@@ -141,11 +141,11 @@ const UploadImageForm = () => {
   //     }
   //   };
 
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     setOpenLoader(true);
-  //   }, 1000);
-  // }, []);
+  useEffect(() => {
+    setTimeout(() => {
+      setOpenLoader(true);
+    }, 1000);
+  }, []);
 
   useEffect(() => {
     if (openLoader) {

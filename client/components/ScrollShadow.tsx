@@ -1,4 +1,5 @@
-import { useMatchMedia } from "../../../../hooks/useMatchMedia";
+import { useEffect, useRef } from "react";
+import { useMatchMedia } from "../hooks/useMatchMedia";
 
 type TScrollShadowProps = {
   top: boolean;
@@ -12,13 +13,15 @@ type TScrollShadowProps = {
   }>;
   // inputErrorRef: React.MutableRefObject<boolean>;
 };
-const ScrollShadow = ({ top, scrollShadowElsRef }: TScrollShadowProps) => {
+
+export const ScrollShadow = ({
+  top,
+  scrollShadowElsRef,
+}: TScrollShadowProps) => {
   const mql = useMatchMedia().current!;
   let height = 25;
   let containerBottomPosition = mql.minWidth_850.matches ? 280 : 150;
-  let position = top
-    ? "top: 0;"
-    : `top: ${containerBottomPosition - height + 5}px;`;
+  let position = top ? "top: 0;" : "bottom: 0;";
   height = top ? height : 20;
 
   const linearGradient = top
@@ -76,4 +79,58 @@ const ScrollShadow = ({ top, scrollShadowElsRef }: TScrollShadowProps) => {
   );
 };
 
-export default ScrollShadow;
+type TSentinelProps = {
+  top: boolean;
+  scrollShadowElsRef: React.MutableRefObject<{
+    top: {
+      current: HTMLDivElement | null;
+    };
+    bottom: {
+      current: HTMLDivElement | null;
+    };
+  }>;
+};
+
+export const SentinelShadow = ({ top, scrollShadowElsRef }: TSentinelProps) => {
+  const elRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries, observer) => {
+      entries.forEach((entry) => {
+        let isVisible = false;
+
+        if (entry.intersectionRatio > 0) {
+          isVisible = true;
+        }
+        const scrollShadow = top
+          ? scrollShadowElsRef.current.top.current!
+          : scrollShadowElsRef.current.bottom.current!;
+
+        if (!scrollShadow) {
+          observer.disconnect();
+          return;
+        }
+
+        scrollShadow.style.opacity = !isVisible ? "1" : "0";
+      });
+    });
+
+    observer.observe(elRef.current!);
+  }, []);
+
+  return (
+    <div ref={elRef} className="sentinel">
+      <style jsx>
+        {`
+          .sentinel {
+            position: ${top ? "absolute" : "relative"};
+            ${top ? "top: 0.5px;" : "bottom: 0.5px;"}
+            left: 0;
+            width: 100%;
+            height: 10px;
+          }
+        `}
+      </style>
+    </div>
+  );
+};

@@ -9,13 +9,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 import { FixedSizeList } from "react-window";
 import MiniImage from "../../../../components/MiniImage";
+import { ScrollShadow } from "../../../../components/ScrollShadow";
 import CloseBtn from "../../../../components/svg/CloseBtn";
 import { useMatchMedia } from "../../../../hooks/useMatchMedia";
 import { RootState } from "../../../../store/rootReducer";
 import smoothScrollTo from "../../../../utils/smoothScrollTo";
 import { removeUrlItem, setUrlItemError, TURLItem } from "../../formSlice";
-import ScrollShadow from "./ScrollShadow";
-import Sentinel from "./Sentinel";
 
 // turning off auto scroll will not be enabled since content is manually added, as well as content visuall size is already so small
 
@@ -346,28 +345,65 @@ const TagsArea = () => {
         </div>
       </div>
       <div className="urls-container">
-        {isScrollContainer ? (
-          <>
-            <ScrollShadow
-              top={true}
-              scrollShadowElsRef={scrollShadowElsRef}
-            ></ScrollShadow>
-            <ScrollShadow
-              top={false}
-              scrollShadowElsRef={scrollShadowElsRef}
-            ></ScrollShadow>
-          </>
-        ) : null}
-        {!isScrollContainer ? (
-          <ul className="urls">
-            <TransitionGroup component={null}>
-              {urls.map(({ id, content, name, error }) => {
+        <div className="urls-container-inner">
+          {isScrollContainer ? (
+            <>
+              <ScrollShadow
+                top={true}
+                scrollShadowElsRef={scrollShadowElsRef}
+              ></ScrollShadow>
+              <ScrollShadow
+                top={false}
+                scrollShadowElsRef={scrollShadowElsRef}
+              ></ScrollShadow>
+            </>
+          ) : null}
+          {!isScrollContainer ? (
+            <ul className="urls">
+              <TransitionGroup component={null}>
+                {urls.map(({ id, content, name, error }) => {
+                  return (
+                    <CSSTransition
+                      classNames={isScrollContainer ? "null" : "url-tag"}
+                      timeout={100}
+                      key={id}
+                    >
+                      <URLTags
+                        id={id}
+                        content={content}
+                        name={name}
+                        error={error}
+                        parent={urlsContainerElRef}
+                        onError={onError}
+                        onRemove={onRemoveUrlList}
+                        isScrollContainer={isScrollContainer}
+                      ></URLTags>
+                    </CSSTransition>
+                  );
+                })}
+              </TransitionGroup>
+            </ul>
+          ) : (
+            // @ts-ignore
+            <FixedSizeList
+              height={
+                mqlRef.current && mqlRef.current.minWidth_850.matches
+                  ? 280
+                  : 150
+              }
+              itemCount={urls.length}
+              itemSize={55}
+              itemData={urls}
+              innerElementType={"ul"}
+              className={"fixed-list"}
+              outerRef={urlsContainerElRef}
+              onScroll={(props) => onScroll(props.scrollOffset)}
+            >
+              {({ data, index, style }) => {
+                const { id, content, error, name } = data[index] as TURLTag;
+
                 return (
-                  <CSSTransition
-                    classNames={isScrollContainer ? "null" : "url-tag"}
-                    timeout={100}
-                    key={id}
-                  >
+                  <div style={style}>
                     <URLTags
                       id={id}
                       content={content}
@@ -378,45 +414,12 @@ const TagsArea = () => {
                       onRemove={onRemoveUrlList}
                       isScrollContainer={isScrollContainer}
                     ></URLTags>
-                  </CSSTransition>
+                  </div>
                 );
-              })}
-            </TransitionGroup>
-          </ul>
-        ) : (
-          // @ts-ignore
-          <FixedSizeList
-            height={
-              mqlRef.current && mqlRef.current.minWidth_850.matches ? 280 : 150
-            }
-            itemCount={urls.length}
-            itemSize={55}
-            itemData={urls}
-            innerElementType={"ul"}
-            className={"fixed-list"}
-            outerRef={urlsContainerElRef}
-            onScroll={(props) => onScroll(props.scrollOffset)}
-          >
-            {({ data, index, style }) => {
-              const { id, content, error, name } = data[index] as TURLTag;
-
-              return (
-                <div style={style}>
-                  <URLTags
-                    id={id}
-                    content={content}
-                    name={name}
-                    error={error}
-                    parent={urlsContainerElRef}
-                    onError={onError}
-                    onRemove={onRemoveUrlList}
-                    isScrollContainer={isScrollContainer}
-                  ></URLTags>
-                </div>
-              );
-            }}
-          </FixedSizeList>
-        )}
+              }}
+            </FixedSizeList>
+          )}
+        </div>
       </div>
       <style jsx>{`
         .main {
@@ -426,8 +429,11 @@ const TagsArea = () => {
         }
 
         .urls-container {
-          position: relative;
           padding-bottom: 50px;
+        }
+
+        .urls-container-inner {
+          position: relative;
         }
 
         :global(.fixed-list ul) {

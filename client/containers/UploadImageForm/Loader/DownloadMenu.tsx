@@ -4,6 +4,8 @@ import {
   Dispatch,
   useEffect,
   ChangeEventHandler,
+  useRef,
+  useState,
 } from "react";
 import { useSelector } from "react-redux";
 import { TManualExit } from "../../../lib/onFocusOut/onFocusOut";
@@ -14,6 +16,7 @@ import DownloadMenuItem, {
   TDownloadMenuItemHandler,
 } from "./DownloadMenuItem";
 import { TQueue } from "./Loader";
+import { ScrollShadow, SentinelShadow } from "../../../components/ScrollShadow";
 
 // Disable Notification Countdown
 type TDownloadMenuProps = {
@@ -57,8 +60,17 @@ const DownloadMenu = ({
   countDownActivityRef,
 }: TDownloadMenuProps) => {
   const countDownActivity = countDownActivityRef.current;
+  const groupElRef = useRef<HTMLUListElement | null>(null);
   const goToNext = goToNextRef.current;
   const currentResult = queue[queueIdx];
+  const [isScrollContainer, setIsScrollContainer] = useState(false);
+  const scrollShadowElsRef = useRef<{
+    top: { current: HTMLDivElement | null };
+    bottom: { current: HTMLDivElement | null };
+  }>({
+    top: { current: null },
+    bottom: { current: null },
+  });
 
   const currentQueueClass = ({ idx }: { idx?: number } = {}) => {
     if (idx != null) {
@@ -71,6 +83,13 @@ const DownloadMenu = ({
     return "";
   };
 
+  const onChangeCheckBox: ChangeEventHandler<HTMLInputElement> = (e) => {
+    const checkValue = !e.target.checked;
+    countDownActivity.enabled = checkValue;
+    // debugger;
+    goToNext({ clearCurrentTimout: true, enableCountDown: checkValue });
+  };
+
   useEffect(() => {
     if (!optionsMenuElRef.current) return;
 
@@ -79,12 +98,14 @@ const DownloadMenu = ({
     optionsMenuElRef.current?.focus();
   }, [openMenu]);
 
-  const onChangeCheckBox: ChangeEventHandler<HTMLInputElement> = (e) => {
-    const checkValue = !e.target.checked;
-    countDownActivity.enabled = checkValue;
-    // debugger;
-    goToNext({ clearCurrentTimout: true, enableCountDown: checkValue });
-  };
+  useEffect(() => {
+    const groupEl = groupElRef.current!;
+    if (groupEl.scrollHeight <= groupEl.clientHeight) {
+      return;
+    }
+
+    setIsScrollContainer(true);
+  }, []);
 
   return (
     <div className="container" tabIndex={-1} ref={optionsMenuElRef}>
@@ -95,14 +116,41 @@ const DownloadMenu = ({
         ></div>
         <div className={`kebab-down-arrow ${currentQueueClass()}`}></div>
 
-        <ul className="group">
-          <DownloadMenuItemsContainer
-            countDownActivityRef={countDownActivityRef}
-            downloadMenuItemHandlerRef={downloadMenuItemHandlerRef}
-            goToNextRef={goToNextRef}
-            onFocusOutExitRef={onFocusOutExitRef}
-          ></DownloadMenuItemsContainer>
-        </ul>
+        <div className="group-container">
+          {isScrollContainer ? (
+            <>
+              <ScrollShadow
+                top={true}
+                scrollShadowElsRef={scrollShadowElsRef}
+              ></ScrollShadow>
+              <ScrollShadow
+                top={false}
+                scrollShadowElsRef={scrollShadowElsRef}
+              ></ScrollShadow>
+            </>
+          ) : null}
+
+          <ul className="group" ref={groupElRef}>
+            <DownloadMenuItemsContainer
+              countDownActivityRef={countDownActivityRef}
+              downloadMenuItemHandlerRef={downloadMenuItemHandlerRef}
+              goToNextRef={goToNextRef}
+              onFocusOutExitRef={onFocusOutExitRef}
+            ></DownloadMenuItemsContainer>
+            {isScrollContainer ? (
+              <>
+                <SentinelShadow
+                  top={true}
+                  scrollShadowElsRef={scrollShadowElsRef}
+                ></SentinelShadow>
+                <SentinelShadow
+                  top={false}
+                  scrollShadowElsRef={scrollShadowElsRef}
+                ></SentinelShadow>
+              </>
+            ) : null}
+          </ul>
+        </div>
         <div className="options">
           <div className="input-checkbox">
             <InputCheckBox onChange={onChangeCheckBox}></InputCheckBox>
@@ -174,7 +222,7 @@ const DownloadMenu = ({
             border-right: 17.5px solid transparent !important;
             border-top: 20px solid #000;
             transition: border-color 500ms;
-            z-index: 10;
+            z-index: 11;
           }
 
           .kebab-down-arrow.success {
@@ -196,9 +244,16 @@ const DownloadMenu = ({
             z-index: 5;
           }
 
+          .group-container {
+            position: relative;
+          }
+
           .group {
+            position: relative;
             display: flex;
             flex-direction: column;
+            max-height: 20vh;
+            overflow-y: auto;
             padding: 0;
             margin: 0;
           }

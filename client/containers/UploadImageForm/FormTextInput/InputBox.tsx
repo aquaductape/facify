@@ -177,11 +177,6 @@ const Input = ({ submitHoverRef, isOpenRef, displayErrorRef }: InputProps) => {
             display: none;
           }
 
-          .container.active .content {
-            min-height: 100px;
-            max-height: 500px;
-          }
-
           .container.submitError .blue {
             transform: translateX(-100%);
           }
@@ -203,13 +198,15 @@ const Input = ({ submitHoverRef, isOpenRef, displayErrorRef }: InputProps) => {
           }
 
           @media (min-width: 600px) {
-            .container.active .content {
-              max-height: calc(100vh - 133px - 45px);
-            }
-
             .shadow {
               transform: scaleX(0.95);
               box-shadow: 0 0px 15px 2px black;
+            }
+          }
+
+          @media (min-width: 850px) {
+            .container.active .content {
+              max-height: 400px;
             }
           }
         `}

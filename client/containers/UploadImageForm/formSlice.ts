@@ -42,19 +42,20 @@ const initialState: TFormState = {
       name: "elon-superlongsuperlongsuperlongsuperlongsuperlongsuperlong.gif",
       errorMsg: "",
     },
-    // {
-    //   id: nanoid(),
-    //   content: "",
-    //   error: false,
-    //   name: "post-malon",
-    //   errorMsg: "",
-    // },
-    // {
-    //   id: nanoid(),
-    //   content: "",
-    //   error: false,
-    //   name: "aubrey",
-    // },
+    {
+      id: nanoid(),
+      content: "",
+      error: false,
+      name: "post-malon",
+      errorMsg: "",
+    },
+    {
+      id: nanoid(),
+      content: "",
+      error: false,
+      errorMsg: "",
+      name: "aubrey",
+    },
   ],
   urlItems: [
     // { id: nanoid(), content: "https://i.imgur.com/nt0RgAH.jpg", error: false },

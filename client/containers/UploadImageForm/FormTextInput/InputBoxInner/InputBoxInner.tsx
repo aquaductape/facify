@@ -1,5 +1,4 @@
 import debounce from "lodash/debounce";
-import { nanoid } from "nanoid";
 import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import { batch, useDispatch } from "react-redux";
 import MiniImage from "../../../../components/MiniImage";
@@ -7,7 +6,6 @@ import ArrowToRight from "../../../../components/svg/ArrowToRight";
 import { imageExistErrorMsg } from "../../../../constants";
 import store from "../../../../store/store";
 import { doesImageExist } from "../../../../utils/doesImageExist";
-import { getImageNameFromUrl } from "../../../../utils/getImageNameFromUrl";
 import { JSON_Stringify_Parse } from "../../../../utils/jsonStringifyParse";
 import { addUrlItem, removeUrlItem, setUrlItemError } from "../../formSlice";
 import Input from "./Input";
@@ -54,13 +52,18 @@ const InputBoxInner = ({
 
   const onInputCheckUrlDebouncedRef = useRef(
     debounce(
-      (value: string) => {
+      async (value: string) => {
         // when there's multiple URLs present (from using Ctrl-a or Backspacing), currently there's no support to detect which URL is invalid
-        // The input string will not be validated
+        // Therefore input string will not be validated
         if (value.match(/\s/g)) {
           value = "";
+          setImgError(false);
+          setImgUrl(value);
+          return;
         }
-        setImgError(false);
+
+        const success = await doesImageExist(value);
+        setImgError(!success);
         setImgUrl(value);
       },
       500,
@@ -203,7 +206,7 @@ const InputBoxInner = ({
           <MiniImage
             url={imgUrl}
             error={imgError}
-            onError={onImgError}
+            onError={() => {}}
             maxWidth={25}
             margin={"0"}
           ></MiniImage>

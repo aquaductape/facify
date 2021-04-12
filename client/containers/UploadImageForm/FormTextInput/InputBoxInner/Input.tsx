@@ -257,13 +257,14 @@ const Input = ({
     const formWidth = inputFormElRef.current!.clientWidth;
     const parentMainBarWidth = parentMainBarInputElRef.current!.clientWidth;
     const borderColumnWidth = 5;
-    const inputValue = inputEl.value.trim();
-    contentElHeightRef.current = contentEl.clientHeight + (inputValue ? 55 : 0);
+    const inputValueCount = inputEl.value.trim().split(" ").slice(0, 7);
+    contentElHeightRef.current = contentEl.clientHeight;
 
     inputEl.style.zIndex = "8";
     titleEl.style.opacity = "1";
     contentEl.style.width = `${parentMainBarWidth}px`;
     contentEl.style.height = `${contentElHeightRef.current}px`;
+    contentElHeightRef.current += inputValueCount.reduce((acc) => acc + 55, 0);
 
     reflow();
 
