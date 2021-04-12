@@ -4,7 +4,9 @@ import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import { batch, useDispatch } from "react-redux";
 import MiniImage from "../../../../components/MiniImage";
 import ArrowToRight from "../../../../components/svg/ArrowToRight";
+import { imageExistErrorMsg } from "../../../../constants";
 import store from "../../../../store/store";
+import { doesImageExist } from "../../../../utils/doesImageExist";
 import { getImageNameFromUrl } from "../../../../utils/getImageNameFromUrl";
 import { JSON_Stringify_Parse } from "../../../../utils/jsonStringifyParse";
 import { addUrlItem, removeUrlItem, setUrlItemError } from "../../formSlice";
@@ -79,17 +81,8 @@ const InputBoxInner = ({
   ) => {
     const urls = JSON_Stringify_Parse(_urls); // input will be tainted by redux/immer, must create new objects
 
-    const loadImageSuccess = (url: string) =>
-      new Promise<boolean>((resolve) => {
-        const img = new Image();
-
-        img.src = url;
-        img.onload = () => resolve(true);
-        img.onerror = () => resolve(false);
-      });
-
     for (const url of urls) {
-      const success = await loadImageSuccess(url.content);
+      const success = await doesImageExist(url.content);
       url.error = !success;
     }
 
@@ -103,7 +96,7 @@ const InputBoxInner = ({
   const onInputUrls = (e: ChangeEvent<HTMLInputElement>) => {
     const { key, paste } = keyDownProps;
     const value = e.target.value;
-    let errorMsg = imgError ? "URL is invalid or image doesn't exist" : "";
+    let errorMsg = imgError ? imageExistErrorMsg : "";
 
     const hasSpace = value.match(/\s/);
     const urlItems = splitValueIntoUrlItems({ value, imgError, errorMsg });

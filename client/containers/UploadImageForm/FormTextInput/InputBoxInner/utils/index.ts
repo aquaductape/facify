@@ -1,4 +1,5 @@
 import { nanoid } from "nanoid";
+import { doesImageExist } from "../../../../../utils/doesImageExist";
 import { getImageNameFromUrl } from "../../../../../utils/getImageNameFromUrl";
 
 export const splitValueIntoUrlItems = ({
@@ -12,13 +13,15 @@ export const splitValueIntoUrlItems = ({
 }) => {
   const urls = value.split(" ").filter((item) => item);
 
-  const urlItems = urls.map((url) => ({
-    id: nanoid(),
-    content: url,
-    name: getImageNameFromUrl(url),
-    error: imgError,
-    errorMsg: errorMsg,
-  }));
+  const urlItems = urls.map((url) => {
+    return {
+      id: nanoid(),
+      content: url,
+      name: getImageNameFromUrl(url),
+      error: imgError,
+      errorMsg: errorMsg,
+    };
+  });
 
   return urlItems;
 };

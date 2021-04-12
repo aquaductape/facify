@@ -1,9 +1,11 @@
 import React, { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { imageExistErrorMsg } from "../../../../constants";
 import onFocusOut, {
   OnFocusOutEvent,
 } from "../../../../lib/onFocusOut/onFocusOut";
 import { RootState } from "../../../../store/rootReducer";
+import { doesImageExist } from "../../../../utils/doesImageExist";
 import { reflow } from "../../../../utils/reflow";
 import { addUrlItem, setInputValueFromUrlItems } from "../../formSlice";
 import { splitValueIntoUrlItems } from "./utils";
@@ -45,10 +47,9 @@ const Input = ({
     null
   );
   const onCloseInputRef = useRef<(() => void) | null>(null);
-  const willRemoveUrlsContainer = urlItems.length >= 10;
 
-  const urlItemsValid = () => urlItems.every((item) => !item.error);
-
+  // input has multiple urls
+  // isScrollContainer
   const submitValuesValid = () => {
     const value = inputElRef.current!.value.trim();
 
@@ -84,13 +85,20 @@ const Input = ({
     return true;
   };
 
-  const onCloseInputEnd = () => {
+  const onCloseInputEnd = async () => {
     const inputEl = inputElRef.current!;
     const value = inputEl.value;
-    let errorMsg = imgError ? "URL is invalid or image doesn't exist" : "";
+    let errorMsg = imgError ? imageExistErrorMsg : "";
     const urlItems = splitValueIntoUrlItems({ value, imgError, errorMsg });
     // reset
     inputEl.value = "";
+    for (const item of urlItems) {
+      const success = await doesImageExist(item.content);
+      item.error = !success;
+      if (success) {
+        item.errorMsg = imageExistErrorMsg;
+      }
+    }
     console.log({ imgError });
 
     if (urlItems.length) {
@@ -98,10 +106,10 @@ const Input = ({
     }
   };
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     contentElHeightRef.current = 100;
 
-    onCloseInputEnd();
+    await onCloseInputEnd();
 
     setTimeout(() => {
       dispatch(setInputValueFromUrlItems());
@@ -156,9 +164,6 @@ const Input = ({
     const run = () => {
       const contentEl = contentElRef.current!;
       const contentBarEl = contentEl.querySelector(".bar") as HTMLElement;
-      const urlsContainerEl = contentEl.querySelector(
-        ".urls-container"
-      ) as HTMLElement;
       const inputBoxInnerEl = inputFormElRef.current!.querySelector(
         ".input-box-inner"
       ) as HTMLElement;
@@ -200,9 +205,6 @@ const Input = ({
       contentBarEl.style.height = "";
       contentEl.style.width = `${parentMainBarWidth}px`;
       contentEl.style.height = `${contentElHeightRef.current}px`;
-      if (willRemoveUrlsContainer) {
-        urlsContainerEl.style.visibility = "hidden";
-      }
 
       setTimeout(() => {
         utilbarEl.style.opacity = "";
@@ -213,7 +215,6 @@ const Input = ({
         contentEl.style.minHeight = "";
         contentEl.style.transition = "";
         contentBarEl.style.transition = "";
-        urlsContainerEl.style.visibility = "";
       }, 100);
     };
 
@@ -243,9 +244,6 @@ const Input = ({
     isOpenRef.current = false;
 
     const contentEl = contentElRef.current!;
-    const urlsContainerEl = contentEl.querySelector(
-      ".urls-container"
-    ) as HTMLElement;
     const contentBarEl = contentEl.querySelector(".bar") as HTMLElement;
     const shadowEl = contentEl.querySelector(".shadow") as HTMLElement;
     const inputBoxInnerEl = inputFormElRef.current!.querySelector(
@@ -271,10 +269,6 @@ const Input = ({
 
     utilbarEl.style.opacity = "0";
     inputEl.style.left = "";
-
-    if (willRemoveUrlsContainer) {
-      urlsContainerEl.style.visibility = "hidden";
-    }
 
     contentEl.style.width = `${formWidth + borderColumnWidth}px`;
     contentEl.style.height = `45px`;

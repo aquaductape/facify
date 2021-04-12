@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { nanoid } from "nanoid";
+import { imageExistErrorMsg } from "../../constants";
 import { JSON_Stringify_Parse } from "../../utils/jsonStringifyParse";
 
 export type TURLItem = {
@@ -109,6 +110,9 @@ const formSlice = createSlice({
       const { id, error } = action.payload;
 
       const item = state.urlItems.find((item) => item.id === id)!;
+      if (error) {
+        item.errorMsg = imageExistErrorMsg;
+      }
       item.error = error;
     },
     setInputValueFromUrlItems: (state) => {

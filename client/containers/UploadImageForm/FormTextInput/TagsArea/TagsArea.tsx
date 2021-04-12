@@ -46,7 +46,7 @@ const URLTags = ({
         error={error}
         onError={() => {
           if (error) return;
-          onError(id);
+          // onError(id);
         }}
         url={content}
         isUrlTag={true}
@@ -137,6 +137,7 @@ const URLTags = ({
             background: inherit;
             cursor: pointer;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
             transition: background-color 250ms, color 250ms;
           }
 
@@ -179,12 +180,13 @@ const TagsArea = () => {
   const urls = useSelector((state: RootState) => state.form.urlItems);
   const mqlRef = useMatchMedia();
   const hasRemovedRef = useRef(false);
-  const [_, setRefreshContainer] = useState(0);
+  const [refreshContainer, setRefreshContainer] = useState(0);
   // const isScrollContainerRef = useRef(false);
   const isScrollContainer =
     mqlRef.current && mqlRef.current.minWidth_850.matches
       ? urls.length > 5
       : urls.length > 2;
+  const urlsContainerScrollOffsetRef = useRef(0);
 
   // https://i.imgur.com/nt0RgAH.jpg https://upload.wikimedia.org/wikipedia/commons/8/85/Elon_Musk_Royal_Society_%28crop1%29.jpg https://static.tvtropes.org/pmwiki/pub/images/aubrey_plaza.jpg
 
@@ -199,11 +201,13 @@ const TagsArea = () => {
 
   const animateExitByRemoveBtn = (id: string) => {
     return new Promise<boolean>((resolve) => {
-      if (!isScrollContainer) return;
-      // const urlsSlice = findAndSlice((item) => item.id === id, urls)
+      if (!isScrollContainer) {
+        resolve(true);
+        return;
+      }
+
       const itemHeight = 55;
       const targetIdx = urls.findIndex((item) => item.id === id);
-      const isLast = targetIdx === urls.length - 1;
       const targetEl = urlsContainerElRef.current!.querySelector(
         `[data-id-url-item="${id}"]`
       ) as HTMLDivElement;
@@ -213,26 +217,9 @@ const TagsArea = () => {
         urlsContainerElRef.current!.scrollHeight -
           urlsContainerElRef.current!.clientHeight;
 
-      if (isLast) {
-        targetEl.style.pointerEvents = "none";
-        targetEl.style.opacity = "0";
-        targetEl.style.transition = "opacity 50ms linear";
-
-        if (!isScrollNearBottom) return;
-
-        smoothScrollTo({
-          destination: urlsContainerElRef.current!.scrollTop - itemHeight,
-          currentPosition: urlsContainerElRef.current!.scrollTop,
-          container: urlsContainerElRef.current!,
-          duration: 100,
-          easing: "linear",
-          onEnd: () => resolve(true),
-        });
-
-        return;
-      }
-
-      const urlsSlice = urls.slice(targetIdx + 1, targetIdx + 6);
+      const urlsSlice = isScrollNearBottom
+        ? urls.slice(targetIdx - 6, targetIdx)
+        : urls.slice(targetIdx + 1, targetIdx + 6);
       const siblingsEl = urlsSlice.map(
         ({ id }) =>
           urlsContainerElRef.current!.querySelector(
@@ -250,25 +237,15 @@ const TagsArea = () => {
         el.style.pointerEvents = "none";
         el.style.zIndex = "1";
         el.style.transition = "transform 100ms linear";
-        el.style.transform = "translateY(-55px)";
+        el.style.transform = `translateY(${
+          isScrollNearBottom ? itemHeight : -itemHeight
+        }px)`;
       });
 
       const onAnimationEnd = () => {
         targetEl.parentElement!.style.display = "none";
         resolve(true);
       };
-
-      if (isScrollNearBottom) {
-        smoothScrollTo({
-          destination: urlsContainerElRef.current!.scrollTop - itemHeight,
-          currentPosition: urlsContainerElRef.current!.scrollTop,
-          container: urlsContainerElRef.current!,
-          duration: 100,
-          easing: "linear",
-          onEnd: onAnimationEnd,
-        });
-        return;
-      }
 
       setTimeout(() => {
         onAnimationEnd();
@@ -290,8 +267,28 @@ const TagsArea = () => {
     dispatch(setUrlItemError({ id, error: true }));
   };
 
+  const onScroll = (offset: number) => {
+    if (hasRemovedRef.current) return;
+
+    const nearTop = offset < 5;
+    const nearBottom = offset + 5 > urlsContainerScrollOffsetRef.current;
+    const scrollShadowElTop = scrollShadowElsRef.current.top.current!;
+    const scrollShadowElBottom = scrollShadowElsRef.current.bottom.current!;
+
+    if (nearTop) {
+      scrollShadowElTop.style.opacity = "0";
+    } else {
+      scrollShadowElTop.style.opacity = "1";
+    }
+
+    if (nearBottom) {
+      scrollShadowElBottom.style.opacity = "0";
+    } else {
+      scrollShadowElBottom.style.opacity = "1";
+    }
+  };
+
   useEffect(() => {
-    // const isScrollContainerRef = mqlRef.current?.minWidth_850.matches ? urls.length > 4 : urls.length > 2;
     const onChange = () => {
       setRefreshContainer(Date.now());
     };
@@ -304,18 +301,34 @@ const TagsArea = () => {
   }, []);
 
   useEffect(() => {
+    if (isScrollContainer) {
+      urlsContainerScrollOffsetRef.current =
+        urlsContainerElRef.current!.scrollHeight -
+        urlsContainerElRef.current!.clientHeight;
+    }
+
     if (!isScrollContainer || hasRemovedRef.current) {
       hasRemovedRef.current = false;
       return;
     }
 
     smoothScrollTo({
-      destination: urlsContainerElRef.current!.scrollHeight,
+      destination:
+        urlsContainerElRef.current!.scrollHeight -
+        urlsContainerElRef.current!.clientHeight,
       container: urlsContainerElRef.current!,
       easing: "easeInOutQuad",
-      duration: 500,
+      duration: 200,
     });
   }, [urls.length]);
+
+  useEffect(() => {
+    if (!isScrollContainer) return;
+
+    urlsContainerScrollOffsetRef.current =
+      urlsContainerElRef.current!.scrollHeight -
+      urlsContainerElRef.current!.clientHeight;
+  }, [refreshContainer]);
 
   return (
     <div className="main">
@@ -382,10 +395,7 @@ const TagsArea = () => {
             innerElementType={"ul"}
             className={"fixed-list"}
             outerRef={urlsContainerElRef}
-            // children={CloseBtn}
-            // onScroll={(foo) => {
-            //   console.log(foo.scrollOffset);
-            // }}
+            onScroll={(props) => onScroll(props.scrollOffset)}
           >
             {({ data, index, style }) => {
               const { id, content, error, name } = data[index] as TURLTag;
@@ -407,19 +417,6 @@ const TagsArea = () => {
             }}
           </FixedSizeList>
         )}
-
-        {isScrollContainer ? (
-          <>
-            <Sentinel
-              top={true}
-              scrollShadowElsRef={scrollShadowElsRef}
-            ></Sentinel>
-            <Sentinel
-              top={false}
-              scrollShadowElsRef={scrollShadowElsRef}
-            ></Sentinel>
-          </>
-        ) : null}
       </div>
       <style jsx>{`
         .main {
@@ -466,6 +463,7 @@ const TagsArea = () => {
           background: #ececec;
           cursor: pointer;
           user-select: none;
+          -webkit-tap-highlight-color: transparent;
           transition: background-color 250ms, color 250ms;
         }
 
