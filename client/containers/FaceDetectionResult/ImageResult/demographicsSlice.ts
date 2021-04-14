@@ -1,6 +1,7 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../../store/rootReducer";
-import { TDemographics } from "../../../ts";
+import { TConcept, TDemographics } from "../../../ts";
+import { JSON_Stringify_Parse } from "../../../utils/jsonStringifyParse";
 
 export type TDemographicsDisplay = {
   id: string;
@@ -22,6 +23,19 @@ type TParent = {
   name: string;
   hoverActive: boolean;
   childIds: string[];
+  tableClassify: {
+    sort: {
+      action: string | null;
+      category: string | null;
+      childIds: string[] | null;
+    };
+    filter: {
+      [key: string]: string[];
+      "multicultural-appearance": string[];
+      "gender-appearance": string[];
+      "age-appearance": string[];
+    };
+  };
 };
 
 export type TDemographicNode = TDemographicsDisplay & TDemographics;
@@ -103,7 +117,7 @@ const demographicsSlice = createSlice({
     addDemographicsParentAndChildren: (
       state,
       action: PayloadAction<{
-        parent: Omit<TParent, "childIds">;
+        parent: Omit<TParent, "childIds" | "tableClassify">;
         data: TDemographicNode[];
       }>
     ) => {
@@ -111,6 +125,14 @@ const demographicsSlice = createSlice({
       const parent = action.payload.parent as TParent;
 
       parent.childIds = data.map((item) => item.id);
+      parent.tableClassify = {
+        filter: {
+          "age-appearance": [],
+          "gender-appearance": [],
+          "multicultural-appearance": [],
+        },
+        sort: { action: null, category: null, childIds: null },
+      };
       state.parents.push(parent);
       data.forEach((item) => {
         state.demographicNodes[item.id] = item;
@@ -127,6 +149,55 @@ const demographicsSlice = createSlice({
 
       childIds.forEach((childId) => {
         delete state.demographicNodes[childId];
+      });
+    },
+    sortChildIds: (
+      state,
+      action: PayloadAction<{
+        id: number;
+        category: "face" | "age" | "gender" | "multicultural";
+        action: "ACS" | "DESC" | "Reset";
+      }>
+    ) => {
+      const { id, category, action: actionValue } = action.payload;
+      const parent = state.parents[id];
+      const newCategory = `${category}-appearance`;
+
+      parent.tableClassify.sort.category = category;
+      parent.tableClassify.sort.action = actionValue;
+
+      if (actionValue === "Reset") {
+        parent.tableClassify.sort.action = null;
+        parent.tableClassify.sort.category = null;
+        if (!parent.tableClassify.sort.childIds) return;
+
+        parent.childIds = parent.tableClassify.sort.childIds;
+        parent.tableClassify.sort.childIds = null;
+        return;
+      }
+
+      if (!parent.tableClassify.sort.childIds) {
+        parent.tableClassify.sort.childIds = JSON_Stringify_Parse(
+          parent.childIds
+        );
+      }
+
+      if (category === "face") {
+        parent.tableClassify.sort.childIds.reverse();
+        return;
+      }
+
+      parent.tableClassify.sort.childIds.sort((a, b) => {
+        const a_childIdValue =
+          state.demographicNodes[a].concepts[newCategory][0].value;
+        const b_childIdValue =
+          state.demographicNodes[b].concepts[newCategory][0].value;
+
+        if (actionValue === "ACS") {
+          return a_childIdValue - b_childIdValue;
+        } else {
+          return b_childIdValue - a_childIdValue;
+        }
       });
     },
     setDemoItemHoverActive: (
@@ -194,5 +265,6 @@ export const {
   setImageDimensions,
   setDemoItemHoverActive,
   setHoverActive,
+  sortChildIds,
 } = demographicsSlice.actions;
 export default demographicsSlice.reducer;

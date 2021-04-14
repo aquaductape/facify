@@ -7,8 +7,12 @@ import {
   selectDemographicParentChildIds,
   selectDemographicsConcepts,
 } from "../FaceDetectionResult/ImageResult/demographicsSlice";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { querySelector } from "../../utils/querySelector";
+import { TConcept } from "../../ts";
+import { FireFox } from "../../lib/onFocusOut/browserInfo";
+import THead from "./THead";
+import { RootState } from "../../store/rootReducer";
 
 type TRowProps = {
   id: string;
@@ -24,6 +28,8 @@ const Row = ({ id, parentIdNumber, parentId, idx }: TRowProps) => {
     "gender-appearance": gender,
     "multicultural-appearance": multicultural,
   } = concepts;
+
+  // filterConceptsSlice
 
   return (
     <tr className="row">
@@ -93,11 +99,18 @@ const Row = ({ id, parentIdNumber, parentId, idx }: TRowProps) => {
 const Table = ({ id, idx }: { id: string; idx: number }) => {
   const parentId = id;
   const parentIdNumber = idx;
-  const demographicParent = useSelector(
+  let demographicParentChildIds = useSelector(
     selectDemographicParentChildIds({ id: idx })
   );
+  const sortedChildIds = useSelector(
+    (state: RootState) =>
+      state.demographics.parents[idx].tableClassify.sort.childIds
+  );
+
+  if (sortedChildIds) {
+    demographicParentChildIds = sortedChildIds;
+  }
   const tableContainerElRef = useRef<HTMLDivElement | null>(null);
-  const thead = ["Face", "Age", "Gender", "Multicultural"];
 
   useEffect(() => {
     const tableContainerEl = tableContainerElRef.current!;
@@ -112,7 +125,13 @@ const Table = ({ id, idx }: { id: string; idx: number }) => {
     run();
 
     const onScroll = () => {
-      theadEl!.scrollTo({ left: tableContainerEl.scrollLeft });
+      const scrollLeft = tableContainerEl.scrollLeft;
+
+      if (!FireFox) {
+        theadEl!.setAttribute("scroll-left", scrollLeft.toString());
+      }
+
+      theadEl!.scrollLeft = scrollLeft;
     };
 
     tableContainerEl.addEventListener("scroll", onScroll);
@@ -120,6 +139,8 @@ const Table = ({ id, idx }: { id: string; idx: number }) => {
       tableContainerEl.removeEventListener("scroll", onScroll);
     };
   }, []);
+
+  if (!demographicParentChildIds.length) return <div>No Faces Found :(</div>;
 
   return (
     <div data-id-table={id} className="table-container">
@@ -129,20 +150,9 @@ const Table = ({ id, idx }: { id: string; idx: number }) => {
           <HorizontalSentinel id={id}></HorizontalSentinel>
           <THeadSentinel id={id}></THeadSentinel>
           <table>
-            <thead data-id-static-thead={id} className="thead">
-              <tr>
-                {thead.map((item, idx) => {
-                  return (
-                    <th className={idx === 0 ? "thead-image" : ""} key={idx}>
-                      {idx === 0 ? <span className="bg"></span> : null}
-                      <span>{item}</span>
-                    </th>
-                  );
-                })}
-              </tr>
-            </thead>
+            <THead id={id} parentIdx={parentIdNumber}></THead>
             <tbody>
-              {demographicParent.map((item, idx) => (
+              {demographicParentChildIds.map((item, idx) => (
                 <Row
                   id={item}
                   parentId={parentId}
@@ -180,40 +190,6 @@ const Table = ({ id, idx }: { id: string; idx: number }) => {
             border: 0px;
             border-collapse: collapse;
             border-spacing: 0px;
-          }
-
-          .thead {
-            border-top: 1px solid #d5d5d5;
-          }
-
-          .thead th {
-            text-align: left;
-            padding: 8px 0;
-          }
-
-          .thead-image {
-            position: sticky;
-            top: 0;
-            left: 0;
-            width: 120px;
-            overflow: hidden;
-          }
-
-          .thead-image span {
-            display: inline-block;
-            position: relative;
-            background: #fff;
-            padding: 0 10px;
-            padding-right: 20px;
-          }
-
-          .thead-image .bg {
-            position: absolute;
-            top: 0;
-            left: calc(-100% + 5px);
-            background: #fff;
-            width: 100%;
-            height: 100%;
           }
 
           @media (min-width: 1300px) {

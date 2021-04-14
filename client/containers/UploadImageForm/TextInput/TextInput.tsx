@@ -1,8 +1,8 @@
-import { nanoid } from "nanoid";
 import React, { FormEvent, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useMatchMedia } from "../../../hooks/useMatchMedia";
 import { RootState } from "../../../store/rootReducer";
+import store from "../../../store/store";
 import { convertFileToBase64 } from "../../../utils/convertFileToBase64";
 import dataURLtoFile from "../../../utils/dataURLtoFile";
 import { getBase64FromUrl } from "../../../utils/getBase64FromUrl";
@@ -81,7 +81,7 @@ const SubmitBtn = ({
             color: #fff;
             position: relative;
             background: #000066;
-            font-size: 1rem;
+            font-size: 18px;
             cursor: pointer;
             transition: 250ms background-color, 250ms color;
             z-index: 15;
@@ -113,7 +113,7 @@ let clearDisplayErrorTimeout = 0;
 type TFormTextInput = {
   setOpenLoader: React.Dispatch<React.SetStateAction<boolean>>;
 };
-const FormTextInput = React.memo(({ setOpenLoader }: TFormTextInput) => {
+const TextInput = React.memo(({ setOpenLoader }: TFormTextInput) => {
   const dispatch = useDispatch();
   const imageLoaded = useSelector(
     (state: RootState) => state.imageUrl.imageLoaded
@@ -131,16 +131,23 @@ const FormTextInput = React.memo(({ setOpenLoader }: TFormTextInput) => {
   const onSubmitForm = async (urlItem: TURLItem) => {
     let urlContent = urlItem.content;
 
+    dispatch(setCurrentImageStatus("EMPTY"));
+
     dispatch(
       setCurrentAddedImage({
         set: {
           id: urlItem.id,
           name: urlItem.name,
-          error: false,
-          errorMsg: "",
+          error: urlItem.error,
+          errorMsg: urlItem.errorMsg,
         },
       })
     );
+
+    if (urlItem.error) {
+      dispatch(setCurrentImageStatus("DONE"));
+      return;
+    }
 
     let { base64, sizeMB, error } = await getBase64FromUrl({
       url: urlContent,
@@ -216,8 +223,8 @@ const FormTextInput = React.memo(({ setOpenLoader }: TFormTextInput) => {
   };
 
   useEffect(() => {
-    if (!formInputResult.length) return;
-    return;
+    if (!formInputResult.length || !store.getState().form.urlItems.length)
+      return;
     setOpenLoader(true);
 
     const run = async () => {
@@ -258,4 +265,4 @@ const FormTextInput = React.memo(({ setOpenLoader }: TFormTextInput) => {
   );
 });
 
-export default FormTextInput;
+export default TextInput;

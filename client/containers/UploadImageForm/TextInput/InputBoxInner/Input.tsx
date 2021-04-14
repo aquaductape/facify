@@ -7,7 +7,7 @@ import onFocusOut, {
 import { RootState } from "../../../../store/rootReducer";
 import { doesImageExist } from "../../../../utils/doesImageExist";
 import { reflow } from "../../../../utils/reflow";
-import { addUrlItem, setInputValueFromUrlItems } from "../../formSlice";
+import { addUrlItem, setInputResultFromUrlItems } from "../../formSlice";
 import { splitValueIntoUrlItems } from "./utils";
 
 type TInputProps = {
@@ -112,7 +112,7 @@ const Input = ({
     await onCloseInputEnd();
 
     setTimeout(() => {
-      dispatch(setInputValueFromUrlItems());
+      dispatch(setInputResultFromUrlItems());
     }, 100);
   };
 
@@ -257,7 +257,8 @@ const Input = ({
     const formWidth = inputFormElRef.current!.clientWidth;
     const parentMainBarWidth = parentMainBarInputElRef.current!.clientWidth;
     const borderColumnWidth = 5;
-    const inputValueCount = inputEl.value.trim().split(" ").slice(0, 7);
+    const inputValue = inputEl.value.trim();
+    const inputValueCount = inputValue ? inputValue.split(" ").slice(0, 7) : [];
     contentElHeightRef.current = contentEl.clientHeight;
 
     inputEl.style.zIndex = "8";

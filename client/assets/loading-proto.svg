@@ -75,9 +75,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.1848914"
-     inkscape:cx="1919.1558"
-     inkscape:cy="1498.1505"
+     inkscape:zoom="0.68454525"
+     inkscape:cx="1443.7568"
+     inkscape:cy="1058.0516"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
@@ -1345,6 +1345,13 @@
        height="78.998962"
        x="233.94519"
        y="258.07684" />
+    <rect
+       style="fill:#004e53;fill-opacity:1;stroke-width:3.18921;stroke-linecap:square;stroke-linejoin:round;stroke-dashoffset:16.9701;paint-order:markers fill stroke"
+       id="rect2762"
+       width="87.479721"
+       height="0.44323584"
+       x="233.94519"
+       y="257.63361" />
     <g
        id="g1088"
        transform="translate(417.50012,198.4469)"
@@ -1419,24 +1426,6 @@
          id="path1132"
          style="fill:#00875c;fill-opacity:1" />
     </g>
-    <path
-       sodipodi:type="star"
-       style="fill:#004e53;fill-opacity:1;stroke:none;stroke-width:0.322001;stroke-linecap:square;stroke-dashoffset:16.9701;stroke-opacity:1;paint-order:markers fill stroke"
-       id="path1116"
-       sodipodi:sides="3"
-       sodipodi:cx="211.98965"
-       sodipodi:cy="61.911537"
-       sodipodi:r1="2.955303"
-       sodipodi:r2="2.6857381"
-       sodipodi:arg1="1.5707963"
-       sodipodi:arg2="2.6179939"
-       inkscape:flatsided="true"
-       inkscape:rounded="1.73472e-17"
-       inkscape:randomized="0"
-       d="m 211.98965,64.86684 l -2.55936,-4.432954 l 5.11873,0 z"
-       inkscape:transform-center-x="-1.1068864e-06"
-       inkscape:transform-center-y="0.13478177"
-       transform="matrix(1.6572614,0,0,1,-113.13553,197.59971)" />
     <g
        id="g1353"
        transform="translate(0,30.018678)">
@@ -2701,5 +2690,10 @@
          id="path1461"
          style="fill:#d20000;fill-opacity:1" />
     </g>
+    <path
+       id="rect2756"
+       style="fill:#004e53;stroke-width:0.608277;stroke-linecap:square;stroke-linejoin:round;stroke-dashoffset:16.9701;paint-order:markers fill stroke;fill-opacity:1"
+       d="m 242.25582,254.36158 l 3.71442,3.71442 h -3.71442 z"
+       sodipodi:nodetypes="cccc" />
   </g>
 </svg>

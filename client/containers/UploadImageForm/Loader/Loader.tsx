@@ -53,20 +53,20 @@ const Loader = ({ setOpenLoader }: TLoaderProps) => {
     (state: RootState) => state.menu.disableNotificationCountDown
   );
 
-  // const currentImgStatus = useSelector(
-  //   (state: RootState) => state.imageUrl.currentImgStatus
-  // );
-  // const currentAddedImg = useSelector(
-  //   (state: RootState) => state.imageUrl.currentAddedImg
-  // );
+  const currentImgStatus = useSelector(
+    (state: RootState) => state.imageUrl.currentImgStatus
+  );
+  const currentAddedImg = useSelector(
+    (state: RootState) => state.imageUrl.currentAddedImg
+  );
 
-  const [currentAddedImg, setCurrentAddedImg] = useState<{
-    id: string;
-    name: string;
-    errorMsg: string;
-    error: boolean;
-  } | null>(null);
-  const [currentImgStatus, setCurrentImgStatus] = useState<TImgStatus>("EMPTY");
+  // const [currentAddedImg, setCurrentAddedImg] = useState<{
+  //   id: string;
+  //   name: string;
+  //   errorMsg: string;
+  //   error: boolean;
+  // } | null>(null);
+  // const [currentImgStatus, setCurrentImgStatus] = useState<TImgStatus>("EMPTY");
   const [showTitle, setShowTitle] = useState(true);
   const [downloadQueue, setDownloadQueue] = useState<TQueue[]>([]);
   const [finishedQueue, setFinishedQueue] = useState<TQueue[]>([]);
@@ -111,74 +111,74 @@ const Loader = ({ setOpenLoader }: TLoaderProps) => {
   openMenuRef.current = openMenu;
 
   // test
-  useEffect(() => {
-    const addItem = (idx: number, cb?: () => void) => {
-      const resultItem = inputResult[idx];
-      setCurrentAddedImg(() => {
-        const item = {
-          id: resultItem.id,
-          name: resultItem.name,
-          error: resultItem.error,
-          errorMsg: resultItem.errorMsg,
-        };
-
-        return item;
-      });
-
-      if (resultItem.error) {
-        setCurrentImgStatus("DONE");
-
-        cb && cb();
-        return;
-      }
-
-      //       if (idx === 1) {
-      //         setCurrentImgStatus("COMPRESSING");
-      //         setTimeout(() => {
-      //           setCurrentAddedImg((prev) => {
-      //             const copy = JSON_Stringify_Parse(prev)!;
-      //             copy.error = true;
-      //             copy.errorMsg = `Error 1003: Image doesn't exist`;
-      //             return copy;
-      //           });
-      //           setCurrentImgStatus("DONE");
-      //
-      //           cb && cb();
-      //         }, 8800);
-      //         return;
-      //       }
-
-      setTimeout(() => {
-        setCurrentImgStatus("COMPRESSING");
-        setTimeout(() => {
-          setCurrentImgStatus("SCANNING");
-
-          setTimeout(() => {
-            setCurrentImgStatus("DONE");
-            cb && cb();
-          }, 800);
-        }, 800);
-      }, 800);
-    };
-
-    addItem(0, () => {
-      setTimeout(() => {
-        addItem(1, () => {
-          setTimeout(() => {
-            addItem(2, () => {
-              setTimeout(() => {
-                addItem(3, () => {
-                  setTimeout(() => {
-                    addItem(4);
-                  }, 0);
-                });
-              }, 0);
-            });
-          }, 0);
-        });
-      }, 0);
-    });
-  }, []);
+  //   useEffect(() => {
+  //     const addItem = (idx: number, cb?: () => void) => {
+  //       const resultItem = inputResult[idx];
+  //       setCurrentAddedImg(() => {
+  //         const item = {
+  //           id: resultItem.id,
+  //           name: resultItem.name,
+  //           error: resultItem.error,
+  //           errorMsg: resultItem.errorMsg,
+  //         };
+  //
+  //         return item;
+  //       });
+  //
+  //       if (resultItem.error) {
+  //         setCurrentImgStatus("DONE");
+  //
+  //         cb && cb();
+  //         return;
+  //       }
+  //
+  //       //       if (idx === 1) {
+  //       //         setCurrentImgStatus("COMPRESSING");
+  //       //         setTimeout(() => {
+  //       //           setCurrentAddedImg((prev) => {
+  //       //             const copy = JSON_Stringify_Parse(prev)!;
+  //       //             copy.error = true;
+  //       //             copy.errorMsg = `Error 1003: Image doesn't exist`;
+  //       //             return copy;
+  //       //           });
+  //       //           setCurrentImgStatus("DONE");
+  //       //
+  //       //           cb && cb();
+  //       //         }, 8800);
+  //       //         return;
+  //       //       }
+  //
+  //       setTimeout(() => {
+  //         setCurrentImgStatus("COMPRESSING");
+  //         setTimeout(() => {
+  //           setCurrentImgStatus("SCANNING");
+  //
+  //           setTimeout(() => {
+  //             setCurrentImgStatus("DONE");
+  //             cb && cb();
+  //           }, 800);
+  //         }, 800);
+  //       }, 800);
+  //     };
+  //
+  //     addItem(0, () => {
+  //       setTimeout(() => {
+  //         addItem(1, () => {
+  //           setTimeout(() => {
+  //             addItem(2, () => {
+  //               setTimeout(() => {
+  //                 addItem(3, () => {
+  //                   setTimeout(() => {
+  //                     addItem(4);
+  //                   }, 0);
+  //                 });
+  //               }, 0);
+  //             });
+  //           }, 0);
+  //         });
+  //       }, 0);
+  //     });
+  //   }, []);
 
   const closeLoaderWhenDone = ({ fireNow }: { fireNow?: boolean } = {}) => {
     const countDownActivity = countDownActivityRef.current;

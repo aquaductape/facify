@@ -15,7 +15,7 @@ export type TDemographics = {
   concepts: {
     "multicultural-appearance": TConcept[];
     "gender-appearance": TConcept[];
-    "age-appearence": TConcept[];
+    "age-appearance": TConcept[];
     [key: string]: TConcept[];
   };
 };

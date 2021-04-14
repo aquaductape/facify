@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { CSSTransition } from "react-transition-group";
-import FormTextInput from "./FormTextInput/FormTextInput";
+import TextInput from "./TextInput/TextInput";
 import Loader from "./Loader/Loader";
+import FileInput from "./FileInput/FileInput";
 
 const placeholderError = "URL Required*";
 
@@ -108,44 +109,12 @@ const UploadImageForm = () => {
   //     }, 500);
   //   }, []);
 
-  //   const onImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
-  //     try {
-  //       const files = e.target.files;
-  //       if (!files) return;
-  //       if (files!.length > 10) {
-  //         // throw notification error: "cannot upload more than 10 images"
-  //         return;
-  //       }
-  //       const file = files![0] as File;
-  //       const { base64, file: newFile } = await convertFileToBase64(file);
-  //       const result = await postClarifaiAPI({ base64 });
-  //       const objectUrl = window.URL.createObjectURL(newFile);
-  //       const img = await getImageDimensions(objectUrl);
-  //       const data = (result.data as unknown) as TDemographicNode[];
-  //
-  //       await uploadAndAnimate({
-  //         id: nanoid(),
-  //         croppedUrl: base64,
-  //         url: objectUrl,
-  //         data,
-  //         img,
-  //         name: file.name,
-  //       });
-  //
-  //       setShowLoader(false);
-  //     } catch (err) {
-  //       // batch(() => {
-  //       //   dispatch(setImageStatus("DONE"));
-  //       //   dispatch(setImageError("Server Error"));
-  //       // });
-  //     }
-  //   };
-
-  useEffect(() => {
-    setTimeout(() => {
-      setOpenLoader(true);
-    }, 1000);
-  }, []);
+  // testing
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     setOpenLoader(true);
+  //   }, 1000);
+  // }, []);
 
   useEffect(() => {
     if (openLoader) {
@@ -168,19 +137,9 @@ const UploadImageForm = () => {
           WebCam
         </button>
         <div className="shared-pillar pillar-1"></div>
-        <input
-          // onChange={onImageUpload}
-          type="file"
-          name="file"
-          accept="image/png, image/jpeg"
-          id="upload-image-form-file"
-          className="input-file--hidden"
-        />
-        <label className="label-input-file" htmlFor="upload-image-form-file">
-          Upload
-        </label>
+        <FileInput setOpenLoader={setOpenLoader}></FileInput>
         <div className="shared-pillar pillar-2"></div>
-        <FormTextInput setOpenLoader={setOpenLoader}></FormTextInput>
+        <TextInput setOpenLoader={setOpenLoader}></TextInput>
       </div>
       <CSSTransition
         in={openLoader}
@@ -210,40 +169,6 @@ const UploadImageForm = () => {
 
           .multifile-upload-group.active {
             visibility: hidden;
-          }
-
-          .input-file--hidden {
-            width: 0.1px;
-            height: 0.1px;
-            opacity: 0;
-            overflow: hidden;
-            position: absolute;
-            z-index: -1;
-          }
-
-          .label-input-file {
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: 250ms background-color, 250ms color;
-          }
-
-          .label-input-file:hover,
-          .input-file--hidden:focus + .label-input-file {
-            background: #c6c6c6;
-            color: #000;
-          }
-
-          .input-file--hidden:focus + .label-input-file {
-            outline: none;
-          }
-
-          .input-file--hidden.focus-visible + .label-input-file {
-            outline: 3px solid #000;
-            outline-offset: 2px;
-            z-index: 1;
           }
 
           .input-button--webcam {

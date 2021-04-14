@@ -216,8 +216,14 @@ const TagsArea = () => {
         urlsContainerElRef.current!.scrollHeight -
           urlsContainerElRef.current!.clientHeight;
 
+      const startingIdx = () => {
+        const idx = targetIdx - 6;
+        if (Math.sign(idx) === -1) return 0;
+        return idx;
+      };
+
       const urlsSlice = isScrollNearBottom
-        ? urls.slice(targetIdx - 6, targetIdx)
+        ? urls.slice(startingIdx(), targetIdx)
         : urls.slice(targetIdx + 1, targetIdx + 6);
       const siblingsEl = urlsSlice.map(
         ({ id }) =>

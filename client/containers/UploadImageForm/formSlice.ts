@@ -20,42 +20,42 @@ type TFormState = {
 const initialState: TFormState = {
   error: false,
   inputResult: [
-    {
-      id: nanoid(),
-      content: "",
-      error: false,
-      name:
-        "post-malon-superlongsuperlongsuperlongsuperlongsuperlongsuperlong.jpg",
-      errorMsg: "BAD",
-    },
-    {
-      id: nanoid(),
-      content: "",
-      error: true,
-      name: "aubrey-superlongsuperlongsuperlongsuperlongsuperlongsuperlong.jpg",
-      errorMsg: "BAD IMAGE",
-    },
-    {
-      id: nanoid(),
-      content: "",
-      error: false,
-      name: "elon-superlongsuperlongsuperlongsuperlongsuperlongsuperlong.gif",
-      errorMsg: "",
-    },
-    {
-      id: nanoid(),
-      content: "",
-      error: false,
-      name: "post-malon",
-      errorMsg: "",
-    },
-    {
-      id: nanoid(),
-      content: "",
-      error: false,
-      errorMsg: "",
-      name: "aubrey",
-    },
+    // {
+    //   id: nanoid(),
+    //   content: "",
+    //   error: false,
+    //   name:
+    //     "post-malon-superlongsuperlongsuperlongsuperlongsuperlongsuperlong.jpg",
+    //   errorMsg: "BAD",
+    // },
+    // {
+    //   id: nanoid(),
+    //   content: "",
+    //   error: true,
+    //   name: "aubrey-superlongsuperlongsuperlongsuperlongsuperlongsuperlong.jpg",
+    //   errorMsg: "BAD IMAGE",
+    // },
+    // {
+    //   id: nanoid(),
+    //   content: "",
+    //   error: false,
+    //   name: "elon-superlongsuperlongsuperlongsuperlongsuperlongsuperlong.gif",
+    //   errorMsg: "",
+    // },
+    // {
+    //   id: nanoid(),
+    //   content: "",
+    //   error: false,
+    //   name: "post-malon",
+    //   errorMsg: "",
+    // },
+    // {
+    //   id: nanoid(),
+    //   content: "",
+    //   error: false,
+    //   errorMsg: "",
+    //   name: "aubrey",
+    // },
   ],
   urlItems: [
     // { id: nanoid(), content: "https://i.imgur.com/nt0RgAH.jpg", error: false },
@@ -116,7 +116,17 @@ const formSlice = createSlice({
       }
       item.error = error;
     },
-    setInputValueFromUrlItems: (state) => {
+    addInputResult: (state, action: PayloadAction<TURLItem | TURLItem[]>) => {
+      const result = action.payload;
+
+      if (Array.isArray(result)) {
+        state.inputResult.push(...result);
+        return;
+      }
+
+      state.inputResult.push(result);
+    },
+    setInputResultFromUrlItems: (state) => {
       state.inputResult = state.urlItems;
     },
     removeInvalidUrlItems: (state) => {
@@ -134,7 +144,8 @@ export const {
   addUrlItem,
   removeUrlItem,
   setUrlItemError,
-  setInputValueFromUrlItems,
+  addInputResult,
+  setInputResultFromUrlItems,
   clearAllFormValues,
   removeInvalidUrlItems,
 } = formSlice.actions;

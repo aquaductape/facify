@@ -1,8 +1,10 @@
 import React, { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { useMatchMedia } from "../../hooks/useMatchMedia";
+import { FireFox } from "../../lib/onFocusOut/browserInfo";
 import { RootState } from "../../store/rootReducer";
 import { hasAttributeValue } from "../../utils/hasAttributeValue";
+import { parseConceptValue } from "../../utils/parseConcept";
 import { selectImageHeight } from "./imageHeightSlice";
 import useCreateObserver, {
   TMqlCallback,
@@ -55,9 +57,11 @@ const THeadSentinel = ({ id }: { id: string }) => {
   const imageHeight = useSelector(selectImageHeight({ id }));
 
   const sentinelId = "THeadSentinel";
-  const theadSelector = `[data-id-thead-sticky="${id}"] .thead-container`;
+  const theadSelector = `[data-id-thead-sticky="${id}"]`;
+  const theadInnerSelector = ".thead-container";
 
   const theadElRef = useRef<HTMLDivElement | null>(null);
+  const theadInnerElRef = useRef<HTMLDivElement | null>(null);
   const sentinelElRef = useRef<HTMLDivElement | null>(null);
   const imageHeightRef = useRef<number | null>(null);
   const theadStickyVisibleRef = useRef(false);
@@ -68,7 +72,7 @@ const THeadSentinel = ({ id }: { id: string }) => {
   const mqlRef = useMatchMedia();
 
   const observerCallback: TObserverCallback = (entry) => {
-    const theadEl = theadElRef.current;
+    const theadInnerEl = theadInnerElRef.current;
     let isVisible = false;
 
     const nearBottom =
@@ -88,23 +92,24 @@ const THeadSentinel = ({ id }: { id: string }) => {
       theadStickyVisibleRef.current = !isVisible;
     }
 
-    if (!theadEl) return;
+    if (!theadInnerEl) return;
 
-    theadEl.setAttribute(
+    theadInnerEl.setAttribute(
       "data-triggered-by-thead",
       !isVisible ? "true" : "false"
     );
 
     if (
-      hasAttributeValue(theadEl, {
+      hasAttributeValue(theadInnerEl, {
         attr: "data-triggered-by-info-result",
         val: "true",
       })
-    )
+    ) {
       return;
+    }
 
-    theadEl.setAttribute("aria-hidden", isVisible ? "true" : "false");
-    theadEl.style.transform = !isVisible
+    theadInnerEl.setAttribute("aria-hidden", isVisible ? "true" : "false");
+    theadInnerEl.style.transform = !isVisible
       ? "translateY(0%)"
       : "translateY(-125%)";
   };
@@ -125,6 +130,9 @@ const THeadSentinel = ({ id }: { id: string }) => {
 
   useEffect(() => {
     theadElRef.current = document.querySelector(theadSelector);
+    theadInnerElRef.current = theadElRef.current!.querySelector(
+      theadInnerSelector
+    );
   }, []);
 
   useCreateObserver({
@@ -193,6 +201,7 @@ const BarSentinel = ({ id }: { id: string }) => {
   const bottomStop = 140;
 
   const observerCallback: TObserverCallback = (entry) => {
+    const theadEl = theadElRef.current!;
     const theadInnerEl = theadInnerElRef.current;
     let isVisible = false;
 
@@ -231,6 +240,42 @@ const BarSentinel = ({ id }: { id: string }) => {
     theadInnerEl.style.transform = !isVisible
       ? "translateY(0%)"
       : "translateY(-125%)";
+
+    if (!FireFox) {
+      forceRestoreScrollPosition();
+    }
+  };
+
+  /**
+   * Chrome bug, haven't tested on all platforms, setting css translate on child will reset parent's scrollLeft position
+   */
+  const forceRestoreScrollPosition = () => {
+    const theadEl = theadElRef.current!;
+    // uses polling
+    const max = 10;
+    let count = 0;
+
+    const scrollLeft = Number(theadEl.getAttribute("scroll-left")) || 0;
+
+    if (scrollLeft === 0) return;
+
+    const run = () => {
+      if (count >= max) {
+        return;
+      }
+      setTimeout(() => {
+        let matches = false;
+        const scrollLeft = Number(theadEl.getAttribute("scroll-left")) || 0;
+        if (scrollLeft === theadEl.scrollLeft) matches = true;
+        theadEl.scrollLeft = scrollLeft;
+        count++;
+
+        if (matches) return;
+        run();
+      }, 50);
+    };
+
+    run();
   };
 
   const mqlCallback: TMqlCallback = ({ e, observer }) => {
@@ -300,12 +345,17 @@ const BarSentinel = ({ id }: { id: string }) => {
   );
 };
 
+// parentEl.scrollLeft = 100
+// childEl.style.transform = 'translateY(100%)'
+
 const InfoResultSentinel = ({ id }: { id: string }) => {
   const sentinelId = `infoResultSentinel`;
 
   const imageHeight = useSelector(selectImageHeight({ id }));
 
-  const theadSelector = `[data-id-thead-sticky="${id}"] .thead-container`;
+  const theadSelector = `[data-id-thead-sticky="${id}"]`;
+  const theadInnerSelector = ".thead-container";
+  const theadElRef = useRef<HTMLDivElement | null>(null);
   const theadInnerElRef = useRef<HTMLDivElement | null>(null);
   const sentinelElRef = useRef<HTMLDivElement | null>(null);
   const imageHeightRef = useRef<number | null>(null);
@@ -314,6 +364,7 @@ const InfoResultSentinel = ({ id }: { id: string }) => {
   const mqlRef = useMatchMedia();
 
   const observerCallback: TObserverCallback = (entry, observer) => {
+    const theadEl = theadElRef.current!;
     const theadInnerEl = theadInnerElRef.current!;
     let isVisible = false;
 
@@ -361,7 +412,10 @@ const InfoResultSentinel = ({ id }: { id: string }) => {
   }, [imageHeight]);
 
   useEffect(() => {
-    theadInnerElRef.current = document.querySelector(theadSelector);
+    theadElRef.current = document.querySelector(theadSelector);
+    theadInnerElRef.current = theadElRef.current!.querySelector(
+      theadInnerSelector
+    );
   }, []);
 
   useCreateObserver({

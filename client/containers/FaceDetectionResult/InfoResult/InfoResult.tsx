@@ -34,7 +34,7 @@ const InfoResult = ({ id, idx }: TInforResultProps) => {
   return (
     <div className="container" ref={containerElRef}>
       <InfoResultSentinel id={id}></InfoResultSentinel>
-      <THead id={id}></THead>
+      <THead id={id} parentIdx={idx} type={"sticky"}></THead>
       <div data-id-info-result={id} className="info-demo" ref={infoDemoElRef}>
         <Table id={id} idx={idx}></Table>
       </div>
