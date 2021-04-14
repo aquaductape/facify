@@ -1,5 +1,5 @@
 import { capitalize } from "lodash";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store/rootReducer";
 import getScrollbarWidth from "../../utils/getScrollWidth";
@@ -19,47 +19,85 @@ const THChildEl = ({
     (state: RootState) =>
       state.demographics.parents[parentIdx].tableClassify.sort
   );
+  const actionQueue = ["ASC", "DESC", "Initial"] as (
+    | "ASC"
+    | "DESC"
+    | "Initial"
+  )[];
+  const actionQueueIdxRef = useRef(0);
 
   const onClick = () => {
+    const actionQueueIdx = actionQueueIdxRef.current;
+    const currentAction = actionQueue[actionQueueIdx];
+
+    actionQueueIdxRef.current = (actionQueueIdxRef.current + 1) % 3;
+    console.log(actionQueueIdxRef);
+
     dispatch(
       sortChildIds({
         id: parentIdx,
-        action: "ACS",
+        action: currentAction,
         category: item as any,
       })
     );
   };
+
+  const theadClickProp = idx !== 0 ? { onClick } : {};
+
+  useEffect(() => {
+    if (sort.category === item) return;
+    actionQueueIdxRef.current = 0;
+  }, [sort.category]);
+
   return (
     <>
       {type === "sticky" ? (
         <div
           className={`th ${idx === 0 ? "thead-image" : ""}`}
-          onClick={onClick}
+          onClick={() => idx !== 0 && onClick()}
           key={idx}
         >
           {idx !== 0 ? <span className="buffer"></span> : null}
-          {idx === 0 ? <span className="bg"></span> : null}
-          <span>{capitalize(item)}</span>
-          {sort.action && sort.category === item ? (
-            <span className={`sort-active ${sort.action.toLowerCase()}`}>
-              V
+          {idx === 0 ? (
+            <span className="sticky-dynamic-btn" onClick={onClick}>
+              <span className="bg-static"></span>
+              <span className="bg-scrolling"></span>
             </span>
           ) : null}
+          <span className="name">{capitalize(item)}</span>
+          <span
+            className={`sort-active ${
+              sort.action && sort.category === item
+                ? sort.action.toLowerCase()
+                : ""
+            }`}
+          >
+            V
+          </span>
         </div>
       ) : (
         <th
           className={`th ${idx === 0 ? "thead-image" : ""}`}
-          onClick={onClick}
+          {...theadClickProp}
           key={idx}
         >
           {idx !== 0 ? <span className="buffer"></span> : null}
-          {idx === 0 ? <span className="bg"></span> : null}
-          <span>{capitalize(item)}</span>
-          {sort.action && sort.category === item ? (
-            <span className={`sort-active ${sort.action.toLowerCase()}`}>
-              V
+          {idx === 0 ? (
+            <span className="sticky-dynamic-btn" onClick={onClick}>
+              <span className="bg-static"></span>
+              <span className="bg-scrolling"></span>
             </span>
           ) : null}
+          <span className="name">{capitalize(item)}</span>
+          <span
+            className={`sort-active ${
+              sort.action && sort.category === item
+                ? sort.action.toLowerCase()
+                : ""
+            }`}
+          >
+            V
+          </span>
         </th>
       )}
       <style jsx>
@@ -73,10 +111,6 @@ const THChildEl = ({
             transition: background-color 250ms;
           }
 
-          .th:hover {
-            background: #d8deef;
-          }
-
           .buffer {
             background: #fff;
             position: absolute;
@@ -86,17 +120,20 @@ const THChildEl = ({
             height: 100%;
             transition: background-color 250ms;
           }
-          .th:hover .buffer {
-            background: #d8deef;
-          }
 
           .sort-active {
             display: inline-block;
-            padding-right: 8px;
+            padding-left: 8px;
+            transform: scaleY(0);
+            transition: transform 250ms;
           }
 
-          .sort-active.acs {
-            transform: rotate(180deg);
+          .sort-active.asc {
+            transform: scaleY(1);
+          }
+
+          .sort-active.desc {
+            transform: scaleY(-1);
           }
 
           .thead-image {
@@ -105,17 +142,27 @@ const THChildEl = ({
             left: 0;
             width: 120px;
             overflow: hidden;
+            pointer-events: none;
             z-index: 1;
           }
 
-          .thead-image span {
+          .thead-image .name {
             display: inline-block;
             position: relative;
-            padding: 0 10px;
-            padding-right: 20px;
+            pointer-events: none;
+            padding-left: 10px;
           }
 
-          .thead-image .bg {
+          .sticky-dynamic-btn {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 110px;
+            height: 100%;
+            padding: 0;
+          }
+
+          .bg-static {
             position: absolute;
             top: 0;
             left: 0;
@@ -123,11 +170,39 @@ const THChildEl = ({
             width: 70px;
             height: 100%;
             padding: 0;
+            pointer-events: all;
             transition: background-color 250ms;
           }
 
-          .th:hover .bg {
-            background: #d8deef;
+          .bg-scrolling {
+            position: absolute;
+            top: 0;
+            left: 70px;
+            background: #fff;
+            width: 40px;
+            height: 100%;
+            padding: 0;
+            pointer-events: all;
+            transition: background-color 250ms;
+          }
+
+          @media not all and (pointer: coarse) {
+            .th:hover .bg-static,
+            .th:hover .bg-scrolling {
+              background: #d8deef;
+            }
+
+            .th.thead-image:hover {
+              background: transparent;
+            }
+
+            .th:hover {
+              background: #d8deef;
+            }
+
+            .th:hover .buffer {
+              background: #d8deef;
+            }
           }
         `}
       </style>
@@ -170,7 +245,7 @@ const THead = ({ id, parentIdx, type }: THeadProps) => {
   }
 
   return (
-    <div data-id-thead-sticky={id} className={`container`}>
+    <div data-id-sticky-thead={id} className={`container`}>
       <div
         className="thead-container"
         data-triggered-by-info-result="false"

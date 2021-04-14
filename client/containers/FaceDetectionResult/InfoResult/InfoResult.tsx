@@ -19,7 +19,7 @@ const InfoResult = ({ id, idx }: TInforResultProps) => {
 
     const run = async () => {
       const thead = await querySelector({
-        selector: `[data-id-thead-sticky="${id}"]`,
+        selector: `[data-id-sticky-thead="${id}"]`,
         parent: containerElRef.current!,
       });
 

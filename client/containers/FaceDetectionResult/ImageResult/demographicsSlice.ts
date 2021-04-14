@@ -156,7 +156,7 @@ const demographicsSlice = createSlice({
       action: PayloadAction<{
         id: number;
         category: "face" | "age" | "gender" | "multicultural";
-        action: "ACS" | "DESC" | "Reset";
+        action: "ASC" | "DESC" | "Initial";
       }>
     ) => {
       const { id, category, action: actionValue } = action.payload;
@@ -166,12 +166,9 @@ const demographicsSlice = createSlice({
       parent.tableClassify.sort.category = category;
       parent.tableClassify.sort.action = actionValue;
 
-      if (actionValue === "Reset") {
+      if (actionValue === "Initial") {
         parent.tableClassify.sort.action = null;
         parent.tableClassify.sort.category = null;
-        if (!parent.tableClassify.sort.childIds) return;
-
-        parent.childIds = parent.tableClassify.sort.childIds;
         parent.tableClassify.sort.childIds = null;
         return;
       }
@@ -188,16 +185,31 @@ const demographicsSlice = createSlice({
       }
 
       parent.tableClassify.sort.childIds.sort((a, b) => {
-        const a_childIdValue =
-          state.demographicNodes[a].concepts[newCategory][0].value;
-        const b_childIdValue =
-          state.demographicNodes[b].concepts[newCategory][0].value;
+        const a_category = state.demographicNodes[a].concepts[newCategory][0];
+        const b_category = state.demographicNodes[b].concepts[newCategory][0];
 
-        if (actionValue === "ACS") {
-          return a_childIdValue - b_childIdValue;
-        } else {
-          return b_childIdValue - a_childIdValue;
+        if (category === "age") {
+          const a_childIdValue = Number(a_category.name.match(/\d+/)![0]);
+          const b_childIdValue = Number(b_category.name.match(/\d+/)![0]);
+
+          if (actionValue === "ASC") {
+            return a_childIdValue - b_childIdValue;
+          } else {
+            return b_childIdValue - a_childIdValue;
+          }
         }
+
+        const a_childIdValue = a_category.name;
+        const b_childIdValue = b_category.name;
+
+        if (a_childIdValue < b_childIdValue) {
+          return actionValue === "ASC" ? -1 : 1;
+        }
+        if (a_childIdValue > b_childIdValue) {
+          return actionValue === "ASC" ? 1 : -1;
+        }
+
+        return 0;
       });
     },
     setDemoItemHoverActive: (

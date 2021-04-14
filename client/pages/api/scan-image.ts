@@ -131,7 +131,7 @@ const manageRegions = (regions: any) => {
     .filter(filterConcepts)
     .map(({ id, name, value }: any) => ({
       id,
-      name,
+      name: name.replace("_", " "),
       value,
     }));
 };

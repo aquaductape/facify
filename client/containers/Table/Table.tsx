@@ -24,7 +24,7 @@ const Row = ({ id, parentIdNumber, parentId, idx }: TRowProps) => {
   const concepts = useSelector(selectDemographicsConcepts({ id }));
 
   const {
-    "age-appearence": age,
+    "age-appearance": age,
     "gender-appearance": gender,
     "multicultural-appearance": multicultural,
   } = concepts;
@@ -99,7 +99,7 @@ const Row = ({ id, parentIdNumber, parentId, idx }: TRowProps) => {
 const Table = ({ id, idx }: { id: string; idx: number }) => {
   const parentId = id;
   const parentIdNumber = idx;
-  let demographicParentChildIds = useSelector(
+  const demographicParentChildIds = useSelector(
     selectDemographicParentChildIds({ id: idx })
   );
   const sortedChildIds = useSelector(
@@ -107,18 +107,37 @@ const Table = ({ id, idx }: { id: string; idx: number }) => {
       state.demographics.parents[idx].tableClassify.sort.childIds
   );
 
+  let renderChildIds: string[] = [];
+
   if (sortedChildIds) {
-    demographicParentChildIds = sortedChildIds;
+    renderChildIds = sortedChildIds;
+  } else {
+    renderChildIds = demographicParentChildIds;
   }
   const tableContainerElRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const tableContainerEl = tableContainerElRef.current!;
-    let theadEl: HTMLElement | null = null;
+    let theadStickyEl: HTMLElement | null = null;
+    let theadStaticEl: HTMLElement | null = null;
+    let theadStaticBgScrollingEl: HTMLElement | null = null;
+    let theadStickyBgScrollingEl: HTMLElement | null = null;
 
     const run = async () => {
-      theadEl = await querySelector({
-        selector: `[data-id-thead-sticky="${id}"]`,
+      theadStickyEl = await querySelector({
+        selector: `[data-id-sticky-thead="${id}"]`,
+      });
+      theadStaticEl = await querySelector({
+        selector: `[data-id-static-thead="${id}"]`,
+        parent: tableContainerEl,
+      });
+      theadStaticBgScrollingEl = await querySelector({
+        selector: ".bg-scrolling",
+        parent: theadStaticEl!,
+      });
+      theadStickyBgScrollingEl = await querySelector({
+        selector: ".bg-scrolling",
+        parent: theadStickyEl!,
       });
     };
 
@@ -128,10 +147,13 @@ const Table = ({ id, idx }: { id: string; idx: number }) => {
       const scrollLeft = tableContainerEl.scrollLeft;
 
       if (!FireFox) {
-        theadEl!.setAttribute("scroll-left", scrollLeft.toString());
+        theadStickyEl!.setAttribute("scroll-left", scrollLeft.toString());
       }
 
-      theadEl!.scrollLeft = scrollLeft;
+      theadStickyEl!.scrollLeft = scrollLeft;
+      if (scrollLeft > 50) return;
+      theadStaticBgScrollingEl!.style.transform = `translate(-${scrollLeft}px)`;
+      theadStickyBgScrollingEl!.style.transform = `translate(-${scrollLeft}px)`;
     };
 
     tableContainerEl.addEventListener("scroll", onScroll);
@@ -152,7 +174,7 @@ const Table = ({ id, idx }: { id: string; idx: number }) => {
           <table>
             <THead id={id} parentIdx={parentIdNumber}></THead>
             <tbody>
-              {demographicParentChildIds.map((item, idx) => (
+              {renderChildIds.map((item, idx) => (
                 <Row
                   id={item}
                   parentId={parentId}

@@ -57,7 +57,7 @@ const THeadSentinel = ({ id }: { id: string }) => {
   const imageHeight = useSelector(selectImageHeight({ id }));
 
   const sentinelId = "THeadSentinel";
-  const theadSelector = `[data-id-thead-sticky="${id}"]`;
+  const theadSelector = `[data-id-sticky-thead="${id}"]`;
   const theadInnerSelector = ".thead-container";
 
   const theadElRef = useRef<HTMLDivElement | null>(null);
@@ -179,12 +179,12 @@ const BarSentinel = ({ id }: { id: string }) => {
   const sentinelId = "BarSentinel";
   const tableSelector = `[data-id-table="${id}"]`;
   const theadStaticSelector = `[data-id-static-thead="${id}"]`;
-  const theadSelector = `[data-id-thead-sticky="${id}"]`;
+  const theadStickySelector = `[data-id-sticky-thead="${id}"]`;
   const theadInnerSelector = ".thead-container";
 
   const tableElRef = useRef<HTMLTableElement | null>(null);
   const theadStaticElRef = useRef<HTMLDivElement | null>(null);
-  const theadElRef = useRef<HTMLDivElement | null>(null);
+  const theadStickyElRef = useRef<HTMLDivElement | null>(null);
   const theadInnerElRef = useRef<HTMLDivElement | null>(null);
   const sentinelElRef = useRef<HTMLDivElement | null>(null);
   const imageHeightRef = useRef<number | null>(null);
@@ -201,7 +201,7 @@ const BarSentinel = ({ id }: { id: string }) => {
   const bottomStop = 140;
 
   const observerCallback: TObserverCallback = (entry) => {
-    const theadEl = theadElRef.current!;
+    const theadEl = theadStickyElRef.current!;
     const theadInnerEl = theadInnerElRef.current;
     let isVisible = false;
 
@@ -250,7 +250,7 @@ const BarSentinel = ({ id }: { id: string }) => {
    * Chrome bug, haven't tested on all platforms, setting css translate on child will reset parent's scrollLeft position
    */
   const forceRestoreScrollPosition = () => {
-    const theadEl = theadElRef.current!;
+    const theadEl = theadStickyElRef.current!;
     // uses polling
     const max = 10;
     let count = 0;
@@ -282,9 +282,9 @@ const BarSentinel = ({ id }: { id: string }) => {
     // theadElRef.current = doc
 
     if (e.matches) {
-      theadElRef.current!.style.top = "";
+      theadStickyElRef.current!.style.top = "";
     } else {
-      theadElRef.current!.style.top = `${positionRef.current}px`;
+      theadStickyElRef.current!.style.top = `${positionRef.current}px`;
     }
 
     observer.observe(sentinelElRef.current!);
@@ -297,7 +297,7 @@ const BarSentinel = ({ id }: { id: string }) => {
     const position = imageHeight + inputHeight + topPadding;
     positionRef.current = position;
 
-    theadElRef.current!.style.top = `${position}px`;
+    theadStickyElRef.current!.style.top = `${position}px`;
   }, [imageHeight, triggerRefresh]);
 
   useEffect(() => {
@@ -305,11 +305,10 @@ const BarSentinel = ({ id }: { id: string }) => {
     theadStaticElRef.current = tableElRef.current!.querySelector(
       theadStaticSelector
     );
-    theadElRef.current = document.querySelector(theadSelector);
-    theadInnerElRef.current = theadElRef.current!.querySelector(
+    theadStickyElRef.current = document.querySelector(theadStickySelector);
+    theadInnerElRef.current = theadStickyElRef.current!.querySelector(
       theadInnerSelector
     );
-    // imgElRef.current = document.querySelector(imgSelector);
   }, []);
 
   useCreateObserver({
@@ -353,7 +352,7 @@ const InfoResultSentinel = ({ id }: { id: string }) => {
 
   const imageHeight = useSelector(selectImageHeight({ id }));
 
-  const theadSelector = `[data-id-thead-sticky="${id}"]`;
+  const theadSelector = `[data-id-sticky-thead="${id}"]`;
   const theadInnerSelector = ".thead-container";
   const theadElRef = useRef<HTMLDivElement | null>(null);
   const theadInnerElRef = useRef<HTMLDivElement | null>(null);
