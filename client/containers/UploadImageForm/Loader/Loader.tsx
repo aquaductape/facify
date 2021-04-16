@@ -1,18 +1,11 @@
-import {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CSSTransition } from "react-transition-group";
 import SwappingSquares from "../../../components/Spinners/SwappingSquares";
 import CircleCheck from "../../../components/svg/CircleCheck";
 import CircleCross from "../../../components/svg/CircleCross";
 import KebabMenu from "../../../components/svg/KebabMenu";
-import LinkIcon from "../../../components/svg/LinkIcon";
+import { default as LinkIcon } from "../../../components/svg/Link";
 import {
   loaderCountDownDisabledDuration,
   loaderErrorDuration,
@@ -561,7 +554,7 @@ const Loader = ({ setOpenLoader }: TLoaderProps) => {
             overflow: hidden;
           }
           .slide-enter .container-inner {
-            transform: translateY(calc(-101%));
+            transform: translateY(-101%);
           }
 
           .slide-enter-active .container-inner {

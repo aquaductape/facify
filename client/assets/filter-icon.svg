@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="7.9375mm"
+   height="7.9375mm"
+   viewBox="0 0 7.9375 7.9375"
+   version="1.1"
+   id="svg8"
+   inkscape:version="1.0.2 (394de47547, 2021-03-26)"
+   sodipodi:docname="filter-icon.svg">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="7.8361195"
+     inkscape:cx="29.620228"
+     inkscape:cy="9.252367"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     inkscape:document-rotation="0"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1016"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     showguides="true"
+     inkscape:guide-bbox="true" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-64.487206,19.742012)">
+    <g
+       id="g3307"
+       transform="translate(1.7126138,1.9071355)">
+      <path
+         id="path1534"
+         style="fill:#cccccc;fill-opacity:1;stroke:none;stroke-width:0.228625;stroke-linecap:square;stroke-dashoffset:16.9701;stroke-opacity:1;paint-order:markers fill stroke"
+         d="m 65.817846,-17.912299 l 0.322409,0.717966 v 2.113369 h 1.206171 v -2.113369 l 0.322408,-0.717966 z" />
+      <path
+         id="path1536"
+         style="fill:none;fill-opacity:1;stroke:#666666;stroke-width:0.396875;stroke-linecap:square;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:16.9701;stroke-opacity:1;paint-order:markers fill stroke"
+         d="m 64.277352,-19.660337 l 1.862903,2.466004 v 2.113117 h 1.206171 v -2.113117 l 1.862913,-2.466004 v -0.619242 h -4.931987 z"
+         sodipodi:nodetypes="ccccccccc" />
+    </g>
+  </g>
+</svg>

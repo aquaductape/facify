@@ -1,9 +1,9 @@
 import { debounce } from "lodash";
 import { useEffect, useRef, useState } from "react";
 import { batch, useDispatch, useSelector, shallowEqual } from "react-redux";
-import { appHeight, appHeightDesktop } from "../../../constants";
+import { imageHeight, imageHeightDesktop } from "../../../constants";
 import { reflow } from "../../../utils/reflow";
-import { setImageHeight } from "../../Table/imageHeightSlice";
+import { setImageHeight } from "../InfoResult/Table/imageHeightSlice";
 import BoundingBox from "../BoundingBox/BoundingBox";
 import {
   selectDemographicParentChildIds,
@@ -122,7 +122,8 @@ const ImageResult = ({ id, idx }: TImageResultProps) => {
             align-items: center;
             background: #2d3556;
             min-height: 200px;
-            max-height: ${appHeight}px;
+            max-height: ${imageHeight}px;
+            margin-bottom: 124px;
             overflow: hidden;
             z-index: 55;
           }
@@ -136,13 +137,13 @@ const ImageResult = ({ id, idx }: TImageResultProps) => {
 
           img {
             width: auto;
-            max-height: ${appHeight}px;
+            max-height: ${imageHeight}px;
           }
 
           @media (min-width: 1300px) {
             .container,
             img {
-              max-height: ${appHeightDesktop}px;
+              max-height: ${imageHeightDesktop}px;
             }
           }
         `}

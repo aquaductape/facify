@@ -1,7 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import Stats from "../../Stats/Stats";
-import { BarSentinel } from "../../Table/Sentinel";
+import { BarSentinel } from "../InfoResult/Table/Sentinel";
 import { selectName } from "../ImageResult/demographicsSlice";
 import CloseBtn from "./CloseBtn";
 
@@ -10,6 +10,7 @@ const Bar = ({ id, idx }: { id: string; idx: number }) => {
 
   return (
     <div className="bar">
+      <div className="bar-sentinel-for-classify"></div>
       <BarSentinel id={id}></BarSentinel>
       <div className="title">
         <div className="title-number"></div>

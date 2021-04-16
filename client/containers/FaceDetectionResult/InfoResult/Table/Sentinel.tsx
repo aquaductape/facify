@@ -1,10 +1,10 @@
 import React, { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
-import { useMatchMedia } from "../../hooks/useMatchMedia";
-import { FireFox } from "../../lib/onFocusOut/browserInfo";
-import { RootState } from "../../store/rootReducer";
-import { hasAttributeValue } from "../../utils/hasAttributeValue";
-import { parseConceptValue } from "../../utils/parseConcept";
+import { useMatchMedia } from "../../../../hooks/useMatchMedia";
+import { FireFox } from "../../../../lib/onFocusOut/browserInfo";
+import { RootState } from "../../../../store/rootReducer";
+import { hasAttributeValue } from "../../../../utils/hasAttributeValue";
+import { parseConceptValue } from "../../../../utils/parseConcept";
 import { selectImageHeight } from "./imageHeightSlice";
 import useCreateObserver, {
   TMqlCallback,

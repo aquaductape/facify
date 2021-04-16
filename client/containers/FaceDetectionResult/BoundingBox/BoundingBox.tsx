@@ -15,7 +15,24 @@ const BoundingBox = ({ id, parentId }: TBoundingBoxProps) => {
   const dispatch = useDispatch();
   const demographic = useSelector(selectDemographicsDisplay({ id }));
   const hoverActive = useSelector(selectHoverActive({ id: parentId }));
-  const onMouseEnter = () => {
+
+  const onBlur = () => {
+    if (!hoverActive) return;
+
+    batch(() => {
+      dispatch(
+        setDemoItemHoverActive({
+          id,
+          // parentId,
+          active: false,
+          scrollIntoView: false,
+        })
+      );
+      dispatch(setHoverActive({ id: parentId, active: false }));
+    });
+  };
+
+  const onClick = () => {
     batch(() => {
       dispatch(
         setDemoItemHoverActive({
@@ -23,11 +40,27 @@ const BoundingBox = ({ id, parentId }: TBoundingBoxProps) => {
           // parentId,
           active: true,
           scrollIntoView: true,
+          scrollTimestamp: Date.now(),
         })
       );
       dispatch(setHoverActive({ id: parentId, active: true }));
     });
   };
+
+  const onMouseEnter = () => {
+    batch(() => {
+      dispatch(
+        setDemoItemHoverActive({
+          id,
+          // parentId,
+          active: true,
+          scrollIntoView: false,
+        })
+      );
+      dispatch(setHoverActive({ id: parentId, active: true }));
+    });
+  };
+
   const onMouseLeave = () => {
     batch(() => {
       dispatch(
@@ -53,14 +86,18 @@ const BoundingBox = ({ id, parentId }: TBoundingBoxProps) => {
     <div
       className="bounding-box active"
       style={renderBox}
+      onClick={onClick}
+      onBlur={onBlur}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
+      tabIndex={-1}
     >
       {/* static */}
       <style jsx>
         {`
           .bounding-box {
             position: absolute;
+            cursor: pointer;
           }
 
           .active {

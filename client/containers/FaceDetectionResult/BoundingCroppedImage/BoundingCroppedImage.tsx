@@ -112,7 +112,7 @@ const BoundingCroppedImage = ({
         container,
       });
     });
-  }, [demographic.scrollIntoView]);
+  }, [demographic.scrollIntoView, demographic.scrollTimestamp]);
 
   return (
     <div>

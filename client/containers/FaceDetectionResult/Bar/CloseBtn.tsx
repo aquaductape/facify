@@ -8,9 +8,9 @@ import { default as CloseBtnIcon } from "../../../components/svg/CloseBtn";
 import {
   removeImageHeight,
   setTriggerRefresh,
-} from "../../Table/imageHeightSlice";
+} from "../InfoResult/Table/imageHeightSlice";
 import { reflow } from "../../../utils/reflow";
-import { theadObserver } from "../../Table/useCreateObserver";
+import { theadObserver } from "../InfoResult/Table/useCreateObserver";
 import { useMatchMedia } from "../../../hooks/useMatchMedia";
 
 const useBtnRemoveHover = ({

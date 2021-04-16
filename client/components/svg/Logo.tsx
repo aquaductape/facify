@@ -1,4 +1,4 @@
-const LogoIcon = () => (
+const Logo = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 25.444 25.444"
@@ -29,4 +29,4 @@ const LogoIcon = () => (
   </svg>
 );
 
-export default LogoIcon;
+export default Logo;

@@ -1,6 +1,4 @@
-import React from "react";
-
-const FaceIcon = ({ title }: { title: string }) => {
+const Face = ({ title }: { title: string }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -35,4 +33,4 @@ const FaceIcon = ({ title }: { title: string }) => {
   );
 };
 
-export default FaceIcon;
+export default Face;

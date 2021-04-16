@@ -9,6 +9,7 @@ export type TDemographicsDisplay = {
   hoverActive: boolean;
   generalHover: boolean;
   scrollIntoView: boolean;
+  scrollTimestamp: number;
 };
 
 type TImageUrl = {
@@ -220,6 +221,7 @@ const demographicsSlice = createSlice({
         active: boolean;
         // activeBy
         scrollIntoView?: boolean;
+        scrollTimestamp?: number;
       }>
     ) => {
       const {
@@ -228,12 +230,17 @@ const demographicsSlice = createSlice({
         // parentId,
         active,
         scrollIntoView,
+        scrollTimestamp,
       } = action.payload;
 
       const result = state.demographicNodes[id];
       result.hoverActive = active;
       if (scrollIntoView != null) {
         result.scrollIntoView = scrollIntoView;
+      }
+
+      if (scrollTimestamp != null) {
+        result.scrollTimestamp = scrollTimestamp;
       }
     },
     setDemoItemUri: (

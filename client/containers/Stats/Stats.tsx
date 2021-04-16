@@ -1,6 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import FaceIcon from "../../components/svg/FaceIcon";
+import Face from "../../components/svg/Face";
 import { selectDemographicParentChildIds } from "../FaceDetectionResult/ImageResult/demographicsSlice";
 
 const Stats = ({ id }: { id: number }) => {
@@ -20,7 +20,7 @@ const Stats = ({ id }: { id: number }) => {
   return (
     <div className="stats">
       <span className="icon">
-        <FaceIcon title={msg}></FaceIcon>
+        <Face title={msg}></Face>
       </span>
       <span className="icon-text">{faces}</span>
       <style jsx>

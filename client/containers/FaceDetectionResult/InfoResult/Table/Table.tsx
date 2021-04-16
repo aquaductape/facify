@@ -1,18 +1,18 @@
 import { useSelector, shallowEqual } from "react-redux";
-import BoundingCroppedImage from "../FaceDetectionResult/BoundingCroppedImage/BoundingCroppedImage";
+import BoundingCroppedImage from "../../BoundingCroppedImage/BoundingCroppedImage";
 import ScrollShadow from "./ScrollShadow";
 import { HorizontalSentinel, THeadSentinel } from "./Sentinel";
-import { parseConceptValue } from "../../utils/parseConcept";
+import { parseConceptValue } from "../../../../utils/parseConcept";
 import {
   selectDemographicParentChildIds,
   selectDemographicsConcepts,
-} from "../FaceDetectionResult/ImageResult/demographicsSlice";
+} from "../../ImageResult/demographicsSlice";
 import { useEffect, useRef, useState } from "react";
-import { querySelector } from "../../utils/querySelector";
-import { TConcept } from "../../ts";
-import { FireFox } from "../../lib/onFocusOut/browserInfo";
+import { querySelector } from "../../../../utils/querySelector";
+import { TConcept } from "../../../../ts";
+import { FireFox } from "../../../../lib/onFocusOut/browserInfo";
 import THead from "./THead";
-import { RootState } from "../../store/rootReducer";
+import { RootState } from "../../../../store/rootReducer";
 
 type TRowProps = {
   id: string;
@@ -157,6 +157,7 @@ const Table = ({ id, idx }: { id: string; idx: number }) => {
     };
 
     tableContainerEl.addEventListener("scroll", onScroll);
+
     return () => {
       tableContainerEl.removeEventListener("scroll", onScroll);
     };

@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import { useSelector } from "react-redux";
 import SwappingSquares from "../../../components/Spinners/SwappingSquares";
-import CevronIcon from "../../../components/svg/CevronIcon";
+import Cevron from "../../../components/svg/Cevron";
 import CircleCheck from "../../../components/svg/CircleCheck";
 import CircleCross from "../../../components/svg/CircleCross";
 import CircleDot from "../../../components/svg/CircleDot";
@@ -270,7 +270,7 @@ const DownloadMenuItem = ({
                 onClick={onBtnShowMore}
               >
                 <span className="btn-show-more-inner">
-                  <CevronIcon></CevronIcon>
+                  <Cevron></Cevron>
                 </span>
               </button>
             ) : downloadQueue!.currentImgStatus === "DONE" ? (

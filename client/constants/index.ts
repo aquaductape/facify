@@ -1,5 +1,5 @@
-export const appHeight = 300;
-export const appHeightDesktop = 700;
+export const imageHeight = 250;
+export const imageHeightDesktop = 700;
 export const appStickyStartTop =
   133 + // Logo
   45; // form bar

@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 import LogoText from "../../components/Logo/LogoText";
-import { appHeight } from "../../constants";
 import getScrollbarWidth from "../../utils/getScrollWidth";
 import FaceDetectionResult from "../FaceDetectionResult/FaceDetectionResult";
+import ClassifyArea from "../FaceDetectionResult/InfoResult/Classify/ClassifyArea";
 import Footer from "../Footer/Footer";
 import Landing from "../Landing/Landing";
 import UploadImageForm from "../UploadImageForm/UploadImageForm";
@@ -30,6 +30,7 @@ const Main = () => {
           </div>
         </main>
         <div className="spacer"></div>
+        <ClassifyArea></ClassifyArea>
         <Footer></Footer>
       </div>
       <style jsx>

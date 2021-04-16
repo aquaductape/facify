@@ -1,9 +1,9 @@
 import { capitalize } from "lodash";
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../store/rootReducer";
-import getScrollbarWidth from "../../utils/getScrollWidth";
-import { sortChildIds } from "../FaceDetectionResult/ImageResult/demographicsSlice";
+import { RootState } from "../../../../store/rootReducer";
+import getScrollbarWidth from "../../../../utils/getScrollWidth";
+import { sortChildIds } from "../../ImageResult/demographicsSlice";
 
 const THChildEl = ({
   parentIdx,
@@ -31,7 +31,6 @@ const THChildEl = ({
     const currentAction = actionQueue[actionQueueIdx];
 
     actionQueueIdxRef.current = (actionQueueIdxRef.current + 1) % 3;
-    console.log(actionQueueIdxRef);
 
     dispatch(
       sortChildIds({
@@ -269,6 +268,7 @@ const THead = ({ id, parentIdx, type }: THeadProps) => {
             top: 0;
             left: 0;
             height: 45px;
+            margin-top: -125px;
             margin-bottom: 80px;
             clip-path: polygon(0% 100%, 0% 0%, 100% 0%, 100% 100%);
             overflow: hidden;
@@ -295,6 +295,7 @@ const THead = ({ id, parentIdx, type }: THeadProps) => {
           @media (min-width: 1300px) {
             .container {
               top: 60px;
+              margin-top: 0;
               clip-path: polygon(0% 100%, 0% 0%, 1300px 0%, 1300px 100%);
             }
           }

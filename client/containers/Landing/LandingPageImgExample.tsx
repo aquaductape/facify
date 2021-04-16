@@ -11,7 +11,7 @@ import {
   addDemographicsParentAndChildren,
   TDemographicNode,
 } from "../FaceDetectionResult/ImageResult/demographicsSlice";
-import { addImage } from "../Table/imageHeightSlice";
+import { addImage } from "../FaceDetectionResult/InfoResult/Table/imageHeightSlice";
 import { animateResult, startAnimate } from "../UploadImageForm/animateUpload";
 import {
   setImageLoaded,

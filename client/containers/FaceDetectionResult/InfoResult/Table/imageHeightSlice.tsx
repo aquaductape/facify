@@ -1,5 +1,5 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RootState } from "../../store/rootReducer";
+import { RootState } from "../../../../store/rootReducer";
 
 type TImageHeightState = {
   images: {

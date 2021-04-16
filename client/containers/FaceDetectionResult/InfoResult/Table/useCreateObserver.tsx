@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { TMqlGroup } from "../../hooks/useMatchMedia";
+import { TMqlGroup } from "../../../../hooks/useMatchMedia";
 
 type TCreateObserverProps = {
   id: string;

@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import LogoIcon from "../../components/svg/LogoIcon";
+import Logo from "../../components/svg/Logo";
 import { RootState } from "../../store/rootReducer";
 import LandingPageImgExample from "./LandingPageImgExample";
 
@@ -18,7 +18,7 @@ const Landing = () => {
         <div className="info">
           <div className="header-title">
             <div className="header-title--logo" title="Facify">
-              <LogoIcon></LogoIcon>
+              <Logo></Logo>
             </div>
             <h1>
               Find <span className="header-title-subtext">Faces</span>

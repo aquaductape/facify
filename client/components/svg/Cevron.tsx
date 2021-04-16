@@ -1,4 +1,4 @@
-const CevronIcon = () => {
+const Cevron = () => {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 55.127 100.001">
       <path
@@ -12,4 +12,4 @@ const CevronIcon = () => {
   );
 };
 
-export default CevronIcon;
+export default Cevron;
