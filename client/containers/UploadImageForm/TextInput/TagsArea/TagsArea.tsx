@@ -395,7 +395,7 @@ const TagsArea = () => {
               height={
                 mqlRef.current && mqlRef.current.minWidth_850.matches
                   ? 280
-                  : 150
+                  : 130
               }
               itemCount={urls.length}
               itemSize={55}
@@ -448,7 +448,7 @@ const TagsArea = () => {
 
         .urls {
           position: relative;
-          max-height: 150px;
+          max-height: 130px;
           overflow: hidden;
           display: flex;
           flex-direction: column;

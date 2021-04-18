@@ -24,7 +24,10 @@ const UtilBar = ({ id, parentIdx }: TUtilBarProps) => {
           </div>
           <div className="face-text">{faces}</div>
         </div>
-        <ClassifyDropdownBtns></ClassifyDropdownBtns>
+        <ClassifyDropdownBtns
+          id={id}
+          parentIdx={parentIdx}
+        ></ClassifyDropdownBtns>
       </div>
       <style jsx>
         {`

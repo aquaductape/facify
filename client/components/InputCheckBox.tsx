@@ -5,12 +5,22 @@ type TInputCheckBoxProps = {
   label: string;
   checked: boolean;
   onChange: ChangeEventHandler;
+  checkColor?: {
+    default: string;
+    active: string;
+  };
+  labelColor?: {
+    default: string;
+    active: string;
+  };
 };
 const InputCheckBox = ({
   id,
   label,
   checked,
   onChange,
+  checkColor = { active: "var(--blue-main)", default: "#666" },
+  labelColor = { active: "currentColor", default: "currentColor" },
 }: TInputCheckBoxProps) => {
   const [focused, setFocused] = useState(false);
 
@@ -57,7 +67,9 @@ const InputCheckBox = ({
           </g>
         </svg>
       </span>
-      <span className="checkbox-button__label">{label}</span>
+      <span className={`checkbox-button__label ${checked ? "active" : ""}`}>
+        {label}
+      </span>
       <style jsx>
         {`
           .checkbox-button {
@@ -96,7 +108,7 @@ const InputCheckBox = ({
             height: 15px;
             margin-right: 12px;
             vertical-align: middle;
-            color: #666;
+            color: ${checkColor.default};
           }
 
           .icon__fill {
@@ -110,8 +122,18 @@ const InputCheckBox = ({
             transform: scale(1);
           }
 
+          .checkbox-button__label {
+            color: ${labelColor.default};
+            transition: color 250ms;
+          }
+
+          .checkbox-button__label.active {
+            color: ${labelColor.active};
+            transition: color 250ms;
+          }
+
           .checkbox-button__input:checked + .checkbox-button__control {
-            color: var(--blue-main);
+            color: ${checkColor.active};
           }
         `}
       </style>

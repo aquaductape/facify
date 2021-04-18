@@ -2,12 +2,14 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 type TClassifyState = {
   id: string;
+  parentIdx: number;
   open: boolean;
   type: "filter" | "sort";
 };
 
 const initialState: TClassifyState = {
   id: "",
+  parentIdx: 0,
   open: false,
   type: "filter",
 };
@@ -18,17 +20,21 @@ const classifySlice = createSlice({
   reducers: {
     setClassifyDisplay: (
       state,
-      action: PayloadAction<{
-        id: string;
-        open: boolean;
-        type: "filter" | "sort";
-      }>
+      action: PayloadAction<
+        Partial<{
+          id: string;
+          parentIdx: number;
+          open: boolean;
+          type: "filter" | "sort";
+        }>
+      >
     ) => {
-      const { id, open, type } = action.payload;
+      const { payload } = action;
 
-      state.id = id;
-      state.open = open;
-      state.type = type;
+      for (const key in payload) {
+        // @ts-ignore
+        state[key] = payload[key];
+      }
     },
   },
 });

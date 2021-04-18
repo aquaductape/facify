@@ -239,7 +239,12 @@ const TextInput = React.memo(({ setOpenLoader }: TFormTextInput) => {
   }, [formInputResult.length]);
 
   return (
-    <form id="url-input-form" onSubmit={onSubmit} aria-label="Paste Image URL">
+    <form
+      id="url-input-form"
+      className="form"
+      onSubmit={onSubmit}
+      aria-label="Paste Image URL"
+    >
       <Input
         submitHoverRef={submitHoverRef}
         isOpenRef={isOpenRef}
@@ -255,7 +260,7 @@ const TextInput = React.memo(({ setOpenLoader }: TFormTextInput) => {
       ></SubmitBtn>
       <style jsx>
         {`
-          form {
+          .form {
             display: grid;
             grid-template-columns: 1fr 1fr;
           }

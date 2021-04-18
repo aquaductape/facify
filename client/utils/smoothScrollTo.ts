@@ -36,11 +36,12 @@ const smoothScrollTo = ({
   easing = "linear",
   onEnd,
 }: smoothScrollToProps) => {
-  if (currentPosition == null)
+  if (currentPosition == null) {
     currentPosition =
       (container as Window).scrollY != null
         ? (container as Window).scrollY
         : (container as HTMLElement).scrollTop;
+  }
   const locked = { x: currentPosition };
 
   const scrollTo = (x: number) => {

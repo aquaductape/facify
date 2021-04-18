@@ -6,11 +6,7 @@ import CircleCheck from "../../../components/svg/CircleCheck";
 import CircleCross from "../../../components/svg/CircleCross";
 import KebabMenu from "../../../components/svg/KebabMenu";
 import { default as LinkIcon } from "../../../components/svg/Link";
-import {
-  loaderCountDownDisabledDuration,
-  loaderErrorDuration,
-  loaderSuccessDuration,
-} from "../../../constants";
+import { CONSTANTS } from "../../../constants";
 import onFocusOut, { OnFocusOutExit } from "../../../lib/onFocusOut/onFocusOut";
 import { RootState } from "../../../store/rootReducer";
 import { JSON_Stringify_Parse } from "../../../utils/jsonStringifyParse";
@@ -92,7 +88,7 @@ const Loader = ({ setOpenLoader }: TLoaderProps) => {
     queuing: false,
     timeoutId: 0,
     timestamp: 0,
-    duration: loaderErrorDuration,
+    duration: CONSTANTS.loaderErrorDuration,
   });
   const downloadMenuItemHandlerRef = useRef<TDownloadMenuItemHandler>({});
   downloadQueueRef.current = downloadQueue;
@@ -266,9 +262,12 @@ const Loader = ({ setOpenLoader }: TLoaderProps) => {
 
   const getCountDownDuration = (currentQueue: TQueue) => {
     const countDownActivity = countDownActivityRef.current;
-    if (!countDownActivity.enabled) return loaderCountDownDisabledDuration;
+    if (!countDownActivity.enabled)
+      return CONSTANTS.loaderCountDownDisabledDuration;
 
-    return currentQueue.error ? loaderErrorDuration : loaderSuccessDuration;
+    return currentQueue.error
+      ? CONSTANTS.loaderErrorDuration
+      : CONSTANTS.loaderSuccessDuration;
   };
 
   const goToNext = ({

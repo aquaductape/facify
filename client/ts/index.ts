@@ -7,17 +7,18 @@ export type TBoundingBox = {
 
 // two displays: image thumbnail preview** and table
 
+export type TConceptVal<T> = {
+  "multicultural-appearance": T;
+  "gender-appearance": T;
+  "age-appearance": T;
+  [key: string]: T;
+};
 // ** when hovered it grows and reveals stats, as well download image button(maybe not)
 export type TConcept = { id: string; name: string; value: number };
 export type TDemographics = {
   id: string;
   bounding_box: TBoundingBox;
-  concepts: {
-    "multicultural-appearance": TConcept[];
-    "gender-appearance": TConcept[];
-    "age-appearance": TConcept[];
-    [key: string]: TConcept[];
-  };
+  concepts: TConceptVal<TConcept[]>;
 };
 
 export type TDemographicsResponse = {

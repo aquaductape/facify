@@ -451,4 +451,62 @@ const InfoResultSentinel = ({ id }: { id: string }) => {
   );
 };
 
-export { HorizontalSentinel, THeadSentinel, InfoResultSentinel, BarSentinel };
+type TClassifiySentinelProps = {
+  id: string;
+};
+const ClassifySentinelTop = ({ id }: TClassifiySentinelProps) => {
+  return (
+    <div data-id-classify-sentinel-top={id} className="top">
+      <style jsx>
+        {`
+          .top {
+            position: absolute;
+            top: -15px;
+            left: 0;
+            width: 100%;
+            height: 0;
+          }
+        `}
+      </style>
+    </div>
+  );
+};
+const ClassifySentinelBottom = ({ id }: TClassifiySentinelProps) => {
+  const imageHeight = useSelector(selectImageHeight({ id }));
+  const elRef = useRef<HTMLDivElement | null>(null);
+  const inputHeight = 45;
+  const viewportTop = 15;
+  const theaderBottomMargin = 125;
+
+  useEffect(() => {
+    if (imageHeight == null) return;
+    elRef.current!.style.bottom = `${
+      inputHeight + viewportTop + theaderBottomMargin + imageHeight
+    }px`;
+  }, [imageHeight]);
+
+  return (
+    <div data-id-classify-sentinel-bottom={id} ref={elRef} className="bottom">
+      <style jsx>
+        {`
+          .bottom {
+            position: absolute;
+            bottom: 163px;
+            left: 0;
+            width: 100%;
+            height: 0;
+          }
+        `}
+      </style>
+    </div>
+  );
+};
+
+export {
+  HorizontalSentinel,
+  THeadSentinel,
+  InfoResultSentinel,
+  BarSentinel,
+  ClassifySentinelTop,
+  ClassifySentinelBottom,
+};

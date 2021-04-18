@@ -3,11 +3,17 @@ import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import { batch, useDispatch } from "react-redux";
 import MiniImage from "../../../../components/MiniImage";
 import ArrowToRight from "../../../../components/svg/ArrowToRight";
-import { imageExistErrorMsg } from "../../../../constants";
+import { CONSTANTS } from "../../../../constants";
+import { Android, IOS } from "../../../../lib/onFocusOut/browserInfo";
 import store from "../../../../store/store";
 import { doesImageExist } from "../../../../utils/doesImageExist";
 import { JSON_Stringify_Parse } from "../../../../utils/jsonStringifyParse";
-import { addUrlItem, removeUrlItem, setUrlItemError } from "../../formSlice";
+import {
+  addUrlItem,
+  removeUrlItem,
+  setUrlItemError,
+  TURLItem,
+} from "../../formSlice";
 import Input from "./Input";
 import UtilBar from "./UtilBar";
 import { splitValueIntoUrlItems } from "./utils";
@@ -55,7 +61,7 @@ const InputBoxInner = ({
       async (value: string) => {
         // when there's multiple URLs present (from using Ctrl-a or Backspacing), currently there's no support to detect which URL is invalid
         // Therefore input string will not be validated
-        if (value.match(/\s/g)) {
+        if (!value || value.match(/\s/g)) {
           value = "";
           setImgError(false);
           setImgUrl(value);
@@ -96,10 +102,45 @@ const InputBoxInner = ({
     });
   };
 
+  const mobileScrollDown = (inputUrlItems: TURLItem[]) => {
+    if (!(Android || IOS)) return;
+
+    const { scrollY } = window;
+    const maxItems = 3;
+    const itemHeight = 55;
+    const maxScrollY = itemHeight * 2;
+    const urlItems = store.getState().form.urlItems;
+
+    // android has issues focusing aligned to input, so I wont use this func for now
+    const scrollDownIfNearTop = () => {
+      if (scrollY > maxScrollY) return;
+      window.scrollTo({ top: maxScrollY - itemHeight });
+    };
+
+    if (urlItems.length > 2) {
+      // scrollDownIfNearTop();
+      return;
+    }
+
+    const total =
+      inputUrlItems.length + urlItems.length > maxItems
+        ? 0
+        : inputUrlItems.length + urlItems.length;
+
+    if (!total) {
+      // scrollDownIfNearTop();
+      return;
+    }
+
+    if (scrollY > maxScrollY) return;
+
+    window.scrollTo({ top: scrollY + itemHeight * total });
+  };
+
   const onInputUrls = (e: ChangeEvent<HTMLInputElement>) => {
     const { key, paste } = keyDownProps;
     const value = e.target.value;
-    let errorMsg = imgError ? imageExistErrorMsg : "";
+    let errorMsg = imgError ? CONSTANTS.imageExistErrorMsg : "";
 
     const hasSpace = value.match(/\s/);
     const urlItems = splitValueIntoUrlItems({ value, imgError, errorMsg });
@@ -109,6 +150,8 @@ const InputBoxInner = ({
       e.target.value = "";
       setImgUrl("");
       setImgError(false);
+
+      mobileScrollDown(urlItems);
 
       dispatch(addUrlItem(urlItems));
 

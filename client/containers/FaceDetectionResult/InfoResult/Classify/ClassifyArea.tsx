@@ -1,26 +1,35 @@
+import { useRef } from "react";
 import { useSelector } from "react-redux";
+import { CSSTransition } from "react-transition-group";
 import TransitionSlide from "../../../../components/TransitionSlide";
 import { RootState } from "../../../../store/rootReducer";
-import ClassifySection from "./ClassifySection";
+import Section from "./Section/Section";
 
 const ClassifyArea = () => {
   const classify = useSelector((state: RootState) => state.classify);
 
   return (
     <div className="container">
-      <TransitionSlide
+      <CSSTransition
+        classNames="slide"
         in={classify.open}
-        slideTo={"up"}
-        positionAbsolute={false}
+        timeout={200}
+        unmountOnExit
       >
-        <ClassifySection type={classify.type}></ClassifySection>
-      </TransitionSlide>
+        <Section
+          id={classify.id}
+          parentIdx={classify.parentIdx}
+          type={classify.type}
+        ></Section>
+      </CSSTransition>
       <style jsx>
         {`
           .container {
             position: fixed;
             top: 0;
             left: 0;
+            width: 100%;
+            z-index: 90;
           }
         `}
       </style>

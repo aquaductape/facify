@@ -1,5 +1,5 @@
 import { MouseEventHandler, useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { CSSTransition } from "react-transition-group";
 import KebabMenu from "../../../../components/svg/KebabMenu";
 import TransitionSlide from "../../../../components/TransitionSlide";
@@ -8,8 +8,10 @@ import onFocusOut, {
   OnFocusOutExit,
 } from "../../../../lib/onFocusOut/onFocusOut";
 import { RootState } from "../../../../store/rootReducer";
+import store from "../../../../store/store";
 import isElObscured from "../../../../utils/isElObscured";
 import smoothScrollTo from "../../../../utils/smoothScrollTo";
+import { setClassifyDisplay } from "../Classify/classifySlice";
 import { selectImageHeight } from "../Table/imageHeightSlice";
 import UtilBar from "./UtilBar";
 
@@ -19,6 +21,7 @@ type TUtilBarDropdown = {
 };
 
 const UtilBarDropdown = ({ id, parentIdx }: TUtilBarDropdown) => {
+  const dispatch = useDispatch();
   const imageHeight = useSelector(selectImageHeight({ id }));
   const triggerRefresh = useSelector(
     (state: RootState) => state.imageHeight.triggerRefresh
@@ -86,8 +89,18 @@ const UtilBarDropdown = ({ id, parentIdx }: TUtilBarDropdown) => {
         setOpenUtilBar(true);
         popUpContainerElRef.current?.focus();
       },
-      allow: [() => popUpContainerElRef.current!],
+      allow: [() => popUpContainerElRef.current!, ".classify-section"],
       onExit: () => {
+        const isClassifyOpen = store.getState().classify.open;
+
+        if (isClassifyOpen) {
+          dispatch(setClassifyDisplay({ open: false }));
+
+          setTimeout(() => {
+            setOpenUtilBar(false);
+          }, 200);
+          return;
+        }
         setOpenUtilBar(false);
         // observerRef.current!.disconnect();
         // observerRef.current = null;

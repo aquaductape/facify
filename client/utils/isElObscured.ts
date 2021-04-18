@@ -7,7 +7,7 @@ const isElObscured = (el: HTMLElement) => {
   // get element at element's position
   const elFromPoint = document.elementFromPoint(elBCR.x, elBCR.y);
   const obscured = !el.contains(elFromPoint);
-  console.log({ elFromPoint });
+
   return {
     obscured,
     targetBCR: elBCR,

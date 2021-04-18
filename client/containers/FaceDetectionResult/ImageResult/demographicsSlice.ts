@@ -1,6 +1,7 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../../store/rootReducer";
-import { TConcept, TDemographics } from "../../../ts";
+import { TConcept, TConceptVal, TDemographics } from "../../../ts";
+import isObjEmpty from "../../../utils/isObjEmpty";
 import { JSON_Stringify_Parse } from "../../../utils/jsonStringifyParse";
 
 export type TDemographicsDisplay = {
@@ -25,17 +26,16 @@ type TParent = {
   hoverActive: boolean;
   childIds: string[];
   tableClassify: {
+    dirty: {
+      sort: TConceptVal<boolean>;
+      filter: TConceptVal<boolean>;
+    };
     sort: {
       action: string | null;
       category: string | null;
       childIds: string[] | null;
     };
-    filter: {
-      [key: string]: string[];
-      "multicultural-appearance": string[];
-      "gender-appearance": string[];
-      "age-appearance": string[];
-    };
+    filter: TConceptVal<{ [key: string]: boolean }>;
   };
 };
 
@@ -128,11 +128,13 @@ const demographicsSlice = createSlice({
       parent.childIds = data.map((item) => item.id);
       parent.tableClassify = {
         filter: {
-          "age-appearance": [],
-          "gender-appearance": [],
-          "multicultural-appearance": [],
+          "age-appearance": {},
+          "gender-appearance": {},
+          "multicultural-appearance": {},
         },
         sort: { action: null, category: null, childIds: null },
+        // @ts-ignore
+        dirty: { sort: {}, filter: {} },
       };
       state.parents.push(parent);
       data.forEach((item) => {
@@ -213,6 +215,41 @@ const demographicsSlice = createSlice({
         return 0;
       });
     },
+    filterChildIds: (
+      state,
+      action: PayloadAction<{ id: number; concept: string; value: string }>
+    ) => {
+      const { id, value, concept } = action.payload;
+
+      const { tableClassify } = state.parents[id];
+
+      const setDirty = () => {
+        const { filter } = tableClassify;
+
+        for (const key in filter) {
+          const isEmpty = isObjEmpty(filter[key]);
+
+          if (isEmpty) {
+            delete tableClassify.dirty.filter[key];
+            continue;
+          }
+
+          tableClassify.dirty.filter[key] = true;
+        }
+      };
+
+      if (tableClassify.filter[concept][value]) {
+        delete tableClassify.filter[concept][value];
+        setDirty();
+        // tableClassify.dirty.filter = isDirty();
+        return;
+      }
+
+      tableClassify.filter[concept][value] = true;
+      setDirty();
+
+      // tableClassify.dirty.filter = isDirty();
+    },
     setDemoItemHoverActive: (
       state,
       action: PayloadAction<{
@@ -285,5 +322,6 @@ export const {
   setDemoItemHoverActive,
   setHoverActive,
   sortChildIds,
+  filterChildIds,
 } = demographicsSlice.actions;
 export default demographicsSlice.reducer;

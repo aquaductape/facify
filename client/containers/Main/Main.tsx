@@ -21,6 +21,7 @@ const Main = () => {
       </div>
       <LogoText></LogoText>
       <UploadImageForm></UploadImageForm>
+      <ClassifyArea></ClassifyArea>
       <div className="main-container">
         <main id="main">
           <div className="main-bg"></div>
@@ -30,7 +31,6 @@ const Main = () => {
           </div>
         </main>
         <div className="spacer"></div>
-        <ClassifyArea></ClassifyArea>
         <Footer></Footer>
       </div>
       <style jsx>

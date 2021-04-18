@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { imageExistErrorMsg } from "../../../../constants";
+import { CONSTANTS } from "../../../../constants";
 import onFocusOut, {
   OnFocusOutEvent,
 } from "../../../../lib/onFocusOut/onFocusOut";
@@ -88,7 +88,7 @@ const Input = ({
   const onCloseInputEnd = async () => {
     const inputEl = inputElRef.current!;
     const value = inputEl.value;
-    let errorMsg = imgError ? imageExistErrorMsg : "";
+    let errorMsg = imgError ? CONSTANTS.imageExistErrorMsg : "";
     const urlItems = splitValueIntoUrlItems({ value, imgError, errorMsg });
     // reset
     inputEl.value = "";
@@ -96,7 +96,7 @@ const Input = ({
       const success = await doesImageExist(item.content);
       item.error = !success;
       if (success) {
-        item.errorMsg = imageExistErrorMsg;
+        item.errorMsg = CONSTANTS.imageExistErrorMsg;
       }
     }
     console.log({ imgError });
@@ -314,8 +314,11 @@ const Input = ({
   return (
     <>
       <input
-        ref={inputElRef}
+        autoCapitalize="off"
+        autoComplete="off"
+        autoCorrect="off"
         spellCheck="false"
+        ref={inputElRef}
         onFocus={onOpenInput}
         // onClick={onOpenInput}
         onInput={onInput}
@@ -325,7 +328,7 @@ const Input = ({
         className={`${isOpenRef.current ? "active" : ""} ${
           displayErrorRef.current ? "submitError" : ""
         }`}
-        type="text"
+        type="url"
         placeholder={"Past URL ..."}
       />
       <style jsx>
