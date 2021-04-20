@@ -1,9 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
-import {
-  removeParentAndNodeChildren,
-  selectParents,
-} from "../ImageResult/demographicsSlice";
+import { removeParentAndNodeChildren } from "../ImageResult/demographicsSlice";
 import { default as CloseBtnIcon } from "../../../components/svg/CloseBtn";
 import {
   removeImageHeight,
@@ -12,6 +9,7 @@ import {
 import { reflow } from "../../../utils/reflow";
 import { theadObserver } from "../InfoResult/Table/useCreateObserver";
 import { useMatchMedia } from "../../../hooks/useMatchMedia";
+import { RootState } from "../../../store/rootReducer";
 
 const useBtnRemoveHover = ({
   id,
@@ -55,7 +53,7 @@ type CloseBtnProps = {
 };
 const CloseBtn = ({ id, idx }: CloseBtnProps) => {
   const dispatch = useDispatch();
-  const parents = useSelector(selectParents());
+  const parents = useSelector((state: RootState) => state.demographics.parents);
 
   const mqlRef = useMatchMedia();
 

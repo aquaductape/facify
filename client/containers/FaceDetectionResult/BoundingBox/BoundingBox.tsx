@@ -1,4 +1,5 @@
 import { batch, useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../../store/rootReducer";
 import {
   selectDemographicsDisplay,
   selectHoverActive,
@@ -13,66 +14,58 @@ type TBoundingBoxProps = {
 
 const BoundingBox = ({ id, parentId }: TBoundingBoxProps) => {
   const dispatch = useDispatch();
+
   const demographic = useSelector(selectDemographicsDisplay({ id }));
+
   const hoverActive = useSelector(selectHoverActive({ id: parentId }));
 
   const onBlur = () => {
-    if (!hoverActive) return;
+    if (!demographic.generalHover) return;
 
-    batch(() => {
-      dispatch(
-        setDemoItemHoverActive({
-          id,
-          // parentId,
-          active: false,
-          scrollIntoView: false,
-        })
-      );
-      dispatch(setHoverActive({ id: parentId, active: false }));
-    });
+    dispatch(
+      setDemoItemHoverActive({
+        id,
+        parentId,
+        active: false,
+        scrollIntoView: false,
+        generalActive: false,
+      })
+    );
   };
 
   const onClick = () => {
-    batch(() => {
-      dispatch(
-        setDemoItemHoverActive({
-          id,
-          // parentId,
-          active: true,
-          scrollIntoView: true,
-          scrollTimestamp: Date.now(),
-        })
-      );
-      dispatch(setHoverActive({ id: parentId, active: true }));
-    });
+    dispatch(
+      setDemoItemHoverActive({
+        id,
+        parentId,
+        active: true,
+        scrollIntoView: true,
+        generalActive: true,
+        scrollTimestamp: Date.now(),
+      })
+    );
   };
 
   const onMouseEnter = () => {
-    batch(() => {
-      dispatch(
-        setDemoItemHoverActive({
-          id,
-          // parentId,
-          active: true,
-          scrollIntoView: false,
-        })
-      );
-      dispatch(setHoverActive({ id: parentId, active: true }));
-    });
+    dispatch(
+      setDemoItemHoverActive({
+        id,
+        active: true,
+        generalActive: true,
+        scrollIntoView: false,
+      })
+    );
   };
 
   const onMouseLeave = () => {
-    batch(() => {
-      dispatch(
-        setDemoItemHoverActive({
-          id,
-          // parentId,
-          active: false,
-          scrollIntoView: false,
-        })
-      );
-      dispatch(setHoverActive({ id: parentId, active: false }));
-    });
+    dispatch(
+      setDemoItemHoverActive({
+        id,
+        generalActive: false,
+        active: false,
+        scrollIntoView: false,
+      })
+    );
   };
 
   const renderBox = {
@@ -81,6 +74,8 @@ const BoundingBox = ({ id, parentId }: TBoundingBoxProps) => {
     bottom: 100 - demographic.bounding_box.bottom_row * 100 + "%",
     left: demographic.bounding_box.left_col * 100 + "%",
   };
+
+  if (demographic.removed) return null;
 
   return (
     <div

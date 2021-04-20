@@ -1,10 +1,13 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import Face from "../../components/svg/Face";
+import { RootState } from "../../store/rootReducer";
 import { selectDemographicParentChildIds } from "../FaceDetectionResult/ImageResult/demographicsSlice";
 
 const Stats = ({ id }: { id: number }) => {
-  const demographics = useSelector(selectDemographicParentChildIds({ id }));
+  const demographics = useSelector((state: RootState) =>
+    selectDemographicParentChildIds(state, id)
+  );
   // face from boundingbox.length
   const faces = demographics.length;
   const strFace = faces && faces === 1 ? "Face" : "Faces";

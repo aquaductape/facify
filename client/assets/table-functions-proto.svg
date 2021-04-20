@@ -38,11 +38,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.92753779"
-     inkscape:cx="1608.1367"
-     inkscape:cy="515.40195"
+     inkscape:zoom="0.91660364"
+     inkscape:cx="2070.1577"
+     inkscape:cy="514.0228"
      inkscape:document-units="mm"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="g1682"
      inkscape:document-rotation="0"
      showgrid="false"
      inkscape:window-width="1920"
@@ -423,7 +423,7 @@
          id="tspan1185"
          x="517.11218"
          y="156.44687"
-         style="stroke-width:0.350175">4</tspan></text>
+         style="stroke-width:0.350175">3 / 4</tspan></text>
     <g
        id="g1193"
        style="opacity:0.3;stroke-width:0.924937;stroke-miterlimit:4;stroke-dasharray:none"
@@ -882,7 +882,7 @@
            id="tspan1621"
            x="586.01898"
            y="116.11496"
-           style="fill:#ffffff;fill-opacity:1;stroke-width:0.264583">Numeric</tspan></text>
+           style="fill:#ffffff;fill-opacity:1;stroke-width:0.264583">Numerical</tspan></text>
       <circle
          style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:0.315915;stroke-linecap:square;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:16.9701;stroke-opacity:1;paint-order:markers fill stroke"
          id="circle1625"
@@ -981,7 +981,7 @@
          id="tspan1736"
          x="244.95522"
          y="156.44687"
-         style="stroke-width:0.350175">4</tspan></text>
+         style="stroke-width:0.350175">3 / 4</tspan></text>
     <g
        id="g1744"
        style="opacity:0.5;stroke-width:0.924937;stroke-miterlimit:4;stroke-dasharray:none"
@@ -1077,27 +1077,24 @@
          x="319.75201"
          y="144.05441"
          style="stroke-width:0.264583">Reset</tspan></text>
-    <g
-       id="g3282">
-      <rect
-         style="opacity:1;fill:none;fill-opacity:1;stroke:#999999;stroke-width:0.654871;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:16.9701;stroke-opacity:1;paint-order:markers fill stroke"
-         id="rect1778"
-         width="27.828056"
-         height="6.030313"
-         x="235.66988"
-         y="139.61819" />
-      <text
-         xml:space="preserve"
-         style="font-size:3.5712px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;stroke-width:0.206031"
+    <rect
+       style="fill:none;fill-opacity:1;stroke:#999999;stroke-width:0.655;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:16.9701;stroke-opacity:1;paint-order:markers fill stroke"
+       id="rect1778"
+       width="27.828056"
+       height="6.030313"
+       x="235.66988"
+       y="139.61819" />
+    <text
+       xml:space="preserve"
+       style="font-size:3.5712px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;stroke-width:0.206031"
+       x="241.80504"
+       y="143.96471"
+       id="text1782"><tspan
+         sodipodi:role="line"
+         id="tspan1780"
          x="241.80504"
          y="143.96471"
-         id="text1782"><tspan
-           sodipodi:role="line"
-           id="tspan1780"
-           x="241.80504"
-           y="143.96471"
-           style="fill:#000000;stroke-width:0.206031">Reset All</tspan></text>
-    </g>
+         style="fill:#000000;stroke-width:0.206031">Reset All</tspan></text>
     <rect
        style="opacity:1;fill:none;fill-opacity:1;stroke:#999999;stroke-width:0.655;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:16.9701;stroke-opacity:1;paint-order:markers fill stroke"
        id="rect1784"
@@ -1403,7 +1400,7 @@
          id="tspan2945"
          x="385.32736"
          y="158.11093"
-         style="stroke-width:0.350175">4</tspan></text>
+         style="stroke-width:0.350175">3 / 4</tspan></text>
     <g
        id="g2953"
        style="opacity:0.5;stroke-width:0.924937;stroke-miterlimit:4;stroke-dasharray:none"

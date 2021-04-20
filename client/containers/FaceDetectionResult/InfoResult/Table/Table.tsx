@@ -13,6 +13,7 @@ import { TConcept } from "../../../../ts";
 import { FireFox } from "../../../../lib/onFocusOut/browserInfo";
 import THead from "./THead";
 import { RootState } from "../../../../store/rootReducer";
+import { createSelector } from "reselect";
 
 type TRowProps = {
   id: string;
@@ -20,8 +21,21 @@ type TRowProps = {
   parentIdNumber: number;
   idx: number;
 };
+
+// const selectDemographics = (id: string ) => {
+//
+//   return createSelector(
+//     (state: RootState) => state.demographics.demographicNodes,
+//     (result) => {
+//       return result[id].concepts;
+//     }
+//   );
+// }
 const Row = ({ id, parentIdNumber, parentId, idx }: TRowProps) => {
   const concepts = useSelector(selectDemographicsConcepts({ id }));
+  const isRemoved = useSelector(
+    (state: RootState) => state.demographics.demographicNodes[id].removed
+  );
 
   const {
     "age-appearance": age,
@@ -30,6 +44,8 @@ const Row = ({ id, parentIdNumber, parentId, idx }: TRowProps) => {
   } = concepts;
 
   // filterConceptsSlice
+
+  if (isRemoved) return null;
 
   return (
     <tr className="row">

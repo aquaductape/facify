@@ -1,3 +1,5 @@
+import { TSortValueType } from "../containers/FaceDetectionResult/ImageResult/demographicsSlice";
+
 export const CONSTANTS = {
   imageHeight: 250,
   imageHeightDesktop: 700,
@@ -12,7 +14,7 @@ export const CONSTANTS = {
   viewportTopPadding: 15,
   utilBarHeight: 42,
   theadHeight: 38,
-  demographicImg: {
+  filterConcepts: {
     concepts: ["face", "age", "gender", "multicultural"],
     ageList: [
       "0-2",
@@ -24,7 +26,7 @@ export const CONSTANTS = {
       "50-59",
       "60-69",
     ],
-    genderList: ["Male", "Female"],
+    genderList: ["Masculine", "Feminine"],
     multiculturalList: [
       "Middle Eastern",
       "Latino Hispanic",
@@ -34,5 +36,92 @@ export const CONSTANTS = {
       "Indian",
       "White",
     ],
+  },
+  sortConcepts: {
+    face: [
+      {
+        action: "ASC",
+        value: "none",
+      },
+      {
+        action: "DESC",
+        value: "none",
+      },
+      {
+        action: "Initial",
+        value: "none",
+      },
+    ],
+    age: [
+      {
+        action: "ASC",
+        value: "numerical",
+      },
+      {
+        action: "DESC",
+        value: "numerical",
+      },
+      {
+        action: "ASC",
+        value: "percentage",
+      },
+      {
+        action: "DESC",
+        value: "percentage",
+      },
+      {
+        action: "Initial",
+        value: "numerical",
+      },
+    ],
+    gender: [
+      {
+        action: "ASC",
+        value: "alphabetical",
+      },
+      {
+        action: "DESC",
+        value: "alphabetical",
+      },
+      {
+        action: "ASC",
+        value: "percentage",
+      },
+      {
+        action: "DESC",
+        value: "percentage",
+      },
+      {
+        action: "Initial",
+        value: "alphabetical",
+      },
+    ],
+    multicultural: [
+      {
+        action: "ASC",
+        value: "alphabetical",
+      },
+      {
+        action: "DESC",
+        value: "alphabetical",
+      },
+      {
+        action: "ASC",
+        value: "percentage",
+      },
+      {
+        action: "DESC",
+        value: "percentage",
+      },
+      {
+        action: "Initial",
+        value: "alphabetical",
+      },
+    ],
+  } as {
+    [key: string]: {
+      action: "ASC" | "DESC" | "Initial";
+      value: TSortValueType;
+    }[];
   },
 };

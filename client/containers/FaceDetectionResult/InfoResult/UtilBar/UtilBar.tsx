@@ -1,6 +1,6 @@
-import { useState } from "react";
 import { useSelector } from "react-redux";
 import Face from "../../../../components/svg/Face";
+import { RootState } from "../../../../store/rootReducer";
 import { selectDemographicParentChildIds } from "../../ImageResult/demographicsSlice";
 import ClassifyDropdownBtns from "../Classify/ClassifyDropdownBtns";
 
@@ -9,21 +9,54 @@ type TUtilBarProps = {
   parentIdx: number;
 };
 
-const UtilBar = ({ id, parentIdx }: TUtilBarProps) => {
+const FaceIndicator = ({ id, parentIdx }: TUtilBarProps) => {
   const demographics = useSelector(
     selectDemographicParentChildIds({ id: parentIdx })
   );
 
+  const filteredIds = useSelector(
+    (state: RootState) =>
+      state.demographics.parents[parentIdx].tableClassify.filter.childIds
+  );
   const faces = demographics.length;
+  const facesText = filteredIds ? `${filteredIds.length} / ${faces}` : faces;
+
+  return (
+    <div className="face-description">
+      <div className="face-icon">
+        <Face title={"Total Number of Faces"}></Face>
+      </div>
+      <div className="face-text">
+        <span>{facesText}</span>
+      </div>
+      <style jsx>
+        {`
+          .face-description {
+            display: flex;
+            align-items: center;
+            height: 100%;
+          }
+
+          .face-icon {
+            width: 20px;
+            flex-shrink: 0;
+            height: 100%;
+          }
+          .face-text {
+            flex: none;
+            margin-left: 5px;
+          }
+        `}
+      </style>
+    </div>
+  );
+};
+
+const UtilBar = ({ id, parentIdx }: TUtilBarProps) => {
   return (
     <div className="container">
       <div className="content">
-        <div className="face-description">
-          <div className="face-icon">
-            <Face title={"Total Number of Faces"}></Face>
-          </div>
-          <div className="face-text">{faces}</div>
-        </div>
+        <FaceIndicator id={id} parentIdx={parentIdx}></FaceIndicator>
         <ClassifyDropdownBtns
           id={id}
           parentIdx={parentIdx}
@@ -43,20 +76,6 @@ const UtilBar = ({ id, parentIdx }: TUtilBarProps) => {
             display: flex;
             height: 100%;
             align-items: center;
-          }
-
-          .face-description {
-            display: flex;
-            align-items: center;
-            height: 100%;
-          }
-
-          .face-icon {
-            width: 20px;
-            height: 100%;
-          }
-          .face-text {
-            margin-left: 5px;
           }
         `}
       </style>

@@ -1,10 +1,11 @@
 import { capitalize } from "lodash";
-import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useCallback, useMemo, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import CircleDot from "../../../../../components/svg/CircleDot";
 import { CONSTANTS } from "../../../../../constants";
 import { RootState } from "../../../../../store/rootReducer";
 import isObjEmpty from "../../../../../utils/isObjEmpty";
+import { resetFilter } from "../../../ImageResult/demographicsSlice";
 import Selector, { MemoSelectorGroup } from "./Selector";
 
 type TMenuProps = {
@@ -14,6 +15,7 @@ type TMenuProps = {
 };
 
 const Menu = ({ id, parentIdx, type }: TMenuProps) => {
+  const dispatch = useDispatch();
   const [currentConcept, setCurrentConcept] = useState("age");
   const currentConceptAppearance = `${currentConcept}-appearance`;
   const dirty = useSelector(
@@ -24,6 +26,30 @@ const Menu = ({ id, parentIdx, type }: TMenuProps) => {
   const onClickConcept = (concept: string) => {
     setCurrentConcept(concept);
   };
+  const demographicNodePositionRef = useRef<number | null>(null);
+
+  const onChangeScroll = useCallback(() => {
+    const { scrollY } = window;
+    const padding = 45;
+    if (!demographicNodePositionRef.current) {
+      const demographicNodeEl = document.getElementById(
+        `demographic-node-${id}`
+      )!;
+      demographicNodePositionRef.current =
+        demographicNodeEl.getBoundingClientRect().top + scrollY - padding;
+    }
+
+    if (demographicNodePositionRef.current > scrollY) return;
+    window.scrollTo({ top: demographicNodePositionRef.current });
+  }, []);
+
+  const onClickReset = (e: React.MouseEvent, concept: string) => {
+    e.stopPropagation(); // workaround onFocusOut bug, although there are other workarounds https://stackoverflow.com/a/43885664/8234457
+    // luckily I don't need bubbling for anyting else for this btn
+    // another workaround is keeping JSX and hiding it by display none, that way the bubbling target is connected in the DOM
+
+    dispatch(resetFilter({ id: parentIdx, concept: concept as any }));
+  };
 
   const isDirty = (concept: string) => dirty[type!][concept + "-appearance"];
 
@@ -32,7 +58,7 @@ const Menu = ({ id, parentIdx, type }: TMenuProps) => {
       <div className="title">{capitalize(type as string)}</div>
       <div className="content">
         <div className="column column-concepts">
-          {CONSTANTS.demographicImg.concepts.slice(1).map((concept, idx) => {
+          {CONSTANTS.filterConcepts.concepts.slice(1).map((concept, idx) => {
             return (
               <div
                 onClick={() => onClickConcept(concept)}
@@ -51,7 +77,10 @@ const Menu = ({ id, parentIdx, type }: TMenuProps) => {
             );
           })}
           {!isObjEmpty(dirty[type!]) ? (
-            <button className="btn-reset column-concepts__btn-reset">
+            <button
+              className="btn-reset column-concepts__btn-reset"
+              onClick={(e) => onClickReset(e, "all")}
+            >
               Reset
             </button>
           ) : null}
@@ -61,9 +90,13 @@ const Menu = ({ id, parentIdx, type }: TMenuProps) => {
             id={parentIdx}
             currentConcept={currentConcept}
             type={type!}
+            onChangeScroll={onChangeScroll}
           ></MemoSelectorGroup>
           {dirty[type!][currentConceptAppearance] ? (
-            <button className="btn-reset column-inputs__btn-reset">
+            <button
+              className="btn-reset column-inputs__btn-reset"
+              onClick={(e) => onClickReset(e, currentConcept)}
+            >
               Reset
             </button>
           ) : null}

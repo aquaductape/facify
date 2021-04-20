@@ -56,6 +56,15 @@ body {
     transform: translateX(0px);
   }
 }
+
+@keyframes Appear {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
 @keyframes Shake-Center {
   0% {
     transform: translateX(0px);

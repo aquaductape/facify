@@ -1,14 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
 import { useMatchMedia } from "../../../hooks/useMatchMedia";
 import { parseConcept } from "../../../utils/parseConcept";
 import {
   selectDemographicsDisplay,
-  selectImageUrl,
   setDemoItemHoverActive,
   setHoverActive,
 } from "../ImageResult/demographicsSlice";
-import createCroppedImgUrl from "./createCroppedImgUrl";
 import smoothScrollTo from "../../../utils/smoothScrollTo";
 
 type BoundingCroppedImageProps = {
@@ -26,35 +24,31 @@ const BoundingCroppedImage = ({
 }: BoundingCroppedImageProps) => {
   const dispatch = useDispatch();
   const demographic = useSelector(selectDemographicsDisplay({ id }));
-  // const imageUrl = useSelector(selectImageUrl({ id: parentId }));
 
   const infoResultElRef = useRef<HTMLTableElement | null>(null);
   const imgElRef = useRef<HTMLImageElement>(null);
   const mqlGroup = useMatchMedia();
 
   const onMouseEnter = () => {
-    batch(() => {
-      dispatch(
-        setDemoItemHoverActive({
-          id,
-          // parentId,
-          active: true,
-        })
-      );
-      dispatch(setHoverActive({ id: parentIdNumber, active: true }));
-    });
+    dispatch(
+      setDemoItemHoverActive({
+        id,
+        parentId: parentIdNumber,
+        generalActive: true,
+        active: true,
+      })
+    );
   };
+
   const onMouseLeave = () => {
-    batch(() => {
-      dispatch(
-        setDemoItemHoverActive({
-          id,
-          // parentId,
-          active: false,
-        })
-      );
-      dispatch(setHoverActive({ id: parentIdNumber, active: false }));
-    });
+    dispatch(
+      setDemoItemHoverActive({
+        id,
+        parentId: parentIdNumber,
+        generalActive: false,
+        active: false,
+      })
+    );
   };
 
   const alt = parseConcept({ concepts: demographic.concepts });

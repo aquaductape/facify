@@ -62,14 +62,15 @@ const LandingPageImgExample = () => {
         item.hoverActive = false;
         item.scrollIntoView = false;
         item.generalHover = false;
-        item.uri = await createCroppedImgUrl({
-          boundingBox: item.bounding_box,
-          img: {
-            src: postMaloneUri,
-            naturalHeight: img.naturalHeight,
-            naturalWidth: img.naturalWidth,
-          },
-        });
+        (item.removed = false),
+          (item.uri = await createCroppedImgUrl({
+            boundingBox: item.bounding_box,
+            img: {
+              src: postMaloneUri,
+              naturalHeight: img.naturalHeight,
+              naturalWidth: img.naturalWidth,
+            },
+          }));
       }
       // return;
 

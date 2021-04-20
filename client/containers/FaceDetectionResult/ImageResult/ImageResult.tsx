@@ -10,6 +10,7 @@ import {
   setImageDimensions,
 } from "./demographicsSlice";
 import { CONSTANTS } from "../../../constants";
+import { RootState } from "../../../store/rootReducer";
 
 type TImageResultProps = {
   id: string;

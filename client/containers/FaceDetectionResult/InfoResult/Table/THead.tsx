@@ -1,9 +1,14 @@
 import { capitalize } from "lodash";
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import Sorting from "../../../../components/svg/Sorting";
+import { CONSTANTS } from "../../../../constants";
 import { RootState } from "../../../../store/rootReducer";
 import getScrollbarWidth from "../../../../utils/getScrollWidth";
-import { sortChildIds } from "../../ImageResult/demographicsSlice";
+import {
+  sortChildIds,
+  TSortValueType,
+} from "../../ImageResult/demographicsSlice";
 
 const THChildEl = ({
   parentIdx,
@@ -19,23 +24,20 @@ const THChildEl = ({
     (state: RootState) =>
       state.demographics.parents[parentIdx].tableClassify.sort
   );
-  const actionQueue = ["ASC", "DESC", "Initial"] as (
-    | "ASC"
-    | "DESC"
-    | "Initial"
-  )[];
+  const actionQueue = CONSTANTS.sortConcepts[item];
   const actionQueueIdxRef = useRef(0);
+  const itemAppearance = item + "-appearance";
 
   const onClick = () => {
-    const actionQueueIdx = actionQueueIdxRef.current;
-    const currentAction = actionQueue[actionQueueIdx];
-
-    actionQueueIdxRef.current = (actionQueueIdxRef.current + 1) % 3;
+    const currentQueue = actionQueue[actionQueueIdxRef.current];
+    actionQueueIdxRef.current =
+      (actionQueueIdxRef.current + 1) % actionQueue.length;
 
     dispatch(
       sortChildIds({
         id: parentIdx,
-        action: currentAction,
+        action: currentQueue.action,
+        sortOnValue: currentQueue.value,
         category: item as any,
       })
     );
@@ -44,9 +46,9 @@ const THChildEl = ({
   const theadClickProp = idx !== 0 ? { onClick } : {};
 
   useEffect(() => {
-    if (sort.category === item) return;
+    if (sort.concepts[itemAppearance].active) return;
     actionQueueIdxRef.current = 0;
-  }, [sort.category]);
+  }, [sort.concepts]);
 
   return (
     <>
@@ -64,15 +66,18 @@ const THChildEl = ({
             </span>
           ) : null}
           <span className="name">{capitalize(item)}</span>
-          <span
-            className={`sort-active ${
-              sort.action && sort.category === item
-                ? sort.action.toLowerCase()
-                : ""
-            }`}
-          >
-            V
-          </span>
+          {sort.action && sort.concepts[itemAppearance].active ? (
+            <span className="sorting-icon">
+              <Sorting
+                action={sort.action as any}
+                show={
+                  sort.concepts[itemAppearance].values.find(
+                    (value) => value.active
+                  )!.type
+                }
+              ></Sorting>
+            </span>
+          ) : null}
         </div>
       ) : (
         <th
@@ -88,15 +93,18 @@ const THChildEl = ({
             </span>
           ) : null}
           <span className="name">{capitalize(item)}</span>
-          <span
-            className={`sort-active ${
-              sort.action && sort.category === item
-                ? sort.action.toLowerCase()
-                : ""
-            }`}
-          >
-            V
-          </span>
+          {sort.action && sort.concepts[itemAppearance].active ? (
+            <span className="sorting-icon">
+              <Sorting
+                action={sort.action as any}
+                show={
+                  sort.concepts[itemAppearance].values.find(
+                    (value) => value.active
+                  )!.type
+                }
+              ></Sorting>
+            </span>
+          ) : null}
         </th>
       )}
       <style jsx>
@@ -120,19 +128,15 @@ const THChildEl = ({
             transition: background-color 250ms;
           }
 
-          .sort-active {
-            display: inline-block;
-            padding-left: 8px;
-            transform: scaleY(0);
-            transition: transform 250ms;
-          }
-
-          .sort-active.asc {
-            transform: scaleY(1);
-          }
-
-          .sort-active.desc {
-            transform: scaleY(-1);
+          .sorting-icon {
+            position: relative;
+            top: 1px;
+            display: inline-flex;
+            height: 15px;
+            width: 30px;
+            margin-left: 8px;
+            transform: scale(1.25);
+            animation: ${"Appear"} 400ms;
           }
 
           .thead-image {

@@ -7,6 +7,7 @@ import { JSON_Stringify_Parse } from "../../../utils/jsonStringifyParse";
 export type TDemographicsDisplay = {
   id: string;
   uri?: string;
+  removed: boolean;
   hoverActive: boolean;
   generalHover: boolean;
   scrollIntoView: boolean;
@@ -19,24 +20,43 @@ type TImageUrl = {
   naturalHeight: number | null;
 };
 
+export type TSortValueType =
+  | "numerical"
+  | "alphabetical"
+  | "percentage"
+  | "none";
+type TSortConcept = {
+  active: boolean;
+  values: {
+    type: TSortValueType;
+    active: boolean;
+  }[];
+};
+type TTableClassify = {
+  dirty: {
+    sort: Partial<TConceptVal<boolean>>;
+    filter: Partial<TConceptVal<boolean>>;
+    dirty: boolean;
+  };
+  sort: {
+    action: string | null;
+    concepts: TConceptVal<TSortConcept>;
+    childIds: string[] | null;
+  };
+  filter: {
+    concepts: TConceptVal<{ [key: string]: boolean }>;
+    action: "all-results" | "top-result";
+    childIds: string[] | null;
+  };
+};
+
 type TParent = {
   id: string;
   imageUrl: TImageUrl;
   name: string;
   hoverActive: boolean;
   childIds: string[];
-  tableClassify: {
-    dirty: {
-      sort: TConceptVal<boolean>;
-      filter: TConceptVal<boolean>;
-    };
-    sort: {
-      action: string | null;
-      category: string | null;
-      childIds: string[] | null;
-    };
-    filter: TConceptVal<{ [key: string]: boolean }>;
-  };
+  tableClassify: TTableClassify;
 };
 
 export type TDemographicNode = TDemographicsDisplay & TDemographics;
@@ -58,6 +78,8 @@ const initialState: TDemographicState = {
 };
 
 export const selectDemographicsDisplay = ({ id }: { id: string }) => {
+  // TODO: Understand Fully on how this works.
+  // saving createSelector doesn't work, unrelated slice dispatches still run it. Returning it as a function works, but this runs createSelector every dispatch that changes demographicNodes
   return createSelector(
     (state: RootState) => state.demographics.demographicNodes,
     (result) => {
@@ -65,6 +87,7 @@ export const selectDemographicsDisplay = ({ id }: { id: string }) => {
     }
   );
 };
+
 export const selectDemographicsConcepts = ({ id }: { id: string }) => {
   return createSelector(
     (state: RootState) => state.demographics.demographicNodes,
@@ -104,11 +127,91 @@ export const selectHoverActive = ({ id }: { id: number }) => {
   );
 };
 
-export const selectParents = () => {
-  return createSelector(
-    (state: RootState) => state.demographics.parents,
-    (result) => result
-  );
+const setDirty = (tableClassify: TTableClassify) => {
+  const { concepts: values } = tableClassify.filter;
+
+  for (const key in values) {
+    const isEmpty = isObjEmpty(values[key]);
+
+    if (isEmpty) {
+      delete tableClassify.dirty.filter[key];
+      continue;
+    }
+    tableClassify.dirty.dirty = true;
+    tableClassify.dirty.filter[key] = true;
+  }
+};
+
+const checkDirtyAndFilterChildren = ({
+  childIds,
+  tableClassify,
+  demographicNodes,
+}: {
+  childIds: string[];
+  tableClassify: TTableClassify;
+  demographicNodes: TDemographicNodeCollection;
+}) => {
+  const filteredChildIdsArr: string[] = [];
+
+  const isDirty = () => {
+    const { concepts: values } = tableClassify.filter;
+
+    for (const key in values) {
+      const isEmpty = isObjEmpty(values[key]);
+
+      if (!isEmpty) {
+        return true;
+      }
+    }
+
+    return false;
+  };
+
+  const filterChildrenIds = () => {
+    childIds.forEach((childId) => {
+      const demographicNode = demographicNodes[childId];
+      filterIds(demographicNode);
+    });
+  };
+
+  const filterIds = (demographicNode: TDemographicNode) => {
+    const concepts = tableClassify.filter.concepts;
+    let areAllConceptsEmpty = true;
+
+    for (const key in concepts) {
+      const classifyConcept = concepts[key];
+      const childConcept = demographicNode.concepts[key];
+      let isConceptEmpty = true;
+      let pass = false;
+
+      for (const name in classifyConcept) {
+        areAllConceptsEmpty = false;
+        isConceptEmpty = false;
+
+        const found = childConcept[0].name === name;
+
+        if (found) {
+          pass = true;
+          demographicNode.removed = false;
+          break;
+        }
+      }
+
+      if (!pass && !isConceptEmpty) {
+        demographicNode.removed = true;
+        return;
+      }
+    }
+
+    filteredChildIdsArr.push(demographicNode.id);
+    if (areAllConceptsEmpty && demographicNode.removed) {
+      demographicNode.removed = false;
+    }
+  };
+
+  filterChildrenIds();
+
+  tableClassify.filter.childIds = isDirty() ? filteredChildIdsArr : null;
 };
 
 const demographicsSlice = createSlice({
@@ -128,13 +231,46 @@ const demographicsSlice = createSlice({
       parent.childIds = data.map((item) => item.id);
       parent.tableClassify = {
         filter: {
-          "age-appearance": {},
-          "gender-appearance": {},
-          "multicultural-appearance": {},
+          concepts: {
+            "age-appearance": {},
+            "gender-appearance": {},
+            "multicultural-appearance": {},
+          },
+          action: "top-result",
+          childIds: null,
         },
-        sort: { action: null, category: null, childIds: null },
-        // @ts-ignore
-        dirty: { sort: {}, filter: {} },
+        sort: {
+          action: null,
+          concepts: {
+            "face-appearance": {
+              active: false,
+              values: [{ type: "none", active: true }],
+            },
+            "age-appearance": {
+              active: false,
+              values: [
+                { type: "numerical", active: true },
+                { type: "percentage", active: false },
+              ],
+            },
+            "gender-appearance": {
+              active: false,
+              values: [
+                { type: "alphabetical", active: true },
+                { type: "percentage", active: false },
+              ],
+            },
+            "multicultural-appearance": {
+              active: false,
+              values: [
+                { type: "alphabetical", active: true },
+                { type: "percentage", active: false },
+              ],
+            },
+          },
+          childIds: null,
+        },
+        dirty: { sort: {}, filter: {}, dirty: false },
       };
       state.parents.push(parent);
       data.forEach((item) => {
@@ -159,39 +295,61 @@ const demographicsSlice = createSlice({
       action: PayloadAction<{
         id: number;
         category: "face" | "age" | "gender" | "multicultural";
+        sortOnValue: TSortValueType;
         action: "ASC" | "DESC" | "Initial";
       }>
     ) => {
-      const { id, category, action: actionValue } = action.payload;
-      const parent = state.parents[id];
-      const newCategory = `${category}-appearance`;
+      const { id, category, action: actionValue, sortOnValue } = action.payload;
+      const { tableClassify, childIds } = state.parents[id];
+      const categoryAppearance = `${category}-appearance`;
 
-      parent.tableClassify.sort.category = category;
-      parent.tableClassify.sort.action = actionValue;
+      const resetActive = () => {
+        const { concepts } = tableClassify.sort;
+        for (const key in concepts) {
+          concepts[key].active = false;
+        }
+      };
+
+      const resetSortOnValue = () => {
+        tableClassify.sort.concepts[categoryAppearance].values.forEach(
+          (val) => (val.active = false)
+        );
+      };
+
+      tableClassify.sort.action = actionValue;
 
       if (actionValue === "Initial") {
-        parent.tableClassify.sort.action = null;
-        parent.tableClassify.sort.category = null;
-        parent.tableClassify.sort.childIds = null;
+        tableClassify.sort.action = null;
+        tableClassify.sort.childIds = null;
+        resetActive();
         return;
       }
 
-      if (!parent.tableClassify.sort.childIds) {
-        parent.tableClassify.sort.childIds = JSON_Stringify_Parse(
-          parent.childIds
-        );
+      resetActive();
+      tableClassify.sort.concepts[categoryAppearance].active = true;
+
+      if (!tableClassify.sort.childIds) {
+        tableClassify.sort.childIds = JSON_Stringify_Parse(childIds);
       }
+
+      resetSortOnValue();
+      const currentSortOnValue = tableClassify.sort.concepts[
+        categoryAppearance
+      ].values.find((value) => value.type === sortOnValue)!;
+      currentSortOnValue.active = true;
 
       if (category === "face") {
-        parent.tableClassify.sort.childIds.reverse();
+        tableClassify.sort.childIds.reverse();
         return;
       }
 
-      parent.tableClassify.sort.childIds.sort((a, b) => {
-        const a_category = state.demographicNodes[a].concepts[newCategory][0];
-        const b_category = state.demographicNodes[b].concepts[newCategory][0];
+      tableClassify.sort.childIds.sort((a, b) => {
+        const a_category =
+          state.demographicNodes[a].concepts[categoryAppearance][0];
+        const b_category =
+          state.demographicNodes[b].concepts[categoryAppearance][0];
 
-        if (category === "age") {
+        if (sortOnValue === "numerical") {
           const a_childIdValue = Number(a_category.name.match(/\d+/)![0]);
           const b_childIdValue = Number(b_category.name.match(/\d+/)![0]);
 
@@ -202,6 +360,18 @@ const demographicsSlice = createSlice({
           }
         }
 
+        if (sortOnValue === "percentage") {
+          const a_childIdValue = a_category.value;
+          const b_childIdValue = b_category.value;
+
+          if (actionValue === "ASC") {
+            return a_childIdValue - b_childIdValue;
+          } else {
+            return b_childIdValue - a_childIdValue;
+          }
+        }
+
+        // sortOnValue is 'alphabetical'
         const a_childIdValue = a_category.name;
         const b_childIdValue = b_category.name;
 
@@ -221,63 +391,99 @@ const demographicsSlice = createSlice({
     ) => {
       const { id, value, concept } = action.payload;
 
-      const { tableClassify } = state.parents[id];
+      const { demographicNodes } = state;
+      const { tableClassify, childIds } = state.parents[id];
 
-      const setDirty = () => {
-        const { filter } = tableClassify;
-
-        for (const key in filter) {
-          const isEmpty = isObjEmpty(filter[key]);
-
-          if (isEmpty) {
-            delete tableClassify.dirty.filter[key];
-            continue;
-          }
-
-          tableClassify.dirty.filter[key] = true;
-        }
-      };
-
-      if (tableClassify.filter[concept][value]) {
-        delete tableClassify.filter[concept][value];
-        setDirty();
-        // tableClassify.dirty.filter = isDirty();
+      if (tableClassify.filter.concepts[concept][value]) {
+        delete tableClassify.filter.concepts[concept][value];
+        setDirty(tableClassify);
+        checkDirtyAndFilterChildren({
+          childIds,
+          demographicNodes,
+          tableClassify,
+        });
         return;
       }
 
-      tableClassify.filter[concept][value] = true;
-      setDirty();
+      tableClassify.filter.concepts[concept][value] = true;
+      setDirty(tableClassify);
+      checkDirtyAndFilterChildren({
+        childIds,
+        demographicNodes,
+        tableClassify,
+      });
+    },
+    resetFilter: (
+      state,
+      action: PayloadAction<{
+        id: number;
+        concept: "age" | "gender" | "multicultural" | "all";
+      }>
+    ) => {
+      const { id, concept } = action.payload;
 
-      // tableClassify.dirty.filter = isDirty();
+      const { demographicNodes } = state;
+      const { tableClassify, childIds } = state.parents[id];
+      const { dirty, filter } = tableClassify;
+
+      if (concept === "all") {
+        const values = filter.concepts;
+
+        filter.childIds = null;
+        dirty.filter = {};
+
+        for (const key in values) {
+          values[key] = {};
+        }
+
+        childIds.forEach((childId) => {
+          demographicNodes[childId].removed = false;
+        });
+        return;
+      }
+
+      filter.concepts[concept + "-appearance"] = {};
+
+      setDirty(tableClassify);
+      checkDirtyAndFilterChildren({
+        childIds,
+        tableClassify,
+        demographicNodes,
+      });
     },
     setDemoItemHoverActive: (
       state,
       action: PayloadAction<{
         id: string;
-        // parentId: number;
+        parentId?: number;
         active: boolean;
-        // activeBy
+        generalActive?: boolean;
         scrollIntoView?: boolean;
         scrollTimestamp?: number;
       }>
     ) => {
       const {
         id,
-        //
-        // parentId,
+        parentId,
         active,
+        generalActive,
         scrollIntoView,
         scrollTimestamp,
       } = action.payload;
 
       const result = state.demographicNodes[id];
       result.hoverActive = active;
+
       if (scrollIntoView != null) {
         result.scrollIntoView = scrollIntoView;
       }
 
       if (scrollTimestamp != null) {
         result.scrollTimestamp = scrollTimestamp;
+      }
+
+      if (generalActive != null) {
+        state.parents[parentId!].hoverActive = generalActive;
       }
     },
     setDemoItemUri: (
@@ -323,5 +529,6 @@ export const {
   setHoverActive,
   sortChildIds,
   filterChildIds,
+  resetFilter,
 } = demographicsSlice.actions;
 export default demographicsSlice.reducer;

@@ -217,6 +217,7 @@ export default function onFocusOut({
       if (isInit()) continue;
 
       if (onStart && onStart(customEvent)) continue;
+      // TODO: This lib falls short when clicked target is removed, how do we know if removed target is within selectors or not. Solution is probably is making the global events to use capturing instead of bubbling. Workaround is placing preventDefault on targeted button
       if (
         not.length &&
         not.some((selector) => {

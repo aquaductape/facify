@@ -5,30 +5,42 @@ import { CONSTANTS } from "../../../../../constants";
 import { RootState } from "../../../../../store/rootReducer";
 import { filterChildIds } from "../../../ImageResult/demographicsSlice";
 
-const conceptValues = {
-  age: CONSTANTS.demographicImg.ageList,
-  gender: CONSTANTS.demographicImg.genderList,
-  multicultural: CONSTANTS.demographicImg.multiculturalList,
+const conceptFilterValues = {
+  age: CONSTANTS.filterConcepts.ageList,
+  gender: CONSTANTS.filterConcepts.genderList,
+  multicultural: CONSTANTS.filterConcepts.multiculturalList,
 } as { [key: string]: string[] };
+
+// const conceptSortValues = {
+//
+// } as {[key: string]: string}
 
 type TSelectorProps = {
   id: number;
   type: "filter" | "sort";
   currentConcept: string;
   value: string;
+  onChangeScroll: () => void;
 };
 
-const Selector = ({ id, type, currentConcept, value }: TSelectorProps) => {
+const Selector = ({
+  id,
+  type,
+  currentConcept,
+  value,
+  onChangeScroll,
+}: TSelectorProps) => {
   const dispatch = useDispatch();
 
   const conceptAppearance = (currentConcept +
     "-appearance") as "age-appearance";
+
   const checked = !!useSelector(
     (state: RootState) =>
       // @ts-ignore
-      state.demographics.parents[id].tableClassify[type][conceptAppearance][
-        value
-      ]
+      state.demographics.parents[id].tableClassify[type].concepts[
+        conceptAppearance
+      ][value]
   ) as boolean;
 
   return (
@@ -40,6 +52,7 @@ const Selector = ({ id, type, currentConcept, value }: TSelectorProps) => {
         onChange={(e) => {
           const target = e.currentTarget as HTMLInputElement;
           // target.checked = !target.checked;
+          onChangeScroll();
 
           dispatch(
             filterChildIds({
@@ -71,13 +84,19 @@ const Selector = ({ id, type, currentConcept, value }: TSelectorProps) => {
 };
 
 export const MemoSelectorGroup = React.memo(
-  ({ id, currentConcept, type }: Omit<TSelectorProps, "value">) => {
+  ({
+    id,
+    currentConcept,
+    type,
+    onChangeScroll,
+  }: Omit<TSelectorProps, "value">) => {
     return (
       <div className="selector-group">
-        {conceptValues[currentConcept].map((value, idx) => (
+        {conceptFilterValues[currentConcept].map((value, idx) => (
           <Selector
             id={id}
             currentConcept={currentConcept}
+            onChangeScroll={onChangeScroll}
             type={type!}
             value={value}
             key={value}
