@@ -290,6 +290,28 @@ const demographicsSlice = createSlice({
         delete state.demographicNodes[childId];
       });
     },
+    setSortValue: (
+      state,
+      action: PayloadAction<{
+        id: number;
+        category: "face" | "age" | "gender" | "multicultural";
+        value: TSortValueType;
+      }>
+    ) => {
+      const { id, value, category } = action.payload;
+      const { tableClassify } = state.parents[id];
+
+      const categoryAppearance = `${category}-appearance`;
+
+      tableClassify.sort.concepts[categoryAppearance].values.forEach(
+        (val) => (val.active = false)
+      );
+
+      const currentSortOnValue = tableClassify.sort.concepts[
+        categoryAppearance
+      ].values.find((_value) => _value.type === value)!;
+      currentSortOnValue.active = true;
+    },
     sortChildIds: (
       state,
       action: PayloadAction<{
@@ -527,6 +549,7 @@ export const {
   setImageDimensions,
   setDemoItemHoverActive,
   setHoverActive,
+  setSortValue,
   sortChildIds,
   filterChildIds,
   resetFilter,

@@ -1,9 +1,11 @@
 import { ChangeEventHandler, KeyboardEventHandler, useState } from "react";
 
-type TInputCheckBoxProps = {
+type TInputSelectorProps = {
   id: string;
+  type: "checkbox" | "radio";
   label: string;
   checked: boolean;
+  name?: string;
   onChange: ChangeEventHandler;
   checkColor?: {
     default: string;
@@ -14,14 +16,15 @@ type TInputCheckBoxProps = {
     active: string;
   };
 };
-const InputCheckBox = ({
+const InputSelector = ({
   id,
+  type,
   label,
   checked,
   onChange,
   checkColor = { active: "var(--blue-main)", default: "#666" },
   labelColor = { active: "currentColor", default: "currentColor" },
-}: TInputCheckBoxProps) => {
+}: TInputSelectorProps) => {
   const [focused, setFocused] = useState(false);
 
   const onKeyUp: KeyboardEventHandler<HTMLInputElement> = (e) => {
@@ -51,19 +54,43 @@ const InputCheckBox = ({
           viewBox="0 0 5.292 5.292"
         >
           <g paintOrder="markers fill stroke">
-            <path
-              fill="none"
-              stroke="currentColor"
-              strokeWidth=".529"
-              strokeLinecap="square"
-              strokeDashoffset="16.97"
-              d="M.265.265h4.763v4.763H.265z"
-            />
-            <path
-              className={`icon__fill ${checked ? "active" : ""}`}
-              fill="currentColor"
-              d="M1.587 1.588h2.117v2.117H1.587z"
-            />
+            {type === "checkbox" ? (
+              <>
+                <path
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth=".529"
+                  strokeLinecap="square"
+                  strokeDashoffset="16.97"
+                  d="M.265.265h4.763v4.763H.265z"
+                />
+                <path
+                  className={`icon__fill ${checked ? "active" : ""}`}
+                  fill="currentColor"
+                  d="M1.587 1.588h2.117v2.117H1.587z"
+                />
+              </>
+            ) : (
+              <>
+                <circle
+                  cx={2.646}
+                  cy={2.646}
+                  r={2.382}
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={0.527}
+                  strokeLinecap="square"
+                  strokeDashoffset={16.97}
+                />
+                <circle
+                  className={`icon__fill ${checked ? "active" : ""}`}
+                  fill="currentColor"
+                  cx={2.646}
+                  cy={2.646}
+                  r={1.059}
+                />
+              </>
+            )}
           </g>
         </svg>
       </span>
@@ -141,4 +168,4 @@ const InputCheckBox = ({
   );
 };
 
-export default InputCheckBox;
+export default InputSelector;

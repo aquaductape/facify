@@ -38,9 +38,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.91660364"
-     inkscape:cx="2070.1577"
-     inkscape:cy="514.0228"
+     inkscape:zoom="1.1159444"
+     inkscape:cx="2002.0865"
+     inkscape:cy="545.40211"
      inkscape:document-units="mm"
      inkscape:current-layer="g1682"
      inkscape:document-rotation="0"
@@ -894,6 +894,36 @@
          id="circle1643"
          cx="581.83203"
          cy="114.84975"
+         r="0.6225999" />
+      <rect
+         style="fill:#4d4d4d;fill-opacity:1;stroke:none;stroke-width:0.529167;stroke-linecap:square;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:16.9701;stroke-opacity:1;paint-order:markers fill stroke"
+         id="rect1170"
+         width="34.901325"
+         height="8.0432949"
+         x="628.58038"
+         y="116.07407" />
+      <text
+         xml:space="preserve"
+         style="font-size:4.24735px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke-width:0.245039"
+         x="635.75067"
+         y="121.26747"
+         id="text1174"><tspan
+           sodipodi:role="line"
+           id="tspan1172"
+           x="635.75067"
+           y="121.26747"
+           style="fill:#ffffff;fill-opacity:1;stroke-width:0.245039">Alphabetical</tspan></text>
+      <circle
+         style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:0.315915;stroke-linecap:square;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:16.9701;stroke-opacity:1;paint-order:markers fill stroke"
+         id="circle1176"
+         cx="631.96967"
+         cy="120.09572"
+         r="1.171307" />
+      <circle
+         style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.167922;stroke-linecap:square;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:16.9701;stroke-opacity:1;paint-order:markers fill stroke"
+         id="circle1178"
+         cx="631.96967"
+         cy="120.09572"
          r="0.6225999" />
     </g>
     <image

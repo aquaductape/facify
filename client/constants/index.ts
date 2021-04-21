@@ -37,91 +37,11 @@ export const CONSTANTS = {
       "White",
     ],
   },
+  sortActions: ["ASC", "DESC", "Initial"],
   sortConcepts: {
-    face: [
-      {
-        action: "ASC",
-        value: "none",
-      },
-      {
-        action: "DESC",
-        value: "none",
-      },
-      {
-        action: "Initial",
-        value: "none",
-      },
-    ],
-    age: [
-      {
-        action: "ASC",
-        value: "numerical",
-      },
-      {
-        action: "DESC",
-        value: "numerical",
-      },
-      {
-        action: "ASC",
-        value: "percentage",
-      },
-      {
-        action: "DESC",
-        value: "percentage",
-      },
-      {
-        action: "Initial",
-        value: "numerical",
-      },
-    ],
-    gender: [
-      {
-        action: "ASC",
-        value: "alphabetical",
-      },
-      {
-        action: "DESC",
-        value: "alphabetical",
-      },
-      {
-        action: "ASC",
-        value: "percentage",
-      },
-      {
-        action: "DESC",
-        value: "percentage",
-      },
-      {
-        action: "Initial",
-        value: "alphabetical",
-      },
-    ],
-    multicultural: [
-      {
-        action: "ASC",
-        value: "alphabetical",
-      },
-      {
-        action: "DESC",
-        value: "alphabetical",
-      },
-      {
-        action: "ASC",
-        value: "percentage",
-      },
-      {
-        action: "DESC",
-        value: "percentage",
-      },
-      {
-        action: "Initial",
-        value: "alphabetical",
-      },
-    ],
-  } as {
-    [key: string]: {
-      action: "ASC" | "DESC" | "Initial";
-      value: TSortValueType;
-    }[];
-  },
+    face: ["none"],
+    age: ["numerical", "percentage"],
+    gender: ["alphabetical", "percentage"],
+    multicultural: ["alphabetical", "percentage"],
+  } as { [key: string]: TSortValueType[] },
 };

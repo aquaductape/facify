@@ -24,7 +24,28 @@ const THChildEl = ({
     (state: RootState) =>
       state.demographics.parents[parentIdx].tableClassify.sort
   );
-  const actionQueue = CONSTANTS.sortConcepts[item];
+  const [actionQueue] = useState(() => {
+    const actions = CONSTANTS.sortActions;
+    const result: {
+      action: "ASC" | "DESC" | "Initial";
+      value: TSortValueType;
+    }[] = [];
+    const sortConcept = CONSTANTS.sortConcepts[item];
+
+    sortConcept.forEach((sortValue) => {
+      actions.slice(0, actions.length - 1).forEach((action) => {
+        result.push({ action: action as "ASC", value: sortValue });
+      });
+    });
+
+    result.push({
+      action: actions[actions.length - 1] as "Initial",
+      value: sortConcept[0],
+    });
+
+    return result;
+  });
+
   const actionQueueIdxRef = useRef(0);
   const itemAppearance = item + "-appearance";
 
@@ -220,7 +241,31 @@ type THeadProps = {
 };
 
 const THead = ({ id, parentIdx, type }: THeadProps) => {
+  const theadStickyElRef = useRef<HTMLDivElement | null>(null);
   const thead = ["face", "age", "gender", "multicultural"];
+
+  useEffect(() => {
+    if (type !== "sticky") return;
+    const theadStickyEl = theadStickyElRef.current!;
+    const tableSelector = `[data-id-table="${id}"]`;
+    const tableScrollSelector = ".table-scroll-container";
+    const tableScrollEl = document
+      .querySelector(tableSelector)
+      ?.querySelector(tableScrollSelector) as HTMLElement;
+
+    const onScroll = () => {
+      tableScrollEl.scrollLeft = theadStickyEl.scrollLeft;
+    };
+
+    // Why I chose wheel instead of scroll event
+    // When table overflow is scrolled, it also scrolls this container, this would
+    // fire this container's scroll event which is unneccessary.
+    // Will cause reseting parent's scrollLeft back to 0 bug, when thead sticky el is transition in and out of states. See `forceRestoreScrollPosition()` for more details of this bug.
+    theadStickyEl.addEventListener("wheel", onScroll);
+    return () => {
+      theadStickyEl.removeEventListener("wheel", onScroll);
+    };
+  }, []);
 
   if (type !== "sticky") {
     return (
@@ -248,7 +293,11 @@ const THead = ({ id, parentIdx, type }: THeadProps) => {
   }
 
   return (
-    <div data-id-sticky-thead={id} className={`container`}>
+    <div
+      data-id-sticky-thead={id}
+      ref={theadStickyElRef}
+      className={"container"}
+    >
       <div
         className="thead-container"
         data-triggered-by-info-result="false"
@@ -278,7 +327,15 @@ const THead = ({ id, parentIdx, type }: THeadProps) => {
             overflow: hidden;
             pointer-events: none;
             top: 0;
+            overflow-x: scroll;
+            scrollbar-width: none; /* Firefox */
             z-index: 5;
+          }
+
+          .container::-webkit-scrollbar {
+            /* WebKit */
+            width: 0;
+            height: 0;
           }
 
           .thead-container {

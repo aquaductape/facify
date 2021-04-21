@@ -50,6 +50,7 @@ const BoundingBox = ({ id, parentId }: TBoundingBoxProps) => {
     dispatch(
       setDemoItemHoverActive({
         id,
+        parentId,
         active: true,
         generalActive: true,
         scrollIntoView: false,
@@ -61,6 +62,7 @@ const BoundingBox = ({ id, parentId }: TBoundingBoxProps) => {
     dispatch(
       setDemoItemHoverActive({
         id,
+        parentId,
         generalActive: false,
         active: false,
         scrollIntoView: false,

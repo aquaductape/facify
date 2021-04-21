@@ -1,9 +1,13 @@
-import React from "react";
+import React, { useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import InputCheckBox from "../../../../../components/InputCheckBox";
+import InputSelector from "../../../../../components/InputCheckBox";
 import { CONSTANTS } from "../../../../../constants";
 import { RootState } from "../../../../../store/rootReducer";
-import { filterChildIds } from "../../../ImageResult/demographicsSlice";
+import {
+  filterChildIds,
+  setSortValue,
+  sortChildIds,
+} from "../../../ImageResult/demographicsSlice";
 
 const conceptFilterValues = {
   age: CONSTANTS.filterConcepts.ageList,
@@ -37,16 +41,16 @@ const Selector = ({
 
   const checked = !!useSelector(
     (state: RootState) =>
-      // @ts-ignore
-      state.demographics.parents[id].tableClassify[type].concepts[
+      state.demographics.parents[id].tableClassify.filter.concepts[
         conceptAppearance
       ][value]
   ) as boolean;
 
   return (
     <div className={`selector ${checked ? "active" : ""}`}>
-      <InputCheckBox
+      <InputSelector
         id={""}
+        type={"checkbox"}
         checked={checked}
         label={value}
         onChange={(e) => {
@@ -64,7 +68,7 @@ const Selector = ({
         }}
         checkColor={{ active: "#fff", default: "#4d4d4d" }}
         labelColor={{ active: "#fff", default: "#4d4d4d" }}
-      ></InputCheckBox>
+      ></InputSelector>
       <style jsx>
         {`
           .selector {
@@ -83,6 +87,53 @@ const Selector = ({
   );
 };
 
+const SortSelectors = ({
+  id,
+  currentConcept,
+  type,
+}: Omit<TSelectorProps, "value" | "onChangeScroll">) => {
+  const dispatch = useDispatch();
+  const conceptAppearance = (currentConcept +
+    "-appearance") as "age-appearance";
+
+  const sortOnValues = useSelector(
+    (state: RootState) =>
+      state.demographics.parents[id].tableClassify.sort.concepts[
+        conceptAppearance
+      ].values
+  );
+
+  return (
+    <div>
+      <div className="direction"></div>
+      <div className="values">
+        {sortOnValues.map((val) => {
+          return (
+            <InputSelector
+              id={""}
+              type={"radio"}
+              name={currentConcept}
+              checked={val.active}
+              label={val.type}
+              onChange={(e) => {
+                dispatch(
+                  setSortValue({
+                    id,
+                    category: currentConcept as any,
+                    value: val.type,
+                  })
+                );
+              }}
+              checkColor={{ active: "#fff", default: "#4d4d4d" }}
+              labelColor={{ active: "#fff", default: "#4d4d4d" }}
+            ></InputSelector>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
 export const MemoSelectorGroup = React.memo(
   ({
     id,
@@ -91,27 +142,37 @@ export const MemoSelectorGroup = React.memo(
     onChangeScroll,
   }: Omit<TSelectorProps, "value">) => {
     return (
-      <div className="selector-group">
-        {conceptFilterValues[currentConcept].map((value, idx) => (
-          <Selector
+      <>
+        {type === "filter" ? (
+          <div className="filter-selectors">
+            {conceptFilterValues[currentConcept].map((value, idx) => (
+              <Selector
+                id={id}
+                currentConcept={currentConcept}
+                onChangeScroll={onChangeScroll}
+                type={type!}
+                value={value}
+                key={value}
+              ></Selector>
+            ))}
+          </div>
+        ) : (
+          <SortSelectors
             id={id}
             currentConcept={currentConcept}
-            onChangeScroll={onChangeScroll}
-            type={type!}
-            value={value}
-            key={value}
-          ></Selector>
-        ))}
+            type={type}
+          ></SortSelectors>
+        )}
         <style jsx>
           {`
-            .selector-group {
+            .filter-selectors {
               display: flex;
               flex-wrap: wrap;
               padding: 5px;
             }
           `}
         </style>
-      </div>
+      </>
     );
   }
 );
