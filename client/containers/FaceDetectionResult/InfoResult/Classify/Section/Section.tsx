@@ -167,6 +167,7 @@ const Section = ({ id, parentIdx, type }: TSectionProps) => {
           top: 0;
           width: 100%;
           max-width: 1550px;
+          padding: 0 15px;
         }
 
         .container.slide-enter,

@@ -110,8 +110,7 @@ const BoundingCroppedImage = ({
 
   return (
     <div>
-      <div className="img-container" style={{ height: "70px" }}>
-        <div className="bg"></div>
+      <div className="img-container" style={{ width: "50px" }}>
         <div className="img-outline-blue"></div>
         <div className="img-outline-white"></div>
         <img
@@ -126,25 +125,17 @@ const BoundingCroppedImage = ({
         {`
           .img-container {
             position: relative;
-            display: inline-block;
-            height: 100%;
             margin-left: 10px;
-          }
-          .bg {
-            position: absolute;
-            top: -100px;
-            left: -10px;
-            width: calc(100% + 20px);
-            height: 300px;
-            z-index: -1;
           }
 
           img {
             position: relative;
+            display: block;
             pointer-events: auto;
-            height: 100%;
+            width: 50px;
             z-index: 1;
           }
+
           .img-outline-blue,
           .img-outline-white {
             position: absolute;
@@ -167,10 +158,6 @@ const BoundingCroppedImage = ({
       {/* dynamic */}
       <style jsx>
         {`
-          .bg {
-            background: ${idx % 2 === 0 ? "#eee" : "#fff"};
-          }
-
           .img-outline-blue,
           .img-outline-white {
             opacity: ${demographic.hoverActive ? "1" : "0"};

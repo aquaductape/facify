@@ -50,6 +50,10 @@ const Row = ({ id, parentIdNumber, parentId, idx }: TRowProps) => {
   return (
     <tr className="row">
       <td className="td-image">
+        <div className="bg">
+          <div className="bg__color"></div>
+          <div className="bg__hider-gradient"></div>
+        </div>
         <BoundingCroppedImage
           id={id}
           parentId={parentId}
@@ -93,6 +97,25 @@ const Row = ({ id, parentIdNumber, parentId, idx }: TRowProps) => {
             background: #eee;
           }
 
+          .bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex;
+            width: 85px;
+            height: 100%;
+            z-index: -1;
+          }
+
+          .bg__color {
+            width: 70px;
+          }
+
+          .bg__hider-gradient {
+            width: 15px;
+            flex-shrink: 0;
+          }
+
           td {
             min-height: 90px;
             padding: 10px 0;
@@ -105,6 +128,20 @@ const Row = ({ id, parentIdNumber, parentId, idx }: TRowProps) => {
             pointer-events: none;
             overflow: hidden;
             z-index: 1;
+          }
+        `}
+      </style>
+      {/* dynamic */}
+      <style jsx>
+        {`
+          .bg__color {
+            background: ${idx % 2 === 0 ? "#eee" : "#fff"};
+          }
+
+          .bg__hider-gradient {
+            background: ${idx % 2 === 0
+              ? "linear-gradient( 90deg, #eee 0%, rgba(255, 255, 255, 0) 100%)"
+              : "linear-gradient( 90deg, #fff 0%, rgba(255, 255, 255, 0) 100%)"};
           }
         `}
       </style>

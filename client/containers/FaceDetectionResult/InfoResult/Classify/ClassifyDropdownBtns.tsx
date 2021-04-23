@@ -99,8 +99,8 @@ const ClassifyDropdownBtns = ({ id, parentIdx }: TClassifyDropdownBtns) => {
           }
 
           @media not all and (pointer: coarse) {
-            .filter-icon:hover:not(.active),
-            .sort-icon:hover:not(.active) {
+            .filter-icon:hover,
+            .sort-icon:hover {
               background: #ddd;
             }
 
@@ -111,6 +111,10 @@ const ClassifyDropdownBtns = ({ id, parentIdx }: TClassifyDropdownBtns) => {
             .filter-icon:hover:not(.active)
               :global(.icon-filter_scrubber-neck) {
               fill: #999;
+            }
+            .filter-icon.active:hover,
+            .sort-icon.active:hover {
+              background: #555;
             }
           }
         `}

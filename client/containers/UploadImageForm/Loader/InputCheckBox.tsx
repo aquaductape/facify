@@ -1,6 +1,6 @@
 import { ChangeEventHandler, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { default as _InputCheckBox } from "../../../components/InputCheckBox";
+import { default as _InputCheckBox } from "../../../components/InputSelector";
 import { RootState } from "../../../store/rootReducer";
 import { setMenu } from "../../Menu/menuSlice";
 
@@ -23,6 +23,7 @@ const InputCheckBox = ({ onChange: _onChange }: TInputCheckBoxProps) => {
   return (
     <_InputCheckBox
       id={id}
+      type={"checkbox"}
       label={label}
       onChange={onChange}
       checked={countDownChecked}

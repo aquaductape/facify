@@ -75,9 +75,14 @@
   opacity: 0;
 }
 
-.fake-url-bar:hover .fake-url-bar-shadow,
-.face-btn-bg:hover {
+.face-btn:hover .face-btn-bg {
   opacity: 1;
+}
+
+@media not all and (pointer: coarse) {
+  .fake-url-bar:hover .fake-url-bar-shadow {
+    opacity: 1;
+  }
 }
 
 .face-btn {

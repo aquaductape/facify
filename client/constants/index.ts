@@ -14,8 +14,8 @@ export const CONSTANTS = {
   viewportTopPadding: 15,
   utilBarHeight: 42,
   theadHeight: 38,
+  concepts: ["face", "age", "gender", "multicultural"],
   filterConcepts: {
-    concepts: ["face", "age", "gender", "multicultural"],
     ageList: [
       "0-2",
       "3-9",

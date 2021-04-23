@@ -57,10 +57,12 @@ const UtilBar = ({ id, parentIdx }: TUtilBarProps) => {
     <div className="container">
       <div className="content">
         <FaceIndicator id={id} parentIdx={parentIdx}></FaceIndicator>
-        <ClassifyDropdownBtns
-          id={id}
-          parentIdx={parentIdx}
-        ></ClassifyDropdownBtns>
+        <div className="classify-container">
+          <ClassifyDropdownBtns
+            id={id}
+            parentIdx={parentIdx}
+          ></ClassifyDropdownBtns>
+        </div>
       </div>
       <style jsx>
         {`
@@ -73,9 +75,18 @@ const UtilBar = ({ id, parentIdx }: TUtilBarProps) => {
           }
 
           .content {
+            position: relative;
             display: flex;
             height: 100%;
             align-items: center;
+          }
+
+          .classify-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
           }
         `}
       </style>

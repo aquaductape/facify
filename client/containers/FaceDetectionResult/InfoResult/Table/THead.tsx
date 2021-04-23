@@ -82,7 +82,10 @@ const THChildEl = ({
           {idx !== 0 ? <span className="buffer"></span> : null}
           {idx === 0 ? (
             <span className="sticky-dynamic-btn" onClick={onClick}>
-              <span className="bg-static"></span>
+              <span className="bg-static">
+                <div className="bg-static-color"></div>
+                <div className="bg-static__hider-gradient"></div>
+              </span>
               <span className="bg-scrolling"></span>
             </span>
           ) : null}
@@ -109,7 +112,10 @@ const THChildEl = ({
           {idx !== 0 ? <span className="buffer"></span> : null}
           {idx === 0 ? (
             <span className="sticky-dynamic-btn" onClick={onClick}>
-              <span className="bg-static"></span>
+              <span className="bg-static">
+                <div className="bg-static__color"></div>
+                <div className="bg-static__hider-gradient"></div>
+              </span>
               <span className="bg-scrolling"></span>
             </span>
           ) : null}
@@ -190,12 +196,28 @@ const THChildEl = ({
             position: absolute;
             top: 0;
             left: 0;
-            background: #fff;
-            width: 70px;
+            display: flex;
+            width: 85px;
             height: 100%;
             padding: 0;
-            pointer-events: all;
+          }
+
+          .bg-static__color {
+            width: 70px;
+            background: #fff;
             transition: background-color 250ms;
+            pointer-events: all;
+          }
+
+          .bg-static__hider-gradient {
+            flex-shrink: 0;
+            width: 15px;
+            height: 100%;
+            background: linear-gradient(
+              90deg,
+              rgba(255, 255, 255, 1) 0%,
+              rgba(255, 255, 255, 0) 100%
+            );
           }
 
           .bg-scrolling {
@@ -211,7 +233,7 @@ const THChildEl = ({
           }
 
           @media not all and (pointer: coarse) {
-            .th:hover .bg-static,
+            .th:hover .bg-static__color,
             .th:hover .bg-scrolling {
               background: #d8deef;
             }
@@ -329,6 +351,8 @@ const THead = ({ id, parentIdx, type }: THeadProps) => {
             top: 0;
             overflow-x: scroll;
             scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* Internet Explorer 10+ and Legacy Edge */
+
             z-index: 5;
           }
 

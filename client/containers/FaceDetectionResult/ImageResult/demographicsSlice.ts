@@ -317,13 +317,20 @@ const demographicsSlice = createSlice({
       action: PayloadAction<{
         id: number;
         category: "face" | "age" | "gender" | "multicultural";
-        sortOnValue: TSortValueType;
+        sortOnValue?: TSortValueType;
         action: "ASC" | "DESC" | "Initial";
       }>
     ) => {
       const { id, category, action: actionValue, sortOnValue } = action.payload;
       const { tableClassify, childIds } = state.parents[id];
       const categoryAppearance = `${category}-appearance`;
+
+      const resetDirty = () => {
+        const categories = tableClassify.dirty.sort;
+        for (const key in categories) {
+          categories[key] = false;
+        }
+      };
 
       const resetActive = () => {
         const { concepts } = tableClassify.sort;
@@ -333,17 +340,34 @@ const demographicsSlice = createSlice({
       };
 
       const resetSortOnValue = () => {
+        if (!sortOnValue) return;
+
         tableClassify.sort.concepts[categoryAppearance].values.forEach(
           (val) => (val.active = false)
         );
       };
 
+      const getSortOnValue = () => {
+        return tableClassify.sort.concepts[categoryAppearance].values.find(
+          (value) => {
+            if (!sortOnValue) return value.active;
+            return value.type === sortOnValue;
+          }
+        )!;
+      };
+
+      resetDirty();
       tableClassify.sort.action = actionValue;
+      tableClassify.dirty.sort[categoryAppearance] = true;
 
       if (actionValue === "Initial") {
+        tableClassify.dirty.sort[categoryAppearance] = false;
         tableClassify.sort.action = null;
         tableClassify.sort.childIds = null;
         resetActive();
+        resetSortOnValue();
+        const currentSortOnValue = getSortOnValue();
+        currentSortOnValue.active = true;
         return;
       }
 
@@ -355,9 +379,7 @@ const demographicsSlice = createSlice({
       }
 
       resetSortOnValue();
-      const currentSortOnValue = tableClassify.sort.concepts[
-        categoryAppearance
-      ].values.find((value) => value.type === sortOnValue)!;
+      const currentSortOnValue = getSortOnValue();
       currentSortOnValue.active = true;
 
       if (category === "face") {
@@ -371,7 +393,7 @@ const demographicsSlice = createSlice({
         const b_category =
           state.demographicNodes[b].concepts[categoryAppearance][0];
 
-        if (sortOnValue === "numerical") {
+        if (currentSortOnValue.type === "numerical") {
           const a_childIdValue = Number(a_category.name.match(/\d+/)![0]);
           const b_childIdValue = Number(b_category.name.match(/\d+/)![0]);
 
@@ -382,7 +404,7 @@ const demographicsSlice = createSlice({
           }
         }
 
-        if (sortOnValue === "percentage") {
+        if (currentSortOnValue.type === "percentage") {
           const a_childIdValue = a_category.value;
           const b_childIdValue = b_category.value;
 
@@ -393,7 +415,7 @@ const demographicsSlice = createSlice({
           }
         }
 
-        // sortOnValue is 'alphabetical'
+        // currentSortOnValue.type is 'alphabetical'
         const a_childIdValue = a_category.name;
         const b_childIdValue = b_category.name;
 
@@ -406,6 +428,35 @@ const demographicsSlice = createSlice({
 
         return 0;
       });
+    },
+    resetSort: (
+      state,
+      action: PayloadAction<{
+        id: number;
+      }>
+    ) => {
+      const { id } = action.payload;
+
+      const { tableClassify } = state.parents[id];
+
+      const resetDirty = () => {
+        tableClassify.dirty.sort = {};
+      };
+
+      const resetActive = () => {
+        const { concepts } = tableClassify.sort;
+        for (const key in concepts) {
+          concepts[key].active = false;
+        }
+      };
+
+      resetDirty();
+
+      tableClassify.sort.action = null;
+      tableClassify.sort.childIds = null;
+      resetActive();
+      // const currentSortOnValue = getSortOnValue();
+      // currentSortOnValue.active = true;
     },
     filterChildIds: (
       state,
@@ -551,6 +602,7 @@ export const {
   setHoverActive,
   setSortValue,
   sortChildIds,
+  resetSort,
   filterChildIds,
   resetFilter,
 } = demographicsSlice.actions;

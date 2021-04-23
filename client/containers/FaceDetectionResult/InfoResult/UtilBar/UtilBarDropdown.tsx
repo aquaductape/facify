@@ -162,12 +162,25 @@ const UtilBarDropdown = ({ id, parentIdx }: TUtilBarDropdown) => {
         ref={btnContainerElRef}
       >
         <div className="btn-sentinel" ref={btnSentinelElRef}></div>
+        <div className="bg-hider"></div>
         <button className="btn-options" onClick={onClick}>
           <KebabMenu></KebabMenu>
         </button>
       </div>
       <style jsx>
         {`
+          .bg-hider {
+            position: absolute;
+            top: 1px;
+            right: 25px;
+            width: 25px;
+            height: 38px;
+            background: linear-gradient(
+              270deg,
+              rgba(255, 255, 255, 1) 0%,
+              rgba(255, 255, 255, 0) 100%
+            );
+          }
           .btn-container {
             position: sticky;
             top: 0;
@@ -221,7 +234,7 @@ const UtilBarDropdown = ({ id, parentIdx }: TUtilBarDropdown) => {
             height: 0px;
           }
 
-          .active .btn-options {
+          .btn-container.active .btn-options {
             background: #000;
             color: #fff;
           }
@@ -229,6 +242,10 @@ const UtilBarDropdown = ({ id, parentIdx }: TUtilBarDropdown) => {
           @media not all and (pointer: coarse) {
             .btn-options:hover {
               background: #ccc;
+            }
+
+            .btn-container.active:hover .btn-options {
+              background: #333;
             }
           }
         `}

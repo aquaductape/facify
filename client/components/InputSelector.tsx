@@ -1,34 +1,50 @@
 import { ChangeEventHandler, KeyboardEventHandler, useState } from "react";
 
 type TInputSelectorProps = {
-  id: string;
+  id?: string;
   type: "checkbox" | "radio";
   label: string;
   checked: boolean;
   name?: string;
   onChange: ChangeEventHandler;
-  checkColor?: {
-    default: string;
-    active: string;
+  checkColor: {
+    static: {
+      default: string;
+      checked: string;
+    };
+    hover?: {
+      default: string;
+      checked: string;
+    };
   };
-  labelColor?: {
-    default: string;
-    active: string;
+  labelColor: {
+    static: {
+      default: string;
+      checked: string;
+    };
+    hover?: {
+      default: string;
+      checked: string;
+    };
   };
+  padding?: string;
 };
+
 const InputSelector = ({
   id,
   type,
+  name,
   label,
   checked,
   onChange,
-  checkColor = { active: "var(--blue-main)", default: "#666" },
-  labelColor = { active: "currentColor", default: "currentColor" },
+  checkColor,
+  labelColor,
+  padding = "",
 }: TInputSelectorProps) => {
   const [focused, setFocused] = useState(false);
 
   const onKeyUp: KeyboardEventHandler<HTMLInputElement> = (e) => {
-    if (!e.key.match(/(tab)/i)) return;
+    if (!e.key.match(/tab|left|right|up|down/i)) return;
     setFocused(true);
   };
 
@@ -37,9 +53,14 @@ const InputSelector = ({
   };
 
   return (
-    <label className={`checkbox-button ${focused ? "focused" : ""}`}>
+    <label
+      className={`checkbox-button ${focused ? "focused" : ""} ${
+        checked ? "checked" : ""
+      }`}
+    >
       <input
-        type="checkbox"
+        type={type}
+        name={name}
         className="checkbox-button__input"
         onChange={onChange}
         onKeyUp={onKeyUp}
@@ -65,7 +86,7 @@ const InputSelector = ({
                   d="M.265.265h4.763v4.763H.265z"
                 />
                 <path
-                  className={`icon__fill ${checked ? "active" : ""}`}
+                  className={"icon__fill"}
                   fill="currentColor"
                   d="M1.587 1.588h2.117v2.117H1.587z"
                 />
@@ -83,7 +104,7 @@ const InputSelector = ({
                   strokeDashoffset={16.97}
                 />
                 <circle
-                  className={`icon__fill ${checked ? "active" : ""}`}
+                  className={"icon__fill"}
                   fill="currentColor"
                   cx={2.646}
                   cy={2.646}
@@ -94,15 +115,16 @@ const InputSelector = ({
           </g>
         </svg>
       </span>
-      <span className={`checkbox-button__label ${checked ? "active" : ""}`}>
-        {label}
-      </span>
+      <span className={"checkbox-button__label"}>{label}</span>
       <style jsx>
         {`
           .checkbox-button {
             display: inline-flex;
             align-items: center;
             cursor: pointer;
+            width: 100%;
+            height: 100%;
+            padding: ${padding};
           }
 
           .checkbox-button.focused {
@@ -135,7 +157,8 @@ const InputSelector = ({
             height: 15px;
             margin-right: 12px;
             vertical-align: middle;
-            color: ${checkColor.default};
+            color: ${checkColor.static.default};
+            transition: color 250ms;
           }
 
           .icon__fill {
@@ -145,22 +168,39 @@ const InputSelector = ({
             transition: transform 250ms;
           }
 
-          .icon__fill.active {
+          .checkbox-button.checked .icon__fill {
             transform: scale(1);
           }
 
           .checkbox-button__label {
-            color: ${labelColor.default};
+            color: ${labelColor.static.default};
             transition: color 250ms;
           }
 
-          .checkbox-button__label.active {
-            color: ${labelColor.active};
-            transition: color 250ms;
+          .checkbox-button.checked .checkbox-button__label {
+            color: ${labelColor.static.checked};
           }
 
-          .checkbox-button__input:checked + .checkbox-button__control {
-            color: ${checkColor.active};
+          .checkbox-button.checked .checkbox-button__control {
+            color: ${checkColor.static.checked};
+          }
+
+          @media not all and (pointer: coarse) {
+            .checkbox-button:hover .checkbox-button__label {
+              color: ${labelColor.hover ? labelColor.hover.default : ""};
+            }
+
+            .checkbox-button.checked:hover .checkbox-button__label {
+              color: ${labelColor.hover ? labelColor.hover.checked : ""};
+            }
+
+            .checkbox-button:hover .checkbox-button__control {
+              color: ${checkColor.hover ? checkColor.hover.default : ""};
+            }
+
+            .checkbox-button.checked:hover .checkbox-button__control {
+              color: ${checkColor.hover ? checkColor.hover.checked : ""};
+            }
           }
         `}
       </style>

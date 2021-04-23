@@ -5,7 +5,7 @@ import CircleDot from "../../../../../components/svg/CircleDot";
 import { CONSTANTS } from "../../../../../constants";
 import { RootState } from "../../../../../store/rootReducer";
 import isObjEmpty from "../../../../../utils/isObjEmpty";
-import { resetFilter } from "../../../ImageResult/demographicsSlice";
+import { resetFilter, resetSort } from "../../../ImageResult/demographicsSlice";
 import Selector, { MemoSelectorGroup } from "./Selector";
 
 type TMenuProps = {
@@ -14,9 +14,11 @@ type TMenuProps = {
   type: "sort" | "filter" | null;
 };
 
+let globalCurrentConcept = "age";
+
 const Menu = ({ id, parentIdx, type }: TMenuProps) => {
   const dispatch = useDispatch();
-  const [currentConcept, setCurrentConcept] = useState("age");
+  const [currentConcept, setCurrentConcept] = useState(globalCurrentConcept);
   const currentConceptAppearance = `${currentConcept}-appearance`;
   const dirty = useSelector(
     (state: RootState) =>
@@ -24,6 +26,7 @@ const Menu = ({ id, parentIdx, type }: TMenuProps) => {
   );
 
   const onClickConcept = (concept: string) => {
+    globalCurrentConcept = concept;
     setCurrentConcept(concept);
   };
   const demographicNodePositionRef = useRef<number | null>(null);
@@ -48,19 +51,34 @@ const Menu = ({ id, parentIdx, type }: TMenuProps) => {
     // luckily I don't need bubbling for anyting else for this btn
     // another workaround is keeping JSX and hiding it by display none, that way the bubbling target is connected in the DOM
 
-    dispatch(resetFilter({ id: parentIdx, concept: concept as any }));
+    if (type === "filter") {
+      dispatch(resetFilter({ id: parentIdx, concept: concept as any }));
+    }
+
+    if (type === "sort") {
+      dispatch(resetSort({ id: parentIdx }));
+    }
   };
 
   const isDirty = (concept: string) => dirty[type!][concept + "-appearance"];
+
+  const concepts =
+    type === "filter" ? CONSTANTS.concepts.slice(1) : CONSTANTS.concepts;
+
+  if (type === "filter" && currentConcept === "face") {
+    globalCurrentConcept = "age";
+    setCurrentConcept("age");
+    return null;
+  }
 
   return (
     <div className="container">
       <div className="title">{capitalize(type as string)}</div>
       <div className="content">
         <div className="column column-concepts">
-          {CONSTANTS.filterConcepts.concepts.slice(1).map((concept, idx) => {
+          {concepts.map((concept, idx) => {
             return (
-              <div
+              <button
                 onClick={() => onClickConcept(concept)}
                 className={`concept ${
                   concept === "multicultural" ? "small" : ""
@@ -73,7 +91,7 @@ const Menu = ({ id, parentIdx, type }: TMenuProps) => {
                   </span>
                 ) : null}
                 <span className="concept-text">{capitalize(concept)}</span>
-              </div>
+              </button>
             );
           })}
           {!isObjEmpty(dirty[type!]) ? (
@@ -92,7 +110,7 @@ const Menu = ({ id, parentIdx, type }: TMenuProps) => {
             type={type!}
             onChangeScroll={onChangeScroll}
           ></MemoSelectorGroup>
-          {dirty[type!][currentConceptAppearance] ? (
+          {dirty[type!][currentConceptAppearance] && type === "filter" ? (
             <button
               className="btn-reset column-inputs__btn-reset"
               onClick={(e) => onClickReset(e, currentConcept)}
@@ -121,17 +139,20 @@ const Menu = ({ id, parentIdx, type }: TMenuProps) => {
           }
 
           .concept {
+            border: 0;
+            background: #fff;
             position: relative;
             display: flex;
             align-items: center;
             font-size: 16px;
             padding-left: 8px;
             width: 100%;
-            height: 45px;
+            height: 40px;
+            transition: background-color 250ms;
           }
 
           .concept.active {
-            background: #ccc;
+            background: #b7b7b7;
           }
 
           .concept.small {
@@ -167,8 +188,11 @@ const Menu = ({ id, parentIdx, type }: TMenuProps) => {
 
           .btn-reset {
             background: #fff;
-            border: 3px solid #999;
-            padding: 2px 15px;
+            border: 3px solid #555;
+            padding: 2px 18px;
+            color: #555;
+            font-size: 16px;
+            transition: background-color 250ms, color 250ms;
           }
 
           .column-concepts__btn-reset {
@@ -179,6 +203,17 @@ const Menu = ({ id, parentIdx, type }: TMenuProps) => {
             position: absolute;
             right: 5px;
             bottom: 5px;
+          }
+
+          @media not all and (pointer: coarse) {
+            .concept:hover:not(.active) {
+              background: #eee;
+            }
+
+            .btn-reset:hover {
+              color: #fff;
+              background: #555;
+            }
           }
         `}
       </style>
