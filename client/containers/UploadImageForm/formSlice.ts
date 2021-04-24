@@ -1,4 +1,5 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { Action, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { nanoid } from "nanoid";
 import { CONSTANTS } from "../../constants";
 
 export type TURLItem = {
@@ -8,8 +9,13 @@ export type TURLItem = {
   error: boolean;
   errorMsg: string;
 };
+type TSubmit = {
+  active: boolean;
+  from: "text" | "webcam" | "dragAndDrop" | "file" | null;
+};
 type TFormState = {
   inputResult: TURLItem[];
+  submit: TSubmit;
   error: boolean;
   urlItems: TURLItem[];
 };
@@ -17,43 +23,47 @@ type TFormState = {
 // https://i.imgur.com/nt0RgAH.jpg https://upload.wikimedia.org/wikipedia/commons/8/85/Elon_Musk_Royal_Society_%28crop1%29.jpg https://static.tvtropes.org/pmwiki/pub/images/aubrey_plaza.jpg
 const initialState: TFormState = {
   error: false,
+  submit: {
+    active: false,
+    from: null,
+  },
   inputResult: [
-    // {
-    //   id: nanoid(),
-    //   content: "",
-    //   error: false,
-    //   name:
-    //     "post-malon-superlongsuperlongsuperlongsuperlongsuperlongsuperlong.jpg",
-    //   errorMsg: "BAD",
-    // },
-    // {
-    //   id: nanoid(),
-    //   content: "",
-    //   error: true,
-    //   name: "aubrey-superlongsuperlongsuperlongsuperlongsuperlongsuperlong.jpg",
-    //   errorMsg: "BAD IMAGE",
-    // },
-    // {
-    //   id: nanoid(),
-    //   content: "",
-    //   error: false,
-    //   name: "elon-superlongsuperlongsuperlongsuperlongsuperlongsuperlong.gif",
-    //   errorMsg: "",
-    // },
-    // {
-    //   id: nanoid(),
-    //   content: "",
-    //   error: false,
-    //   name: "post-malon",
-    //   errorMsg: "",
-    // },
-    // {
-    //   id: nanoid(),
-    //   content: "",
-    //   error: false,
-    //   errorMsg: "",
-    //   name: "aubrey",
-    // },
+    {
+      id: nanoid(),
+      content: "",
+      error: false,
+      name:
+        "post-malon-superlongsuperlongsuperlongsuperlongsuperlongsuperlong.jpg",
+      errorMsg: "BAD",
+    },
+    {
+      id: nanoid(),
+      content: "",
+      error: false,
+      name: "aubrey-superlongsuperlongsuperlongsuperlongsuperlongsuperlong.jpg",
+      errorMsg: "",
+    },
+    {
+      id: nanoid(),
+      content: "",
+      error: false,
+      name: "elon-superlongsuperlongsuperlongsuperlongsuperlongsuperlong.gif",
+      errorMsg: "",
+    },
+    {
+      id: nanoid(),
+      content: "",
+      error: false,
+      name: "post-malon",
+      errorMsg: "",
+    },
+    {
+      id: nanoid(),
+      content: "",
+      error: false,
+      errorMsg: "",
+      name: "aubrey",
+    },
   ],
   urlItems: [
     // { id: nanoid(), content: "https://i.imgur.com/nt0RgAH.jpg", error: false },
@@ -134,7 +144,9 @@ const formSlice = createSlice({
       state.inputResult = [];
       state.urlItems = [];
     },
-    // this is not how you should use redux
+    setSubmit: (state, action: PayloadAction<TSubmit>) => {
+      state.submit = action.payload;
+    },
   },
 });
 
@@ -146,5 +158,6 @@ export const {
   setInputResultFromUrlItems,
   clearAllFormValues,
   removeInvalidUrlItems,
+  setSubmit,
 } = formSlice.actions;
 export default formSlice.reducer;

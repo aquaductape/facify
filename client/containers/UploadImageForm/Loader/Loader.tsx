@@ -1,3 +1,5 @@
+import { capitalize } from "lodash";
+import { nanoid } from "nanoid";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CSSTransition } from "react-transition-group";
@@ -11,7 +13,7 @@ import onFocusOut, { OnFocusOutExit } from "../../../lib/onFocusOut/onFocusOut";
 import { RootState } from "../../../store/rootReducer";
 import { JSON_Stringify_Parse } from "../../../utils/jsonStringifyParse";
 import { reflow } from "../../../utils/reflow";
-import { clearAllFormValues } from "../formSlice";
+import { clearAllFormValues, TURLItem } from "../formSlice";
 import { TImgStatus } from "../imageUrlSlice";
 import DownloadMenu from "./DownloadMenu";
 import { TDownloadMenuItemHandler } from "./DownloadMenuItem";
@@ -62,6 +64,7 @@ const Loader = ({ setOpenLoader }: TLoaderProps) => {
   const [finishedQueueIdx, setFinishedQueueIdx] = useState(0);
   const [openMenu, setOpenMenu] = useState(false);
   const downloadQueueIdxRef = useRef(0);
+  const initRef = useRef(true);
   const downloadQueueRef = useRef<TQueue[]>(downloadQueue);
   const optionsMenuElRef = useRef<HTMLDivElement | null>(null);
   const countDownBarElRef = useRef<HTMLDivElement | null>(null);
@@ -146,8 +149,8 @@ const Loader = ({ setOpenLoader }: TLoaderProps) => {
   //             setCurrentImgStatus("DONE");
   //             cb && cb();
   //           }, 800);
-  //         }, 800);
-  //       }, 800);
+  //         }, 0);
+  //       }, 100);
   //     };
   //
   //     addItem(0, () => {
@@ -199,11 +202,15 @@ const Loader = ({ setOpenLoader }: TLoaderProps) => {
     return "";
   };
 
-  const titleLoadingText =
-    currentResult.currentImgStatus === "COMPRESSING" ||
-    currentResult.currentImgStatus === "EMPTY"
-      ? "Compressing"
-      : "Scanning";
+  const titleLoadingText = () => {
+    if (currentResult.currentImgStatus === "EMPTY") return "Reading";
+    return capitalize(currentResult.currentImgStatus);
+  };
+
+  // currentResult.currentImgStatus === "COMPRESSING" ||
+  // currentResult.currentImgStatus === "EMPTY"
+  //   ? "Reading"
+  //   : "Scanning";
 
   const closeLoader = () => {
     dispatch(clearAllFormValues());
@@ -245,6 +252,7 @@ const Loader = ({ setOpenLoader }: TLoaderProps) => {
 
   /** is needed when success queues are displayed back to back, since the css classes won't change, the countdown bar will never be reset */
   const refreshCountDownBarDisplay = () => {
+    debugger;
     const countDownActivity = countDownActivityRef.current!;
     if (!countDownActivity.enabled) {
       return;
@@ -303,6 +311,7 @@ const Loader = ({ setOpenLoader }: TLoaderProps) => {
 
     const onTimeout = () => {
       console.log("timeout!!!!");
+      debugger;
       setFinishedQueueIdx((prev) => prev + 1);
 
       updateDownloadMenuItemDisplayCountDown(
@@ -441,7 +450,12 @@ const Loader = ({ setOpenLoader }: TLoaderProps) => {
   }, [currentImgStatus]);
 
   useEffect(() => {
+    if (initRef.current) {
+      initRef.current = false;
+      return;
+    }
     // downloadQueue
+    debugger;
     countDownActivityRef.current.active = false;
     goToNext();
   }, [finishedQueueIdx]);
@@ -454,6 +468,7 @@ const Loader = ({ setOpenLoader }: TLoaderProps) => {
   }, [finishedQueueIdx, currentImgStatus]);
 
   useEffect(() => {
+    if (!downloadQueue.length) return;
     goToNext();
   }, [downloadQueue.length]);
 
@@ -484,7 +499,7 @@ const Loader = ({ setOpenLoader }: TLoaderProps) => {
                   currentResult.currentImgStatus === "COMPRESSING" ||
                   currentResult.currentImgStatus === "SCANNING" ? (
                   <>
-                    <div className="title-text">{titleLoadingText}</div>
+                    <div className="title-text">{titleLoadingText()}</div>
                     <div className="icon-holder">
                       <SwappingSquares></SwappingSquares>
                     </div>

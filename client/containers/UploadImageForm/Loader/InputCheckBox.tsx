@@ -27,6 +27,11 @@ const InputCheckBox = ({ onChange: _onChange }: TInputCheckBoxProps) => {
       label={label}
       onChange={onChange}
       checked={countDownChecked}
+      checkColor={{ static: { default: "#555", checked: "var(--blue-main)" } }}
+      labelColor={{
+        static: { default: "#555", checked: "#555" },
+        hover: { default: "#000", checked: "#000" },
+      }}
     ></_InputCheckBox>
   );
 };

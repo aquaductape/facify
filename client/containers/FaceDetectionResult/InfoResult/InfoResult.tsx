@@ -6,6 +6,7 @@ import { useMatchMedia } from "../../../hooks/useMatchMedia";
 import { querySelector } from "../../../utils/querySelector";
 import UtilBarDropdown from "./UtilBar/UtilBarDropdown";
 import { CONSTANTS } from "../../../constants";
+import store from "../../../store/store";
 
 type TInforResultProps = { id: string; idx: number };
 const InfoResult = ({ id, idx }: TInforResultProps) => {
@@ -15,6 +16,9 @@ const InfoResult = ({ id, idx }: TInforResultProps) => {
 
   useEffect(() => {
     const infoDemoEl = infoDemoElRef.current!;
+
+    // const itemsLength = store.getState().demographics.demographicNodes
+    //
 
     if (!mqlGroup.current?.minWidth_1300.matches) return;
 

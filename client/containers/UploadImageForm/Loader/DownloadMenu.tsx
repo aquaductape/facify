@@ -153,7 +153,9 @@ const DownloadMenu = ({
         </div>
         <div className="options">
           <div className="input-checkbox">
-            <InputCheckBox onChange={onChangeCheckBox}></InputCheckBox>
+            <div className="input-checkbox-inner">
+              <InputCheckBox onChange={onChangeCheckBox}></InputCheckBox>
+            </div>
           </div>
         </div>
       </div>
@@ -210,6 +212,9 @@ const DownloadMenu = ({
           .input-checkbox {
             text-align: center;
             padding: 20px 0;
+          }
+          .input-checkbox-inner {
+            display: inline-block;
           }
 
           .kebab-down-arrow {

@@ -61,6 +61,7 @@ export const addImageAndAnimate = async ({
     dispatch(setImageLoaded(true));
     dispatch(setImageStatus("DONE"));
     dispatch(setCurrentImageStatus("DONE"));
+    console.log("DONE");
     dispatch(addImage({ id, imageHeight: null }));
     dispatch(
       addDemographicsParentAndChildren({

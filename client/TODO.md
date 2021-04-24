@@ -3,18 +3,12 @@
 3. have query parameter where you can place either image url or base64 string and upon page load, it will detect the face from the query.
 4. Based from #3, have Open Graph Preview. From what I gathered, needs to be done serverside, hosting on vercel seems to be easiest solution. On the server the image should be ported to canvas, then add the box boundaries inside canvas, then add padding to make sure it is not cropped
 
-5. have filter/sorting functions on table
-   Face: ACS DECS Revert
-   Age: number Greatest Least Revert
-   Gender: Male/Female Revert
-   Multicultural: Alphabetical Reverse Revert
-
-6. Clarifai maximum image size is 3.6MB. Compress url that has over 3.6MB https://media.defense.gov/2014/Sep/08/2000943675/-1/-1/0/140907-F-WE773-015.JPG
-7. When removing demograhicNode use translate effect. Get removing target top position > remove observers > target pointer events none > translate
-8. Predict image size on resizing between 1300px. Layout thrashing.
-9. Have table of contents on the right side. On mobile either have a nav icon on the viewport's bottom right, or have a nav icon on item utility panel.
-10. Instead of click me, use "Try Me"
-11. OpenLoader should have data where it's opened from
+5. Clarifai maximum image size is 3.6MB. Compress url that has over 3.6MB https://media.defense.gov/2014/Sep/08/2000943675/-1/-1/0/140907-F-WE773-015.JPG
+6. When removing demograhicNode use translate effect. Get removing target top position > remove observers > target pointer events none > translate
+7. Predict image size on resizing between 1300px. Layout thrashing.
+8. Have table of contents on the right side. On mobile either have a nav icon on the viewport's bottom right, or have a nav icon on item utility panel.
+9. Instead of click me, use "Try Me"
+10. OpenLoader should have data where it's opened from
 
 ### Note
 

@@ -25,6 +25,7 @@ export const CONSTANTS = {
       "40-49",
       "50-59",
       "60-69",
+      "70+",
     ],
     genderList: ["Masculine", "Feminine"],
     multiculturalList: [

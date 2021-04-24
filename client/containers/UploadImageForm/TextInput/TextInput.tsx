@@ -5,10 +5,11 @@ import { RootState } from "../../../store/rootReducer";
 import store from "../../../store/store";
 import { convertFileToBase64 } from "../../../utils/convertFileToBase64";
 import dataURLtoFile from "../../../utils/dataURLtoFile";
+import { delayP } from "../../../utils/delayP";
 import { getBase64FromUrl } from "../../../utils/getBase64FromUrl";
 import { getImageNameFromUrl } from "../../../utils/getImageNameFromUrl";
 import { TDemographicNode } from "../../FaceDetectionResult/ImageResult/demographicsSlice";
-import { clearAllFormValues, TURLItem } from "../formSlice";
+import { clearAllFormValues, setSubmit, TURLItem } from "../formSlice";
 import { setCurrentAddedImage, setCurrentImageStatus } from "../imageUrlSlice";
 import {
   getImageDimensions,
@@ -113,14 +114,13 @@ let clearDisplayErrorTimeout = 0;
 type TFormTextInput = {
   setOpenLoader: React.Dispatch<React.SetStateAction<boolean>>;
 };
+
 const TextInput = React.memo(({ setOpenLoader }: TFormTextInput) => {
   const dispatch = useDispatch();
   const imageLoaded = useSelector(
     (state: RootState) => state.imageUrl.imageLoaded
   );
-  const formInputResult = useSelector(
-    (state: RootState) => state.form.inputResult
-  );
+  const formSubmit = useSelector((state: RootState) => state.form.submit);
   const [error, setError] = useState(false);
   const isOpenRef = useRef(false);
   const displayErrorRef = useRef(false);
@@ -131,7 +131,8 @@ const TextInput = React.memo(({ setOpenLoader }: TFormTextInput) => {
   const onSubmitForm = async (urlItem: TURLItem) => {
     let urlContent = urlItem.content;
 
-    dispatch(setCurrentImageStatus("EMPTY"));
+    dispatch(setCurrentImageStatus("COMPRESSING"));
+    console.log("COMPRESSING", urlItem.name);
 
     dispatch(
       setCurrentAddedImage({
@@ -167,12 +168,14 @@ const TextInput = React.memo(({ setOpenLoader }: TFormTextInput) => {
 
     if (sizeMB != null && sizeMB > 3.5) {
       dispatch(setCurrentImageStatus("COMPRESSING"));
+      console.log("COMPRESSING", urlItem.name);
       const result = await convertFileToBase64(dataURLtoFile(base64));
       base64 = result.base64;
       urlContent = window.URL.createObjectURL(result.file);
     }
 
     dispatch(setCurrentImageStatus("SCANNING"));
+    console.log("SCANNING", urlItem.name);
 
     const result = await postClarifaiAPI({ base64 });
 
@@ -223,9 +226,12 @@ const TextInput = React.memo(({ setOpenLoader }: TFormTextInput) => {
   };
 
   useEffect(() => {
-    if (!formInputResult.length || !store.getState().form.urlItems.length)
-      return;
+    if (!formSubmit.active || formSubmit.from !== "text") return;
+    dispatch(setSubmit({ active: false, from: null }));
+    dispatch(setCurrentImageStatus("EMPTY"));
     setOpenLoader(true);
+    console.log("Submit!!!");
+    const formInputResult = store.getState().form.inputResult;
 
     const run = async () => {
       // const values = formInputResult.map(({ content }) => content);
@@ -236,7 +242,7 @@ const TextInput = React.memo(({ setOpenLoader }: TFormTextInput) => {
     };
 
     run();
-  }, [formInputResult.length]);
+  }, [formSubmit]);
 
   return (
     <form

@@ -6,8 +6,13 @@ import onFocusOut, {
 } from "../../../../lib/onFocusOut/onFocusOut";
 import { RootState } from "../../../../store/rootReducer";
 import { doesImageExist } from "../../../../utils/doesImageExist";
+import { getImageNameFromUrl } from "../../../../utils/getImageNameFromUrl";
 import { reflow } from "../../../../utils/reflow";
-import { addUrlItem, setInputResultFromUrlItems } from "../../formSlice";
+import {
+  addUrlItem,
+  setInputResultFromUrlItems,
+  setSubmit,
+} from "../../formSlice";
 import { splitValueIntoUrlItems } from "./utils";
 
 type TInputProps = {
@@ -95,7 +100,7 @@ const Input = ({
     for (const item of urlItems) {
       const success = await doesImageExist(item.content);
       item.error = !success;
-      if (success) {
+      if (item.error) {
         item.errorMsg = CONSTANTS.imageExistErrorMsg;
       }
     }
@@ -113,6 +118,7 @@ const Input = ({
 
     setTimeout(() => {
       dispatch(setInputResultFromUrlItems());
+      dispatch(setSubmit({ active: true, from: "text" }));
     }, 100);
   };
 

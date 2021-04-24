@@ -1,5 +1,6 @@
 import { nanoid } from "nanoid";
-import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { batch, useDispatch, useSelector } from "react-redux";
 import { useMatchMedia } from "../../../hooks/useMatchMedia";
 import { RootState } from "../../../store/rootReducer";
 import { convertFileToBase64 } from "../../../utils/convertFileToBase64";
@@ -8,6 +9,7 @@ import { TDemographicNode } from "../../FaceDetectionResult/ImageResult/demograp
 import {
   addInputResult,
   setInputResultFromUrlItems,
+  setSubmit,
   TURLItem,
 } from "../formSlice";
 import { setCurrentAddedImage, setCurrentImageStatus } from "../imageUrlSlice";
@@ -22,10 +24,12 @@ type TFileInputProps = {
 };
 const FileInput = ({ setOpenLoader }: TFileInputProps) => {
   const dispatch = useDispatch();
+  const formSubmit = useSelector((state: RootState) => state.form.submit);
   const imageLoaded = useSelector(
     (state: RootState) => state.imageUrl.imageLoaded
   );
   const mqlRef = useMatchMedia();
+  const [fileItems, setFileItems] = useState<(TURLItem & { file: File })[]>([]);
 
   const onFileUpload = async (item: { file: File } & TURLItem) => {
     dispatch(setCurrentImageStatus("EMPTY"));
@@ -91,18 +95,34 @@ const FileInput = ({ setOpenLoader }: TFileInputProps) => {
       });
     });
 
-    dispatch(addInputResult(JSON_Stringify_Parse(inputResult)));
+    for (let i = 0; i < inputResult.length; i++) {
+      const item = inputResult[i];
+      item.file = files[i];
+    }
+    setFileItems(inputResult);
 
-    //     setTimeout(async () => {
-    //       setOpenLoader(true);
-    //
-    //       for (let i = 0; i < inputResult.length; i++) {
-    //         const item = inputResult[i];
-    //         item.file = files[i];
-    //         await onFileUpload(item);
-    //       }
-    //     }, 3000);
+    batch(() => {
+      dispatch(addInputResult(JSON_Stringify_Parse(inputResult)));
+      dispatch(setSubmit({ active: true, from: "file" }));
+    });
   };
+
+  useEffect(() => {
+    console.log(formSubmit);
+    if (!formSubmit.active || formSubmit.from !== "file") return;
+    dispatch(setSubmit({ active: false, from: null }));
+    setOpenLoader(true);
+
+    const run = async () => {
+      for (const item of fileItems) {
+        await onFileUpload(item);
+      }
+    };
+
+    run();
+
+    setFileItems([]);
+  }, [formSubmit, fileItems.length]);
 
   return (
     <>

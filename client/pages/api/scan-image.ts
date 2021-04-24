@@ -29,7 +29,7 @@ type TDemographicsResult = {
 const models = {
   "multicultural-appearance": "93c277ec3940fba661491fda4d3ccfa0",
   "gender-appearance": "af40a692dfe6040f23ca656f4e144fc2",
-  "age-appearence": "36f90889189ad96c516d134bc713004d",
+  "age-appearance": "36f90889189ad96c516d134bc713004d",
 };
 
 const getDemographics = (uri: string) => {
@@ -71,7 +71,7 @@ const getDemographics = (uri: string) => {
         }
 
         try {
-          result.data = filterDemographics(response);
+          result.data = editDemographics(response);
           resolve(result);
         } catch (err) {
           // maybe this isn't wise, since this internal error is related to my server but not clarifai's
@@ -84,7 +84,7 @@ const getDemographics = (uri: string) => {
   });
 };
 
-const filterDemographics = (response: any) => {
+const editDemographics = (response: any) => {
   const dataOutput: TDataOutput[] = [];
   let itemsAssigned = false;
 
@@ -123,17 +123,23 @@ const filterDemographics = (response: any) => {
 
 const filterConcepts = (concept: TConcept, idx: number, self: TConcept[]) => {
   if (idx === 0) return true;
-  return concept.value >= 0.03 && idx <= 3;
+  return concept.value >= 0.01 && idx <= 4;
 };
 
 const manageRegions = (regions: any) => {
   return regions.data.concepts
     .filter(filterConcepts)
-    .map(({ id, name, value }: any) => ({
-      id,
-      name: name.replace("_", " "),
-      value,
-    }));
+    .map(({ id, name, value }: any) => {
+      if (name === "more than 70") {
+        name = "70+";
+      }
+
+      return {
+        id,
+        name: name.replace("_", " "),
+        value,
+      };
+    });
 };
 
 const handler: NextApiHandler = async (req, res) => {

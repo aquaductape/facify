@@ -4,8 +4,6 @@ import TextInput from "./TextInput/TextInput";
 import Loader from "./Loader/Loader";
 import FileInput from "./FileInput/FileInput";
 
-const placeholderError = "URL Required*";
-
 const UploadImageForm = () => {
   const [openLoader, setOpenLoader] = useState(false);
   const [hideFormGroup, setHideFormGroup] = useState(false);
