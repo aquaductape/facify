@@ -8,7 +8,7 @@ type TSectionProps = {
   type: "sort" | "filter" | null;
 };
 
-const Section = ({ id, parentIdx, type }: TSectionProps) => {
+export const StickySection = ({ id, parentIdx, type }: TSectionProps) => {
   const containerElRef = useRef<HTMLDivElement | null>(null);
   const theadStickyElRef = useRef<HTMLElement | null>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -229,4 +229,51 @@ const Section = ({ id, parentIdx, type }: TSectionProps) => {
   );
 };
 
-export default Section;
+export const RelativeSection = ({ id, parentIdx, type }: TSectionProps) => {
+  return (
+    <div className="container">
+      <div className="classify-section inner">
+        <Menu id={id} parentIdx={parentIdx} type={type}></Menu>
+      </div>
+      <style jsx>{`
+        .container {
+          position: absolute;
+          top: 45px;
+          width: 100%;
+        }
+
+        .container.slide-enter,
+        .container.slide-exit {
+          overflow: hidden;
+        }
+
+        .slide-enter .inner {
+          transform: translateY(-101%);
+        }
+
+        .slide-enter-active .inner {
+          transform: translateY(0);
+          transition: transform 200ms;
+        }
+
+        .slide-exit .inner {
+          transform: translateY(0);
+        }
+
+        .slide-exit-active .inner {
+          transform: translateY(-101%);
+          transition: transform 200ms;
+        }
+
+        .inner {
+          height: 222px;
+          background: #fff;
+          border: 1px solid #999;
+          border-top: 3px solid #666666;
+          box-shadow: 0 10px 10px -8px #0009;
+          margin-bottom: 5px;
+        }
+      `}</style>
+    </div>
+  );
+};

@@ -153,7 +153,9 @@ const UtilBarDropdown = ({ id, parentIdx }: TUtilBarDropdown) => {
             slideTo={"up"}
             positionAbsolute={false}
           >
-            <UtilBar id={id} parentIdx={parentIdx}></UtilBar>
+            <div className="util-bar">
+              <UtilBar id={id} parentIdx={parentIdx}></UtilBar>
+            </div>
           </TransitionSlide>
         </div>
       </div>
@@ -169,6 +171,11 @@ const UtilBarDropdown = ({ id, parentIdx }: TUtilBarDropdown) => {
       </div>
       <style jsx>
         {`
+          .util-bar {
+            height: 42px;
+            padding: 0 8px;
+            border-bottom: 3px solid #000;
+          }
           .bg-hider {
             position: absolute;
             top: 1px;

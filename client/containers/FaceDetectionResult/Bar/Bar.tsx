@@ -1,12 +1,36 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import Stats from "../../Stats/Stats";
 import { BarSentinel, ClassifySentinelTop } from "../InfoResult/Table/Sentinel";
 import { selectName } from "../ImageResult/demographicsSlice";
 import CloseBtn from "./CloseBtn";
+import UtilBar from "../InfoResult/UtilBar/UtilBar";
+import { useMatchMedia } from "../../../hooks/useMatchMedia";
 
 const Bar = ({ id, idx }: { id: string; idx: number }) => {
   const imageName = useSelector(selectName({ id: idx }));
+
+  const [displayUtilBar, setDisplayUtilBar] = useState(true);
+  const mqlGroup = useMatchMedia();
+
+  useEffect(() => {
+    if (mqlGroup.current!.minWidth_1300) {
+      setDisplayUtilBar(true);
+    }
+
+    const onChange = (e: MediaQueryListEvent) => {
+      if (e.matches) {
+        setDisplayUtilBar(true);
+      } else {
+        setDisplayUtilBar(false);
+      }
+    };
+
+    mqlGroup.current!.minWidth_1300.addEventListener("change", onChange);
+
+    return () => {
+      mqlGroup.current!.minWidth_1300.removeEventListener("change", onChange);
+    };
+  }, []);
 
   return (
     <div className="bar">
@@ -16,12 +40,25 @@ const Bar = ({ id, idx }: { id: string; idx: number }) => {
         <div className="title-number"></div>
         <div className="title-name">{imageName}</div>
       </div>
-      <div className="stats">
-        <Stats id={idx}></Stats>
+      {displayUtilBar ? (
+        <div className="util-bar">
+          <UtilBar id={id} parentIdx={idx}></UtilBar>
+        </div>
+      ) : null}
+      <div className="close-btn">
+        <CloseBtn id={id} idx={idx}></CloseBtn>
       </div>
-      <CloseBtn id={id} idx={idx}></CloseBtn>
       <style jsx>
         {`
+          .close-btn {
+            flex-shrink: 0;
+          }
+          .util-bar {
+            height: 100%;
+            width: 600px;
+            margin-left: auto;
+            margin-right: 50px;
+          }
           .bar {
             position: relative;
             display: flex;

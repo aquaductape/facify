@@ -5,6 +5,7 @@ type TClassifyState = {
   parentIdx: number;
   open: boolean;
   type: "filter" | "sort";
+  location: "bar" | "viewport";
 };
 
 const initialState: TClassifyState = {
@@ -12,6 +13,7 @@ const initialState: TClassifyState = {
   parentIdx: 0,
   open: false,
   type: "filter",
+  location: "viewport",
 };
 
 const classifySlice = createSlice({
@@ -20,14 +22,7 @@ const classifySlice = createSlice({
   reducers: {
     setClassifyDisplay: (
       state,
-      action: PayloadAction<
-        Partial<{
-          id: string;
-          parentIdx: number;
-          open: boolean;
-          type: "filter" | "sort";
-        }>
-      >
+      action: PayloadAction<Partial<TClassifyState>>
     ) => {
       const { payload } = action;
 

@@ -7,7 +7,6 @@ import Seperator from "./Bar/Seperator";
 import Bar from "./Bar/Bar";
 import { reflow } from "../../utils/reflow";
 import { animationEnd } from "../UploadImageForm/animateUpload";
-import { nanoid } from "nanoid";
 
 type TResultProps = {
   id: string;
@@ -18,14 +17,13 @@ const Result = React.memo(({ id, idx }: TResultProps) => {
   const demographicNodeElRef = useRef<HTMLLIElement>(null);
 
   useEffect(() => {
-    // if (idx === 0) {
-    //   return;
-    // }
+    if (idx === 0) {
+      return;
+    }
 
     const demographicNodeEl = demographicNodeElRef.current!;
 
     demographicNodeEl.style.opacity = "1";
-    return;
 
     demographicNodeEl.style.transform = "translateY(-100%)";
     demographicNodeEl.style.position = "relative";

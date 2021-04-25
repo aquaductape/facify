@@ -1,8 +1,10 @@
 import { useSelector } from "react-redux";
+import { CSSTransition } from "react-transition-group";
 import Face from "../../../../components/svg/Face";
 import { RootState } from "../../../../store/rootReducer";
 import { selectDemographicParentChildIds } from "../../ImageResult/demographicsSlice";
 import ClassifyDropdownBtns from "../Classify/ClassifyDropdownBtns";
+import { RelativeSection } from "../Classify/Section/Section";
 
 type TUtilBarProps = {
   id: string;
@@ -53,6 +55,8 @@ const FaceIndicator = ({ id, parentIdx }: TUtilBarProps) => {
 };
 
 const UtilBar = ({ id, parentIdx }: TUtilBarProps) => {
+  const classify = useSelector((state: RootState) => state.classify);
+
   return (
     <div className="container">
       <div className="content">
@@ -63,15 +67,25 @@ const UtilBar = ({ id, parentIdx }: TUtilBarProps) => {
             parentIdx={parentIdx}
           ></ClassifyDropdownBtns>
         </div>
+        <CSSTransition
+          classNames="slide"
+          in={classify.open && classify.location === "bar"}
+          timeout={200}
+          unmountOnExit
+        >
+          <RelativeSection
+            id={classify.id}
+            parentIdx={classify.parentIdx}
+            type={classify.type}
+          ></RelativeSection>
+        </CSSTransition>
       </div>
       <style jsx>
         {`
           .container {
             background: #fff;
             color: #000;
-            border-bottom: 3px solid #000;
-            height: 42px;
-            padding: 0 8px;
+            height: 100%;
           }
 
           .content {
@@ -79,6 +93,7 @@ const UtilBar = ({ id, parentIdx }: TUtilBarProps) => {
             display: flex;
             height: 100%;
             align-items: center;
+            z-index: 5;
           }
 
           .classify-container {

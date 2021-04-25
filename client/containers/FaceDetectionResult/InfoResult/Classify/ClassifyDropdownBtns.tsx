@@ -2,6 +2,7 @@ import { Dispatch, MouseEventHandler, SetStateAction, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Filter from "../../../../components/svg/Filter";
 import Sort from "../../../../components/svg/Sort";
+import { useMatchMedia } from "../../../../hooks/useMatchMedia";
 import { RootState } from "../../../../store/rootReducer";
 import smoothScrollTo from "../../../../utils/smoothScrollTo";
 import { setClassifyDisplay } from "./classifySlice";
@@ -11,6 +12,7 @@ type TClassifyDropdownBtns = { id: string; parentIdx: number };
 const ClassifyDropdownBtns = ({ id, parentIdx }: TClassifyDropdownBtns) => {
   const dispatch = useDispatch();
   const classify = useSelector((state: RootState) => state.classify);
+  const mqlGroup = useMatchMedia();
 
   const onClickBtn: MouseEventHandler<HTMLButtonElement> = (e) => {
     const target = e.currentTarget as HTMLButtonElement;
@@ -18,8 +20,24 @@ const ClassifyDropdownBtns = ({ id, parentIdx }: TClassifyDropdownBtns) => {
     const imageSelection = `[data-id-image-result="${id}"]`;
     const imageEl = document.querySelector(imageSelection) as HTMLElement;
     const imageBCR = imageEl.getBoundingClientRect();
+    const location = mqlGroup.current?.minWidth_1300.matches
+      ? "bar"
+      : ("viewport" as "bar" | "viewport");
 
     const open = (classify.type !== type && classify.open) || !classify.open;
+
+    if (location === "bar") {
+      dispatch(
+        setClassifyDisplay({
+          id,
+          parentIdx,
+          open,
+          type,
+          location,
+        })
+      );
+      return;
+    }
 
     if (imageBCR.top < 60 && !classify.open) {
       const padding = 50; // to prevent slight nudge down, which will close dropdown
@@ -29,14 +47,22 @@ const ClassifyDropdownBtns = ({ id, parentIdx }: TClassifyDropdownBtns) => {
         destination,
         duration: 200,
         onEnd: () => {
-          dispatch(setClassifyDisplay({ id, parentIdx, open, type }));
+          dispatch(
+            setClassifyDisplay({
+              id,
+              parentIdx,
+              open,
+              type,
+              location,
+            })
+          );
         },
       });
 
       return;
     }
 
-    dispatch(setClassifyDisplay({ id, parentIdx, open, type }));
+    dispatch(setClassifyDisplay({ id, parentIdx, open, type, location }));
   };
 
   const isActive = (value: "filter" | "sort") => {

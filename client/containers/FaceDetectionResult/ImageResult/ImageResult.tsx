@@ -145,6 +145,7 @@ const ImageResult = ({ id, idx }: TImageResultProps) => {
             .container,
             img {
               max-height: ${CONSTANTS.imageHeightDesktop}px;
+              margin: 0;
             }
           }
         `}
