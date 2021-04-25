@@ -102,6 +102,7 @@ const SortSelector = ({
       : sortOnValues!.find((value) => value.type === sortValueType)!.active;
 
   const onChange = () => {
+    console.log("dispatch", { id });
     if (type === "sortAction") {
       dispatch(
         sortChildIds({

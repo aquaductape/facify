@@ -12,7 +12,12 @@ import {
   setSubmit,
   TURLItem,
 } from "../formSlice";
-import { setCurrentAddedImage, setCurrentImageStatus } from "../imageUrlSlice";
+import {
+  setCurrentImageStatus,
+  setImgQueue,
+  updateImgQueue,
+} from "../imageUrlSlice";
+import { TQueue } from "../Loader/Loader";
 import {
   addImageAndAnimate,
   getImageDimensions,
@@ -31,20 +36,18 @@ const FileInput = ({ setOpenLoader }: TFileInputProps) => {
   const mqlRef = useMatchMedia();
   const [fileItems, setFileItems] = useState<(TURLItem & { file: File })[]>([]);
 
-  const onFileUpload = async (item: { file: File } & TURLItem) => {
+  const onFileUpload = async (item: { file: File } & TURLItem, idx: number) => {
     dispatch(setCurrentImageStatus("EMPTY"));
 
-    dispatch(
-      setCurrentAddedImage({
-        set: {
-          id: item.id,
-          name: item.name,
-          error: item.error,
-          errorMsg: item.errorMsg,
-        },
-      })
-    );
+    const maxSizeMB = 3.5;
+    const kbRatio = 1_000_000;
+
+    if (item.file.size > maxSizeMB * kbRatio) {
+      dispatch(setCurrentImageStatus("COMPRESSING"));
+    }
     const { base64, file: newFile } = await convertFileToBase64(item.file);
+    dispatch(setCurrentImageStatus("SCANNING"));
+
     const result = await postClarifaiAPI({ base64 });
 
     if (
@@ -53,7 +56,12 @@ const FileInput = ({ setOpenLoader }: TFileInputProps) => {
     ) {
       const errorMsg = `Server Error. ${result.status.message}`;
       dispatch(setCurrentImageStatus("DONE"));
-      dispatch(setCurrentAddedImage({ updateError: errorMsg }));
+      dispatch(
+        updateImgQueue({
+          id: item.id,
+          props: { error: true, errorMsg, currentImgStatus: "DONE" },
+        })
+      );
       return;
     }
 
@@ -70,7 +78,7 @@ const FileInput = ({ setOpenLoader }: TFileInputProps) => {
       img,
       name: item.name,
       dispatch,
-      imageLoaded,
+      firstImage: !imageLoaded,
       mql,
     });
   };
@@ -99,23 +107,42 @@ const FileInput = ({ setOpenLoader }: TFileInputProps) => {
       const item = inputResult[i];
       item.file = files[i];
     }
-    setFileItems(inputResult);
 
     batch(() => {
       dispatch(addInputResult(JSON_Stringify_Parse(inputResult)));
       dispatch(setSubmit({ active: true, from: "file" }));
+      dispatch(
+        setImgQueue(
+          inputResult.map(
+            (item) =>
+              ({
+                id: item.id,
+                content: item.content,
+                error: item.error,
+                errorMsg: item.errorMsg,
+                name: item.name,
+                countdown: true,
+                countdownActive: false,
+                currentImgStatus: item.error ? "DONE" : "EMPTY",
+              } as TQueue)
+          )
+        )
+      );
     });
+    setFileItems(inputResult);
   };
 
   useEffect(() => {
-    console.log(formSubmit);
     if (!formSubmit.active || formSubmit.from !== "file") return;
+    console.log(formSubmit);
     dispatch(setSubmit({ active: false, from: null }));
+
     setOpenLoader(true);
 
     const run = async () => {
-      for (const item of fileItems) {
-        await onFileUpload(item);
+      for (let i = 0; i < fileItems.length; i++) {
+        const item = fileItems[i];
+        await onFileUpload(item, i);
       }
     };
 

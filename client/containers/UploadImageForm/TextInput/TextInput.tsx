@@ -1,5 +1,5 @@
 import React, { FormEvent, useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { batch, useDispatch, useSelector } from "react-redux";
 import { useMatchMedia } from "../../../hooks/useMatchMedia";
 import { RootState } from "../../../store/rootReducer";
 import store from "../../../store/store";
@@ -10,7 +10,12 @@ import { getBase64FromUrl } from "../../../utils/getBase64FromUrl";
 import { getImageNameFromUrl } from "../../../utils/getImageNameFromUrl";
 import { TDemographicNode } from "../../FaceDetectionResult/ImageResult/demographicsSlice";
 import { clearAllFormValues, setSubmit, TURLItem } from "../formSlice";
-import { setCurrentAddedImage, setCurrentImageStatus } from "../imageUrlSlice";
+import {
+  setCurrentImageStatus,
+  setImgQueue,
+  updateImgQueue,
+} from "../imageUrlSlice";
+import { TQueue } from "../Loader/Loader";
 import {
   getImageDimensions,
   postClarifaiAPI,
@@ -35,6 +40,7 @@ const SubmitBtn = ({
   isOpenRef,
   displayErrorRef,
 }: TSubmitBtnProps) => {
+  const dispatch = useDispatch();
   const urlItems = useSelector((state: RootState) => state.form.urlItems);
 
   const onSubmitClick = () => {
@@ -60,6 +66,8 @@ const SubmitBtn = ({
       }, 2000);
       return;
     }
+
+    // dispatch(setSubmit({ active: true, from: "text" }));
   };
   return (
     <button
@@ -121,29 +129,24 @@ const TextInput = React.memo(({ setOpenLoader }: TFormTextInput) => {
     (state: RootState) => state.imageUrl.imageLoaded
   );
   const formSubmit = useSelector((state: RootState) => state.form.submit);
-  const [error, setError] = useState(false);
   const isOpenRef = useRef(false);
   const displayErrorRef = useRef(false);
   const submitHoverRef = useRef(false);
 
   const mqlRef = useMatchMedia();
 
-  const onSubmitForm = async (urlItem: TURLItem) => {
+  const onSubmitForm = async (urlItem: TURLItem, idx: number) => {
     let urlContent = urlItem.content;
 
-    dispatch(setCurrentImageStatus("COMPRESSING"));
-    console.log("COMPRESSING", urlItem.name);
+    dispatch(setCurrentImageStatus("EMPTY"));
+    console.log("Empty", urlItem.name);
 
-    dispatch(
-      setCurrentAddedImage({
-        set: {
-          id: urlItem.id,
-          name: urlItem.name,
-          error: urlItem.error,
-          errorMsg: urlItem.errorMsg,
-        },
-      })
-    );
+    // dispatch(
+    //   updateImgQueue({
+    //     id: urlItem.id,
+    //
+    //   })
+    // );
 
     if (urlItem.error) {
       dispatch(setCurrentImageStatus("DONE"));
@@ -157,8 +160,13 @@ const TextInput = React.memo(({ setOpenLoader }: TFormTextInput) => {
 
     if (error) {
       console.log("base64", { error });
+      dispatch(
+        updateImgQueue({
+          id: urlItem.id,
+          props: { error: true, errorMsg: error, currentImgStatus: "DONE" },
+        })
+      );
       dispatch(setCurrentImageStatus("DONE"));
-      dispatch(setCurrentAddedImage({ updateError: error }));
       return;
     }
 
@@ -168,14 +176,12 @@ const TextInput = React.memo(({ setOpenLoader }: TFormTextInput) => {
 
     if (sizeMB != null && sizeMB > 3.5) {
       dispatch(setCurrentImageStatus("COMPRESSING"));
-      console.log("COMPRESSING", urlItem.name);
       const result = await convertFileToBase64(dataURLtoFile(base64));
       base64 = result.base64;
       urlContent = window.URL.createObjectURL(result.file);
     }
 
     dispatch(setCurrentImageStatus("SCANNING"));
-    console.log("SCANNING", urlItem.name);
 
     const result = await postClarifaiAPI({ base64 });
 
@@ -185,7 +191,12 @@ const TextInput = React.memo(({ setOpenLoader }: TFormTextInput) => {
     ) {
       const errorMsg = `Server Error. ${result.status.message}`;
       dispatch(setCurrentImageStatus("DONE"));
-      dispatch(setCurrentAddedImage({ updateError: errorMsg }));
+      dispatch(
+        updateImgQueue({
+          id: urlItem.id,
+          props: { error: true, errorMsg, currentImgStatus: "DONE" },
+        })
+      );
       return;
     }
 
@@ -200,7 +211,7 @@ const TextInput = React.memo(({ setOpenLoader }: TFormTextInput) => {
       img,
       name,
       dispatch,
-      imageLoaded,
+      firstImage: !imageLoaded && idx === 0,
       mql: mqlRef.current!,
     });
   };
@@ -227,17 +238,39 @@ const TextInput = React.memo(({ setOpenLoader }: TFormTextInput) => {
 
   useEffect(() => {
     if (!formSubmit.active || formSubmit.from !== "text") return;
-    dispatch(setSubmit({ active: false, from: null }));
-    dispatch(setCurrentImageStatus("EMPTY"));
-    setOpenLoader(true);
-    console.log("Submit!!!");
     const formInputResult = store.getState().form.inputResult;
+
+    batch(() => {
+      dispatch(setSubmit({ active: false, from: null }));
+      dispatch(setCurrentImageStatus("EMPTY"));
+      dispatch(
+        setImgQueue(
+          formInputResult.map(
+            (item) =>
+              ({
+                id: item.id,
+                content: item.content,
+                error: item.error,
+                errorMsg: item.errorMsg,
+                name: item.name,
+                countdown: true,
+                countdownActive: false,
+                currentImgStatus: item.error ? "DONE" : "EMPTY",
+              } as TQueue)
+          )
+        )
+      );
+    });
 
     const run = async () => {
       // const values = formInputResult.map(({ content }) => content);
+      await delayP(50);
+      setOpenLoader(true);
+      console.log("Submit!!!");
 
-      for (const item of formInputResult) {
-        await onSubmitForm(item);
+      for (let i = 0; i < formInputResult.length; i++) {
+        const item = formInputResult[i];
+        await onSubmitForm(item, i);
       }
     };
 

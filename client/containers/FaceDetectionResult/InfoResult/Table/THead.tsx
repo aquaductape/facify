@@ -83,7 +83,7 @@ const THChildEl = ({
           {idx === 0 ? (
             <span className="sticky-dynamic-btn" onClick={onClick}>
               <span className="bg-static">
-                <div className="bg-static-color"></div>
+                <div className="bg-static__color"></div>
                 <div className="bg-static__hider-gradient"></div>
               </span>
               <span className="bg-scrolling"></span>
@@ -365,8 +365,8 @@ const THead = ({ id, parentIdx, type }: THeadProps) => {
           .thead-container {
             display: grid;
             grid-template-columns: 120px 1fr 1fr 1fr;
+            grid-template-rows: 38px;
             border-top: 1px solid #d5d5d5;
-            height: 38px;
             min-width: 700px;
             font-weight: bold;
             text-align: left;

@@ -1,7 +1,7 @@
 import imageCompression from "browser-image-compression";
 
 const maxSizeMB = 3.5;
-const kbRatio = 1_048_576;
+const kbRatio = 1_000_000;
 export const convertFileToBase64 = async (file: File) => {
   if (file.size > maxSizeMB * kbRatio) {
     file = await imageCompression(file, { maxSizeMB, useWebWorker: true });

@@ -6,6 +6,9 @@ type TStartAnimate = {
 };
 export const startAnimate = ({ firstImage }: TStartAnimate) =>
   new Promise<boolean>((resolve) => {
+    if (!firstImage) return resolve(true);
+
+    console.log("startAimate", { firstImage });
     const landingEl = document.getElementById("landing")!;
     const mainEl = document.getElementById("main")!;
     const mainBgEl = mainEl.querySelector(".main-bg") as HTMLElement;
@@ -46,18 +49,20 @@ export const startAnimate = ({ firstImage }: TStartAnimate) =>
   });
 
 type TAnimationEnd = {
-  id: string;
+  id?: string;
 };
-export const animationEnd = ({ id }: TAnimationEnd) => {
+export const animationEnd = ({ id }: TAnimationEnd = {}) => {
   const mainEl = document.getElementById("main")!;
   const mainBgEl = mainEl.querySelector(".main-bg") as HTMLElement;
   const logo = document.getElementById("logo")!;
   const demographicEl = document.getElementById(`demographic-node-${id}`)!;
   const landingEl = document.getElementById("landing")!;
 
-  demographicEl.style.transform = "";
-  demographicEl.style.transition = "";
-  demographicEl.style.zIndex = "";
+  if (demographicEl) {
+    demographicEl.style.transform = "";
+    demographicEl.style.transition = "";
+    demographicEl.style.zIndex = "";
+  }
   landingEl.style.display = "none";
   landingEl.style.transform = "";
   landingEl.style.transition = "";
@@ -74,6 +79,8 @@ type TAnimateResult = {
   firstImage: boolean;
 };
 export const animateResult = ({ id, firstImage, mql }: TAnimateResult) => {
+  if (!firstImage) return;
+
   const run = () => {
     const demographicEl = document.getElementById(`demographic-node-${id}`)!;
     const landingEl = document.getElementById("landing")!;

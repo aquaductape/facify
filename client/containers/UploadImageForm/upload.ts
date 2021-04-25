@@ -24,7 +24,7 @@ export const addImageAndAnimate = async ({
   data,
   img,
   mql,
-  imageLoaded,
+  firstImage,
   dispatch,
 }: {
   id: string;
@@ -36,7 +36,7 @@ export const addImageAndAnimate = async ({
     naturalHeight: number;
     naturalWidth: number;
   };
-  imageLoaded: boolean;
+  firstImage: boolean;
   mql: TMqlGroup;
   dispatch: Dispatch<any>;
 }) => {
@@ -54,7 +54,7 @@ export const addImageAndAnimate = async ({
     });
   }
 
-  await startAnimate({ firstImage: !imageLoaded });
+  await startAnimate({ firstImage });
 
   batch(() => {
     dispatch(setUri(croppedUrl));
@@ -83,7 +83,7 @@ export const addImageAndAnimate = async ({
   animateResult({
     id,
     mql: mql.minWidth_1900_and_minHeight_850,
-    firstImage: !imageLoaded,
+    firstImage,
   });
 };
 

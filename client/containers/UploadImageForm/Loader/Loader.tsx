@@ -14,7 +14,7 @@ import { RootState } from "../../../store/rootReducer";
 import { JSON_Stringify_Parse } from "../../../utils/jsonStringifyParse";
 import { reflow } from "../../../utils/reflow";
 import { clearAllFormValues, TURLItem } from "../formSlice";
-import { TImgStatus } from "../imageUrlSlice";
+import { setImgQueue, TImgStatus, updateImgQueue } from "../imageUrlSlice";
 import DownloadMenu from "./DownloadMenu";
 import { TDownloadMenuItemHandler } from "./DownloadMenuItem";
 import {
@@ -34,12 +34,10 @@ export type TQueue = {
   errorMsg: string;
   countdown: boolean;
   countdownActive: boolean;
-  close: boolean;
 };
 
 const Loader = ({ setOpenLoader }: TLoaderProps) => {
   const dispatch = useDispatch();
-  const inputResult = useSelector((state: RootState) => state.form.inputResult);
   const countDownChecked = useSelector(
     (state: RootState) => state.menu.disableNotificationCountDown
   );
@@ -47,23 +45,13 @@ const Loader = ({ setOpenLoader }: TLoaderProps) => {
   const currentImgStatus = useSelector(
     (state: RootState) => state.imageUrl.currentImgStatus
   );
-  const currentAddedImg = useSelector(
-    (state: RootState) => state.imageUrl.currentAddedImg
-  );
 
-  // const [currentAddedImg, setCurrentAddedImg] = useState<{
-  //   id: string;
-  //   name: string;
-  //   errorMsg: string;
-  //   error: boolean;
-  // } | null>(null);
   // const [currentImgStatus, setCurrentImgStatus] = useState<TImgStatus>("EMPTY");
-  const [showTitle, setShowTitle] = useState(true);
-  const [downloadQueue, setDownloadQueue] = useState<TQueue[]>([]);
-  const [finishedQueue, setFinishedQueue] = useState<TQueue[]>([]);
+  const downloadQueue = useSelector(
+    (state: RootState) => state.imageUrl.imgQueue
+  );
   const [finishedQueueIdx, setFinishedQueueIdx] = useState(0);
   const [openMenu, setOpenMenu] = useState(false);
-  const downloadQueueIdxRef = useRef(0);
   const initRef = useRef(true);
   const downloadQueueRef = useRef<TQueue[]>(downloadQueue);
   const optionsMenuElRef = useRef<HTMLDivElement | null>(null);
@@ -95,7 +83,7 @@ const Loader = ({ setOpenLoader }: TLoaderProps) => {
   });
   const downloadMenuItemHandlerRef = useRef<TDownloadMenuItemHandler>({});
   downloadQueueRef.current = downloadQueue;
-  const isLast = finishedQueueIdx === inputResult.length - 1;
+  const isLast = finishedQueueIdx === downloadQueue.length - 1;
   const currentResult = downloadQueue[finishedQueueIdx]
     ? downloadQueue[finishedQueueIdx]
     : ({} as TQueue);
@@ -105,40 +93,14 @@ const Loader = ({ setOpenLoader }: TLoaderProps) => {
   // test
   //   useEffect(() => {
   //     const addItem = (idx: number, cb?: () => void) => {
-  //       const resultItem = inputResult[idx];
-  //       setCurrentAddedImg(() => {
-  //         const item = {
-  //           id: resultItem.id,
-  //           name: resultItem.name,
-  //           error: resultItem.error,
-  //           errorMsg: resultItem.errorMsg,
-  //         };
   //
-  //         return item;
-  //       });
+  //       if (idx === 1 || idx === 2) {
   //
-  //       if (resultItem.error) {
-  //         setCurrentImgStatus("DONE");
-  //
-  //         cb && cb();
+  //         setTimeout(() => {
+  //           cb && cb();
+  //         }, 0);
   //         return;
   //       }
-  //
-  //       //       if (idx === 1) {
-  //       //         setCurrentImgStatus("COMPRESSING");
-  //       //         setTimeout(() => {
-  //       //           setCurrentAddedImg((prev) => {
-  //       //             const copy = JSON_Stringify_Parse(prev)!;
-  //       //             copy.error = true;
-  //       //             copy.errorMsg = `Error 1003: Image doesn't exist`;
-  //       //             return copy;
-  //       //           });
-  //       //           setCurrentImgStatus("DONE");
-  //       //
-  //       //           cb && cb();
-  //       //         }, 8800);
-  //       //         return;
-  //       //       }
   //
   //       setTimeout(() => {
   //         setCurrentImgStatus("COMPRESSING");
@@ -146,11 +108,13 @@ const Loader = ({ setOpenLoader }: TLoaderProps) => {
   //           setCurrentImgStatus("SCANNING");
   //
   //           setTimeout(() => {
+  //             console.log("DONE");
+  //
   //             setCurrentImgStatus("DONE");
   //             cb && cb();
-  //           }, 800);
-  //         }, 0);
-  //       }, 100);
+  //           }, 3000);
+  //         }, 3000);
+  //       }, 0);
   //     };
   //
   //     addItem(0, () => {
@@ -207,11 +171,6 @@ const Loader = ({ setOpenLoader }: TLoaderProps) => {
     return capitalize(currentResult.currentImgStatus);
   };
 
-  // currentResult.currentImgStatus === "COMPRESSING" ||
-  // currentResult.currentImgStatus === "EMPTY"
-  //   ? "Reading"
-  //   : "Scanning";
-
   const closeLoader = () => {
     dispatch(clearAllFormValues());
     setOpenLoader(false);
@@ -252,7 +211,6 @@ const Loader = ({ setOpenLoader }: TLoaderProps) => {
 
   /** is needed when success queues are displayed back to back, since the css classes won't change, the countdown bar will never be reset */
   const refreshCountDownBarDisplay = () => {
-    debugger;
     const countDownActivity = countDownActivityRef.current!;
     if (!countDownActivity.enabled) {
       return;
@@ -284,7 +242,6 @@ const Loader = ({ setOpenLoader }: TLoaderProps) => {
   }: { clearCurrentTimout?: boolean; enableCountDown?: boolean } = {}) => {
     const countDownActivity = countDownActivityRef.current;
     const downloadQueue = downloadQueueRef.current;
-    const canGoNext = finishedQueueIdx < downloadQueue.length - 1;
     const current = downloadQueue[finishedQueueIdx];
 
     const startCountDown = ({ nextImgId }: { nextImgId?: boolean } = {}) => {
@@ -310,8 +267,7 @@ const Loader = ({ setOpenLoader }: TLoaderProps) => {
     };
 
     const onTimeout = () => {
-      console.log("timeout!!!!");
-      debugger;
+      // console.log("timeout!!!!");
       setFinishedQueueIdx((prev) => prev + 1);
 
       updateDownloadMenuItemDisplayCountDown(
@@ -341,11 +297,12 @@ const Loader = ({ setOpenLoader }: TLoaderProps) => {
     if (isLast && !countDownActivity.active) {
       console.log("isLast");
       startCountDown();
+      closeLoaderWhenDone();
       return;
     }
 
     // console.log({ finishedQueueIdx });
-    if (!canGoNext || !current) return;
+    if (!current || current.currentImgStatus !== "DONE") return;
     if (countDownActivity.active) return;
 
     startCountDown();
@@ -358,95 +315,31 @@ const Loader = ({ setOpenLoader }: TLoaderProps) => {
   goToNextRef.current = goToNext;
 
   useEffect(() => {
-    if (!currentAddedImg) return;
-    const foundIdx = downloadQueue.findIndex(
-      (item) => item.id === currentAddedImg.id
-    );
+    const foundIdx = downloadQueueRef.current.findIndex(
+      (item) => item.currentImgStatus !== "DONE"
+    )!;
 
-    const newItem: TQueue = {
-      id: currentAddedImg.id,
-      name: currentAddedImg.name,
-      error: currentAddedImg.error,
-      errorMsg: currentAddedImg.errorMsg,
-      close: false,
-      countdown: true,
-      countdownActive: false,
-      currentImgStatus: currentAddedImg.error ? "DONE" : "EMPTY",
-    };
+    let countdownActive = false;
 
-    const copy = JSON_Stringify_Parse(downloadQueue);
-
-    if (foundIdx !== -1) {
-      // updateDownloadMenuItem(
-      //   { error: currentAddedImg.error, errorMsg: currentAddedImg.errorMsg },
-      //   foundIdx
-      // );
-      updateDownloadMenuItemQueue(
-        {
-          error: currentAddedImg.error,
-          errorMsg: currentAddedImg.errorMsg,
-        },
-        { downloadMenuItemHandlerRef, idx: foundIdx }
-      );
-
-      copy[foundIdx].error = currentAddedImg.error;
-      copy[foundIdx].errorMsg = currentAddedImg.errorMsg;
-    } else {
-      updateDownloadMenuItemQueue(newItem, {
-        downloadMenuItemHandlerRef,
-        idx: downloadQueueIdxRef.current,
-      });
+    if (foundIdx === -1) {
+      return;
     }
-
-    setDownloadQueue(() => {
-      if (foundIdx !== -1) {
-        return copy;
-      }
-
-      copy.push(newItem);
-
-      downloadQueueIdxRef.current += 1;
-
-      return copy;
-    });
-  }, [currentAddedImg]);
-
-  useEffect(() => {
-    if (!currentAddedImg) return;
-    const foundIdx = downloadQueue.findIndex(
-      (item) => item.id === currentAddedImg.id
-    );
-
-    if (foundIdx === -1) return;
 
     updateDownloadMenuItemQueue(
       { currentImgStatus },
       { downloadMenuItemHandlerRef, idx: foundIdx }
     );
 
-    setDownloadQueue((prev) => {
-      const copy = JSON_Stringify_Parse(prev);
-
-      if (currentImgStatus === "DONE") {
-        copy[foundIdx].countdownActive = true;
-      }
-
-      copy[foundIdx].currentImgStatus = currentImgStatus;
-      return copy;
-    });
-
     if (currentImgStatus === "DONE") {
-      goToNext();
+      countdownActive = true;
     }
 
-    // console.log("foo", finishedQueueIdx);
-
-    // setFinishedQueue((prev) => {
-    //   const copy = JSON_Stringify_Parse(prev);
-    //   copy.push(downloadQueue[downloadQueue.length - 1]);
-    //   return copy;
-    // });
-    // push to finishedQueue
+    dispatch(
+      updateImgQueue({
+        id: downloadQueue[foundIdx].id,
+        props: { countdownActive, currentImgStatus },
+      })
+    );
   }, [currentImgStatus]);
 
   useEffect(() => {
@@ -455,22 +348,34 @@ const Loader = ({ setOpenLoader }: TLoaderProps) => {
       return;
     }
     // downloadQueue
-    debugger;
     countDownActivityRef.current.active = false;
     goToNext();
   }, [finishedQueueIdx]);
 
-  useEffect(() => {
-    if (isLast && currentImgStatus === "DONE") {
-      console.log("DOONE");
-      closeLoaderWhenDone();
-    }
-  }, [finishedQueueIdx, currentImgStatus]);
+  // useEffect(() => {
+  //   if (isLast && currentImgStatus === "DONE" && downloadQueue.length !== 1) {
+  //     console.log("DOONE");
+  //     closeLoaderWhenDone();
+  //   }
+  // }, [finishedQueueIdx, currentImgStatus]);
 
   useEffect(() => {
-    if (!downloadQueue.length) return;
+    if (initRef.current) {
+      initRef.current = false;
+      return;
+    }
+
+    const currentItem = downloadQueueRef.current[finishedQueueIdx];
+
+    if (!currentItem || currentItem.currentImgStatus !== "DONE") {
+      return;
+    }
+
+    if (countDownActivityRef.current.active) return;
+    console.log("go next");
+
     goToNext();
-  }, [downloadQueue.length]);
+  }, [finishedQueueIdx, downloadQueue]);
 
   return (
     <div className="container">
@@ -537,7 +442,7 @@ const Loader = ({ setOpenLoader }: TLoaderProps) => {
             </div>
 
             <div className="counter">
-              {finishedQueueIdx + 1} / {inputResult.length}
+              {finishedQueueIdx + 1} / {downloadQueue.length}
             </div>
             <div ref={countDownBarElRef} className="countdown-bar"></div>
           </div>

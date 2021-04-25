@@ -209,11 +209,10 @@ const UtilBarDropdown = ({ id, parentIdx }: TUtilBarDropdown) => {
 
           .btn-options {
             position: absolute;
-            top: 0;
+            top: 1px;
             right: 0;
             width: 25px;
             height: 38px;
-            border-top: 1px solid #d5d5d5;
             padding: 8px 0px;
             background: #fff;
             color: #000;

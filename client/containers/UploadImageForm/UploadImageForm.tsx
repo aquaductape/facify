@@ -3,10 +3,29 @@ import { CSSTransition } from "react-transition-group";
 import TextInput from "./TextInput/TextInput";
 import Loader from "./Loader/Loader";
 import FileInput from "./FileInput/FileInput";
+import { nanoid } from "nanoid";
+import { imageUri, imageUri3, imgUri2 } from "../../dummyData/imageUri";
+import {
+  demographicResult3,
+  demographicsResult,
+  demographResult2,
+} from "../../dummyData/demographicsResult";
+import { JSON_Stringify_Parse } from "../../utils/jsonStringifyParse";
+import dataURLtoFile from "../../utils/dataURLtoFile";
+import {
+  addDemographicsParentAndChildren,
+  TDemographicNode,
+} from "../FaceDetectionResult/ImageResult/demographicsSlice";
+import createCroppedImgUrl from "../FaceDetectionResult/BoundingCroppedImage/createCroppedImgUrl";
+import { batch, useDispatch } from "react-redux";
+import { setImageLoaded, setImageStatus } from "./imageUrlSlice";
+import { addImage } from "../FaceDetectionResult/InfoResult/Table/imageHeightSlice";
+import { animationEnd } from "./animateUpload";
 
 const UploadImageForm = () => {
   const [openLoader, setOpenLoader] = useState(false);
   const [hideFormGroup, setHideFormGroup] = useState(false);
+  const dispatch = useDispatch();
 
   //
 
@@ -17,15 +36,15 @@ const UploadImageForm = () => {
   //       const items = [
   //         {
   //           _id: nanoid(),
-  //           imageUri: imgUri2,
-  //           data: JSON_Stringify_Parse(demographResult2),
-  //           name: "da-feasters",
-  //         },
-  //         {
-  //           _id: nanoid(),
   //           imageUri: imageUri3,
   //           data: demographicResult3,
   //           name: "2021768",
+  //         },
+  //         {
+  //           _id: nanoid(),
+  //           imageUri: imgUri2,
+  //           data: JSON_Stringify_Parse(demographResult2),
+  //           name: "da-feasters",
   //         },
   //         {
   //           _id: nanoid(),
@@ -33,17 +52,17 @@ const UploadImageForm = () => {
   //           data: demographicsResult,
   //           name: "GettyImages-1147443912",
   //         },
-  //         {
-  //           _id: nanoid(),
-  //           imageUri: imgUri2,
-  //           data: {
-  //             data: JSON_Stringify_Parse(demographResult2).data.map((item) => ({
-  //               ...item,
-  //               id: item.id + "2",
-  //             })),
-  //           },
-  //           name: "da-feasters",
-  //         },
+  //         // {
+  //         //   _id: nanoid(),
+  //         //   imageUri: imgUri2,
+  //         //   data: {
+  //         //     data: JSON_Stringify_Parse(demographResult2).data.map((item) => ({
+  //         //       ...item,
+  //         //       id: item.id + "2",
+  //         //     })),
+  //         //   },
+  //         //   name: "da-feasters",
+  //         // },
   //       ];
   //
   //       for (const { _id, data, imageUri, name } of items) {
@@ -100,6 +119,8 @@ const UploadImageForm = () => {
   //           );
   //         });
   //       }
+  //
+  //       animationEnd();
   //     };
   //
   //     setTimeout(() => {

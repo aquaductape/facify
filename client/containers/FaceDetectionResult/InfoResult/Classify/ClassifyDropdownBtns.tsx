@@ -36,7 +36,7 @@ const ClassifyDropdownBtns = ({ id, parentIdx }: TClassifyDropdownBtns) => {
       return;
     }
 
-    dispatch(setClassifyDisplay({ id, open, type }));
+    dispatch(setClassifyDisplay({ id, parentIdx, open, type }));
   };
 
   const isActive = (value: "filter" | "sort") => {

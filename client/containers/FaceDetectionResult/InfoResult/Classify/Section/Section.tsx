@@ -103,8 +103,12 @@ const Section = ({ id, parentIdx, type }: TSectionProps) => {
         // if(!scrollEventActiveRef && el.dataset.idClassifySentinelBottom) {
         //   sentinelVisible.bottom = isVisible;
         // }
-
-        console.log({ isVisible });
+        console.log(
+          entry.target,
+          scrollEventActive.type,
+          el.dataset.idClassifySentinelBottom,
+          { isVisible }
+        );
 
         if (
           (scrollEventActive.active &&
@@ -125,7 +129,11 @@ const Section = ({ id, parentIdx, type }: TSectionProps) => {
           return;
         }
 
-        if (isVisible && el.dataset.idClassifySentinelTop) {
+        if (
+          isVisible &&
+          el.dataset.idClassifySentinelTop &&
+          entry.boundingClientRect.top < window.innerHeight * 0.5
+        ) {
           scrollEventActive.active = true;
           scrollEventActive.type = "top";
           position.scrollY = window.scrollY;
@@ -133,11 +141,16 @@ const Section = ({ id, parentIdx, type }: TSectionProps) => {
           position.top = getTheadStickyTopPosition();
 
           setContainerTopPosition();
+          console.log("add scroll from top");
           window.addEventListener("scroll", onScrollRef.current!);
           return;
         }
 
-        if (!isVisible && el.dataset.idClassifySentinelBottom) {
+        if (
+          !isVisible &&
+          el.dataset.idClassifySentinelBottom &&
+          entry.boundingClientRect.top < window.innerHeight * 0.5
+        ) {
           scrollEventActive.active = true;
           scrollEventActive.type = "bottom";
           position.scrollY = window.scrollY;
@@ -145,6 +158,7 @@ const Section = ({ id, parentIdx, type }: TSectionProps) => {
           position.top = getTheadStickyTopPosition();
 
           setContainerTopPosition();
+          console.log("add scroll from bottom");
           window.addEventListener("scroll", onScrollRef.current!);
           return;
         }
