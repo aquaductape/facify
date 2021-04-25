@@ -9,11 +9,11 @@ import { useMatchMedia } from "../../../hooks/useMatchMedia";
 const Bar = ({ id, idx }: { id: string; idx: number }) => {
   const imageName = useSelector(selectName({ id: idx }));
 
-  const [displayUtilBar, setDisplayUtilBar] = useState(true);
+  const [displayUtilBar, setDisplayUtilBar] = useState(false);
   const mqlGroup = useMatchMedia();
 
   useEffect(() => {
-    if (mqlGroup.current!.minWidth_1300) {
+    if (mqlGroup.current!.minWidth_1300.matches) {
       setDisplayUtilBar(true);
     }
 

@@ -21,7 +21,7 @@ const InfoResult = ({ id, idx }: TInforResultProps) => {
     // const itemsLength = store.getState().demographics.demographicNodes
     //
 
-    if (mqlGroup.current!.minWidth_1300) {
+    if (mqlGroup.current!.minWidth_1300.matches) {
       setDisplayUtilBar(false);
     }
 

@@ -175,7 +175,9 @@ const UtilBarDropdown = ({ id, parentIdx }: TUtilBarDropdown) => {
             height: 42px;
             padding: 0 8px;
             border-bottom: 3px solid #000;
+            background: #fff;
           }
+
           .bg-hider {
             position: absolute;
             top: 1px;

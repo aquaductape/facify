@@ -21,6 +21,7 @@ const Result = React.memo(({ id, idx }: TResultProps) => {
       return;
     }
 
+    const mainEl = document.getElementById("main")!;
     const demographicNodeEl = demographicNodeElRef.current!;
 
     demographicNodeEl.style.opacity = "1";
@@ -28,6 +29,7 @@ const Result = React.memo(({ id, idx }: TResultProps) => {
     demographicNodeEl.style.transform = "translateY(-100%)";
     demographicNodeEl.style.position = "relative";
     demographicNodeEl.style.zIndex = "-1";
+    mainEl.style.clipPath = "polygon(0% 100%, 0% 0%, 100% 0%, 100% 100%)";
     reflow();
     demographicNodeEl.style.opacity = "1";
     demographicNodeEl.style.transition = "500ms transform";
