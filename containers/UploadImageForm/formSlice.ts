@@ -27,44 +27,7 @@ const initialState: TFormState = {
     active: false,
     from: null,
   },
-  inputResult: [
-    {
-      id: nanoid(),
-      content: "",
-      error: false,
-      name:
-        "post-malon-superlongsuperlongsuperlongsuperlongsuperlongsuperlong.jpg",
-      errorMsg: "BAD",
-    },
-    {
-      id: nanoid(),
-      content: "",
-      error: false,
-      name: "aubrey-superlongsuperlongsuperlongsuperlongsuperlongsuperlong.jpg",
-      errorMsg: "",
-    },
-    {
-      id: nanoid(),
-      content: "",
-      error: false,
-      name: "elon-superlongsuperlongsuperlongsuperlongsuperlongsuperlong.gif",
-      errorMsg: "",
-    },
-    {
-      id: nanoid(),
-      content: "",
-      error: false,
-      name: "post-malon",
-      errorMsg: "",
-    },
-    {
-      id: nanoid(),
-      content: "",
-      error: false,
-      errorMsg: "",
-      name: "aubrey",
-    },
-  ],
+  inputResult: [],
   urlItems: [
     // { id: nanoid(), content: "https://i.imgur.com/nt0RgAH.jpg", error: false },
     // {

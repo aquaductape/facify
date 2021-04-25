@@ -279,13 +279,9 @@ const THead = ({ id, parentIdx, type }: THeadProps) => {
       tableScrollEl.scrollLeft = theadStickyEl.scrollLeft;
     };
 
-    // Why I chose wheel instead of scroll event
-    // When table overflow is scrolled, it also scrolls this container, this would
-    // fire this container's scroll event which is unneccessary.
-    // Will cause reseting parent's scrollLeft back to 0 bug, when thead sticky el is transition in and out of states. See `forceRestoreScrollPosition()` for more details of this bug.
-    theadStickyEl.addEventListener("wheel", onScroll);
+    theadStickyEl.addEventListener("scroll", onScroll);
     return () => {
-      theadStickyEl.removeEventListener("wheel", onScroll);
+      theadStickyEl.addEventListener("scroll", onScroll);
     };
   }, []);
 
