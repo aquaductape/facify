@@ -78,7 +78,7 @@ const FileInput = ({ setOpenLoader }: TFileInputProps) => {
       img,
       name: item.name,
       dispatch,
-      firstImage: !imageLoaded,
+      firstImage: !imageLoaded && idx === 0,
       mql,
     });
   };

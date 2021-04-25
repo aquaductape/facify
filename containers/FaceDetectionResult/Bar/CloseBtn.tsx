@@ -10,6 +10,7 @@ import { reflow } from "../../../utils/reflow";
 import { theadObserver } from "../InfoResult/Table/useCreateObserver";
 import { useMatchMedia } from "../../../hooks/useMatchMedia";
 import { RootState } from "../../../store/rootReducer";
+import { setImageLoaded } from "../../UploadImageForm/imageUrlSlice";
 
 const useBtnRemoveHover = ({
   id,
@@ -254,6 +255,9 @@ const CloseBtn = ({ id, idx }: CloseBtnProps) => {
     theadObserver.reconnect();
 
     batch(() => {
+      if (isLastNode) {
+        dispatch(setImageLoaded(false));
+      }
       dispatch(removeParentAndNodeChildren({ id: idx }));
       dispatch(removeImageHeight({ id }));
       dispatch(setTriggerRefresh(Date.now()));
