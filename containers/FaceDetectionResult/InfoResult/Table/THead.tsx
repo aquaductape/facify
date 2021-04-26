@@ -302,10 +302,10 @@ const THead = ({ id, parentIdx, type }: THeadProps) => {
     };
 
     theadStickyEl.addEventListener("touchstart", onTouchStart);
-    // theadStickyEl.addEventListener("wheel", onWheel);
+    theadStickyEl.addEventListener("wheel", onWheel);
     return () => {
       theadStickyEl.removeEventListener("touchstart", onTouchStart);
-      // theadStickyEl.removeEventListener("wheel", onWheel);
+      theadStickyEl.removeEventListener("wheel", onWheel);
     };
   }, []);
 
