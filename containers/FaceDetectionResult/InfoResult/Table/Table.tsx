@@ -251,6 +251,7 @@ const Table = ({ id, idx }: { id: string; idx: number }) => {
           .table-scroll-container {
             overflow-x: auto;
             overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
           }
 
           .table-container-inner {
