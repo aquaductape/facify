@@ -334,12 +334,12 @@ const Input = ({
         className={`${isOpenRef.current ? "active" : ""} ${
           displayErrorRef.current ? "submitError" : ""
         }`}
-        type="url"
+        type="text"
         placeholder={"Past URL ..."}
       />
       <style jsx>
         {`
-          input[type="url"] {
+          input[type="text"] {
             -webkit-appearance: none;
             position: relative;
             top: calc(-100% + 5px);
