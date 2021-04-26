@@ -73,13 +73,16 @@
 
 .face-btn-bg {
   opacity: 0;
-}
-
-.face-btn:hover .face-btn-bg {
-  opacity: 1;
+  transform: scaleY(1.8) scaleX(1.2);
+  transform-origin: center;
+  transform-box: fill-box;
 }
 
 @media not all and (pointer: coarse) {
+  .face-btn:hover .face-btn-bg {
+    opacity: 1;
+  }
+
   .fake-url-bar:hover .fake-url-bar-shadow {
     opacity: 1;
   }
@@ -120,6 +123,12 @@
       opacity: 1;
       transform: scaleY(1.5) scaleX(1.05);
     }
+  }
+}
+
+@media (min-width: 600px) {
+  .face-btn-bg {
+    transform: none;
   }
 }
 
