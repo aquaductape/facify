@@ -10,7 +10,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { querySelector } from "../../../../utils/querySelector";
 import { TConcept } from "../../../../ts";
-import { FireFox } from "../../../../lib/onFocusOut/browserInfo";
+import { FireFox, IOS } from "../../../../lib/onFocusOut/browserInfo";
 import THead from "./THead";
 import { RootState } from "../../../../store/rootReducer";
 import { createSelector } from "reselect";
@@ -196,23 +196,55 @@ const Table = ({ id, idx }: { id: string; idx: number }) => {
 
     run();
 
-    //     const onScroll = () => {
-    //       const scrollLeft = tableContainerEl.scrollLeft;
-    //
-    //       if (!FireFox) {
-    //         theadStickyEl!.setAttribute("scroll-left", scrollLeft.toString());
-    //       }
-    //
-    //       theadStickyEl!.scrollLeft = scrollLeft;
-    //       if (scrollLeft > 50) return;
-    //       theadStaticBgScrollingEl!.style.transform = `translate(-${scrollLeft}px)`;
-    //       theadStickyBgScrollingEl!.style.transform = `translate(-${scrollLeft}px)`;
-    //     };
-    //
-    //     tableContainerEl.addEventListener("scroll", onScroll);
+    const onTableScrolling = (position: number) => {
+      if (!FireFox) {
+        theadStickyEl!.setAttribute("scroll-left", position.toString());
+      }
+
+      theadStickyEl!.scrollLeft = position;
+      if (position > 50) return;
+      theadStaticBgScrollingEl!.style.transform = `translate(-${position}px)`;
+      theadStickyBgScrollingEl!.style.transform = `translate(-${position}px)`;
+    };
+
+    const onScroll = () => {
+      const scrollLeft = tableContainerEl.scrollLeft;
+
+      onTableScrolling(scrollLeft);
+    };
+
+    const onTouchStart = (e: TouchEvent) => {
+      const startClientX =
+        e.targetTouches[0].clientX + tableContainerEl.scrollLeft;
+      const theadOffsetWidth = tableContainerEl.offsetWidth;
+
+      const onTouchMove = (e: TouchEvent) => {
+        e.preventDefault();
+        const diff = startClientX - e.changedTouches[0].clientX;
+
+        if (diff < 0 || diff > theadOffsetWidth) return;
+
+        onTableScrolling(diff);
+      };
+
+      const onTouchEnd = () => {
+        tableContainerEl.removeEventListener("touchmove", onTouchMove);
+        tableContainerEl.removeEventListener("touchend", onTouchEnd);
+      };
+
+      tableContainerEl.addEventListener("touchmove", onTouchMove);
+      tableContainerEl.addEventListener("touchend", onTouchEnd);
+    };
+
+    if (IOS) {
+      tableContainerEl.addEventListener("touchstart", onTouchStart);
+    } else {
+      tableContainerEl.addEventListener("scroll", onScroll);
+    }
 
     return () => {
-      // tableContainerEl.removeEventListener("scroll", onScroll);
+      tableContainerEl.removeEventListener("scroll", onScroll);
+      tableContainerEl.removeEventListener("touchstart", onTouchStart);
     };
   }, []);
 
