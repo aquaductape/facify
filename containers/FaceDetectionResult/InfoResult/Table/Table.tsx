@@ -197,7 +197,6 @@ const Table = ({ id, idx }: { id: string; idx: number }) => {
     run();
 
     const onTableScrolling = (position: number) => {
-      console.log("fire", position);
       if (!FireFox) {
         theadStickyEl!.setAttribute("scroll-left", position.toString());
       }
@@ -238,14 +237,14 @@ const Table = ({ id, idx }: { id: string; idx: number }) => {
       tableContainerEl.addEventListener("touchend", onTouchEnd);
     };
 
-    // if (IOS) {
-    tableContainerEl.addEventListener("touchstart", onTouchStart);
-    // } else {
-    // tableContainerEl.addEventListener("scroll", onScroll);
-    // }
+    if (IOS) {
+      tableContainerEl.addEventListener("touchstart", onTouchStart);
+    } else {
+      tableContainerEl.addEventListener("scroll", onScroll);
+    }
 
     return () => {
-      // tableContainerEl.removeEventListener("scroll", onScroll);
+      tableContainerEl.removeEventListener("scroll", onScroll);
       tableContainerEl.removeEventListener("touchstart", onTouchStart);
     };
   }, []);
