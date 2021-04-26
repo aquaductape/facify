@@ -196,23 +196,23 @@ const Table = ({ id, idx }: { id: string; idx: number }) => {
 
     run();
 
-    const onScroll = () => {
-      const scrollLeft = tableContainerEl.scrollLeft;
-
-      if (!FireFox) {
-        theadStickyEl!.setAttribute("scroll-left", scrollLeft.toString());
-      }
-
-      theadStickyEl!.scrollLeft = scrollLeft;
-      if (scrollLeft > 50) return;
-      theadStaticBgScrollingEl!.style.transform = `translate(-${scrollLeft}px)`;
-      theadStickyBgScrollingEl!.style.transform = `translate(-${scrollLeft}px)`;
-    };
-
-    tableContainerEl.addEventListener("scroll", onScroll);
+    //     const onScroll = () => {
+    //       const scrollLeft = tableContainerEl.scrollLeft;
+    //
+    //       if (!FireFox) {
+    //         theadStickyEl!.setAttribute("scroll-left", scrollLeft.toString());
+    //       }
+    //
+    //       theadStickyEl!.scrollLeft = scrollLeft;
+    //       if (scrollLeft > 50) return;
+    //       theadStaticBgScrollingEl!.style.transform = `translate(-${scrollLeft}px)`;
+    //       theadStickyBgScrollingEl!.style.transform = `translate(-${scrollLeft}px)`;
+    //     };
+    //
+    //     tableContainerEl.addEventListener("scroll", onScroll);
 
     return () => {
-      tableContainerEl.removeEventListener("scroll", onScroll);
+      // tableContainerEl.removeEventListener("scroll", onScroll);
     };
   }, []);
 
