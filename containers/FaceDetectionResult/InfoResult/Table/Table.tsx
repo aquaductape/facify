@@ -220,7 +220,6 @@ const Table = ({ id, idx }: { id: string; idx: number }) => {
       const theadOffsetWidth = tableContainerEl.offsetWidth;
 
       const onTouchMove = (e: TouchEvent) => {
-        // e.preventDefault();
         const diff = startClientX - e.changedTouches[0].clientX;
 
         if (diff < 0 || diff > theadOffsetWidth) return;
@@ -237,11 +236,18 @@ const Table = ({ id, idx }: { id: string; idx: number }) => {
       tableContainerEl.addEventListener("touchend", onTouchEnd);
     };
 
-    tableContainerEl.addEventListener("touchstart", onTouchStart);
+    if (IOS) {
+      // iOS scroll is almost in locked like state, it barely moves (not sure why), touch events solves this
+      tableContainerEl.addEventListener("touchstart", onTouchStart);
+    }
+
     tableContainerEl.addEventListener("scroll", onScroll);
 
     return () => {
-      tableContainerEl.removeEventListener("scroll", onScroll);
+      if (IOS) {
+        tableContainerEl.removeEventListener("scroll", onScroll);
+      }
+
       tableContainerEl.removeEventListener("touchstart", onTouchStart);
     };
   }, []);
