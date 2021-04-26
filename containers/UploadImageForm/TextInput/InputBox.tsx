@@ -51,7 +51,6 @@ const Input = ({ submitHoverRef, isOpenRef, displayErrorRef }: InputProps) => {
       <style jsx>
         {`
           .container {
-            flex-grow: 1;
           }
 
           .shadow {
