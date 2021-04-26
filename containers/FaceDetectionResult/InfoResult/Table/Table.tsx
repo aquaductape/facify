@@ -237,11 +237,8 @@ const Table = ({ id, idx }: { id: string; idx: number }) => {
       tableContainerEl.addEventListener("touchend", onTouchEnd);
     };
 
-    if (IOS) {
-      tableContainerEl.addEventListener("touchstart", onTouchStart);
-    } else {
-      tableContainerEl.addEventListener("scroll", onScroll);
-    }
+    tableContainerEl.addEventListener("touchstart", onTouchStart);
+    tableContainerEl.addEventListener("scroll", onScroll);
 
     return () => {
       tableContainerEl.removeEventListener("scroll", onScroll);

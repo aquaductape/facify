@@ -45,13 +45,15 @@ const Seperator = ({ id }: { id: string }) => {
               0deg,
               var(--blue-3) -8%,
               var(--blue-2) 15%,
-              rgba(0, 0, 0, 0) 48%
+              red 48%
             );
           }
+
           .dark.active {
             opacity: 1;
             transition: opacity 250ms;
           }
+
           .light.active {
             opacity: 0;
             transition: opacity 250ms;
