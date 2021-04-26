@@ -1,6 +1,7 @@
 import React from "react";
 
 const Seperator = ({ id }: { id: string }) => {
+  // https://stackoverflow.com/questions/38391457/linear-gradient-to-transparent-bug-in-latest-safari
   return (
     <div className="seperator">
       <div className="gradient light"></div>
