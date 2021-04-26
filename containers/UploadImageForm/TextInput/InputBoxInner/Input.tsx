@@ -341,9 +341,6 @@ const Input = ({
         {`
           input[type="url"] {
             -webkit-appearance: none;
-          }
-
-          input {
             position: relative;
             top: calc(-100% + 5px);
             left: 0;
