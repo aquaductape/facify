@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { useMatchMedia } from "../../../../hooks/useMatchMedia";
-import { FireFox } from "../../../../lib/onFocusOut/browserInfo";
+import { FireFox, IOS } from "../../../../lib/onFocusOut/browserInfo";
 import { RootState } from "../../../../store/rootReducer";
 import { hasAttributeValue } from "../../../../utils/hasAttributeValue";
 import { parseConceptValue } from "../../../../utils/parseConcept";
@@ -241,7 +241,7 @@ const BarSentinel = ({ id }: { id: string }) => {
       ? "translateY(0%)"
       : "translateY(-125%)";
 
-    if (!FireFox) {
+    if (!FireFox || IOS) {
       forceRestoreScrollPosition();
     }
   };
