@@ -1,7 +1,6 @@
 import React from "react";
 
 const Seperator = ({ id }: { id: string }) => {
-  // https://stackoverflow.com/questions/38391457/linear-gradient-to-transparent-bug-in-latest-safari
   return (
     <div className="seperator">
       <div className="gradient light"></div>
@@ -41,6 +40,12 @@ const Seperator = ({ id }: { id: string }) => {
           }
 
           .light {
+             {
+              /* Making linear-gradient transparent stop value work in Safari: When using transparent stop value in linear gradient make sure it's a rgba value based on previous stop solid color
+              
+               https://stackoverflow.com/a/56548711/8234457
+               */
+            }
             opacity: 1;
             background: linear-gradient(
               0deg,

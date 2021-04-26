@@ -53,10 +53,6 @@ const Input = ({ submitHoverRef, isOpenRef, displayErrorRef }: InputProps) => {
           .container {
             width: 100%;
             height: 100%;
-             {
-              /* fixes overflow bug in Safari, happens after previously opened inputBox is closed */
-            }
-            max-width: 35vw;
           }
 
           .shadow {
@@ -83,6 +79,9 @@ const Input = ({ submitHoverRef, isOpenRef, displayErrorRef }: InputProps) => {
           }
 
           .content {
+             {
+              /* fixes overflow bug in Safari, happens after previously opened inputBox is closed, which inputBox still has expanded width value */
+            }
             max-width: 35vw;
           }
 
