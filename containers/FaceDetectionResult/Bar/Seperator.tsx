@@ -46,7 +46,7 @@ const Seperator = ({ id }: { id: string }) => {
               0deg,
               var(--blue-3) -8%,
               var(--blue-2) 15%,
-              rgba(185 195 232, 0) 48%
+              rgba(185, 195, 232, 0) 48%
             );
           }
 
