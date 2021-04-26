@@ -96,11 +96,6 @@ const SubmitBtn = ({
             z-index: 15;
           }
 
-          .detect-button:hover {
-            color: #ffffff;
-            background: #000000;
-          }
-
           .detect-button:focus {
             outline: none;
           }
@@ -110,6 +105,13 @@ const SubmitBtn = ({
             background: #000000;
             outline: 3px solid #000;
             outline-offset: 2px;
+          }
+
+          @media not all and (pointer: coarse) {
+            .detect-button:hover {
+              color: #ffffff;
+              background: #000000;
+            }
           }
         `}
       </style>
@@ -129,6 +131,7 @@ const TextInput = React.memo(({ setOpenLoader }: TFormTextInput) => {
     (state: RootState) => state.imageUrl.imageLoaded
   );
   const formSubmit = useSelector((state: RootState) => state.form.submit);
+  const mobileHoverTimerIdRef = useRef(0);
   const isOpenRef = useRef(false);
   const displayErrorRef = useRef(false);
   const submitHoverRef = useRef(false);
@@ -139,7 +142,6 @@ const TextInput = React.memo(({ setOpenLoader }: TFormTextInput) => {
     let urlContent = urlItem.content;
 
     dispatch(setCurrentImageStatus("EMPTY"));
-    console.log("Empty", urlItem.name);
 
     // dispatch(
     //   updateImgQueue({
@@ -159,7 +161,6 @@ const TextInput = React.memo(({ setOpenLoader }: TFormTextInput) => {
     });
 
     if (error) {
-      console.log("base64", { error });
       dispatch(
         updateImgQueue({
           id: urlItem.id,
@@ -169,8 +170,6 @@ const TextInput = React.memo(({ setOpenLoader }: TFormTextInput) => {
       dispatch(setCurrentImageStatus("DONE"));
       return;
     }
-
-    console.log({ sizeMB });
 
     const name = getImageNameFromUrl(urlItem.content);
 
@@ -183,7 +182,7 @@ const TextInput = React.memo(({ setOpenLoader }: TFormTextInput) => {
 
     dispatch(setCurrentImageStatus("SCANNING"));
 
-    const result = await postClarifaiAPI({ base64 });
+    const result = await postClarifaiAPI({ base64, inputFrom: "text" });
 
     if (
       result.status.code !== 10000 && // OK
@@ -223,6 +222,17 @@ const TextInput = React.memo(({ setOpenLoader }: TFormTextInput) => {
     submitHoverRef.current = isMouseenter;
 
     const submitBoxEl = document.getElementById("submit-box")!;
+    const isTouchDevice = !matchMedia("not all and (pointer: coarse)").matches;
+
+    if (isTouchDevice && isMouseenter) {
+      window.clearTimeout(mobileHoverTimerIdRef.current);
+
+      const timerId = window.setTimeout(() => {
+        submitBoxEl.classList.remove("submitHover");
+        submitHoverRef.current = true;
+      }, 1000);
+      mobileHoverTimerIdRef.current = timerId;
+    }
 
     if (isMouseenter) {
       submitBoxEl.classList.add("submitHover");
@@ -233,7 +243,6 @@ const TextInput = React.memo(({ setOpenLoader }: TFormTextInput) => {
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
-    console.log(e.target);
   };
 
   useEffect(() => {
@@ -263,10 +272,8 @@ const TextInput = React.memo(({ setOpenLoader }: TFormTextInput) => {
     });
 
     const run = async () => {
-      // const values = formInputResult.map(({ content }) => content);
       await delayP(50);
       setOpenLoader(true);
-      console.log("Submit!!!");
 
       for (let i = 0; i < formInputResult.length; i++) {
         const item = formInputResult[i];

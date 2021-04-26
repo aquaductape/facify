@@ -36,17 +36,24 @@ const FaceIndicator = ({ id, parentIdx }: TUtilBarProps) => {
           .face-description {
             display: flex;
             align-items: center;
+            width: 20px;
             height: 100%;
           }
 
           .face-icon {
-            width: 20px;
             flex-shrink: 0;
+            width: 100%;
             height: 100%;
           }
           .face-text {
             flex: none;
             margin-left: 5px;
+          }
+
+          @media (min-width: 1300px) {
+            .face-description {
+              width: 25px;
+            }
           }
         `}
       </style>
@@ -102,6 +109,7 @@ const UtilBar = ({ id, parentIdx }: TUtilBarProps) => {
             left: 0;
             width: 100%;
             height: 100%;
+            pointer-events: none;
           }
         `}
       </style>

@@ -48,7 +48,7 @@ const FileInput = ({ setOpenLoader }: TFileInputProps) => {
     const { base64, file: newFile } = await convertFileToBase64(item.file);
     dispatch(setCurrentImageStatus("SCANNING"));
 
-    const result = await postClarifaiAPI({ base64 });
+    const result = await postClarifaiAPI({ base64, inputFrom: "file" });
 
     if (
       result.status.code !== 10000 && // OK
@@ -183,8 +183,7 @@ const FileInput = ({ setOpenLoader }: TFileInputProps) => {
           transition: 250ms background-color, 250ms color;
         }
 
-        .label-input-file:hover,
-        .input-file--hidden:focus + .label-input-file {
+        .input-file--hidden.focus-visible + .label-input-file {
           background: #c6c6c6;
           color: #000;
         }
@@ -197,6 +196,13 @@ const FileInput = ({ setOpenLoader }: TFileInputProps) => {
           outline: 3px solid #000;
           outline-offset: 2px;
           z-index: 1;
+        }
+
+        @media not all and (pointer: coarse) {
+          .label-input-file:hover {
+            background: #c6c6c6;
+            color: #000;
+          }
         }
       `}</style>
     </>

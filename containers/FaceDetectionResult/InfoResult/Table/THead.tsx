@@ -275,13 +275,37 @@ const THead = ({ id, parentIdx, type }: THeadProps) => {
       .querySelector(tableSelector)
       ?.querySelector(tableScrollSelector) as HTMLElement;
 
-    const onScroll = () => {
+    const onWheel = () => {
       tableScrollEl.scrollLeft = theadStickyEl.scrollLeft;
     };
 
-    theadStickyEl.addEventListener("scroll", onScroll);
+    const onTouchStart = (e: TouchEvent) => {
+      const startClientX =
+        e.targetTouches[0].clientX + theadStickyEl.scrollLeft;
+      const theadOffsetWidth = theadStickyEl.offsetWidth;
+
+      const onTouchMove = (e: TouchEvent) => {
+        e.preventDefault();
+        const diff = startClientX - e.changedTouches[0].clientX;
+        if (diff < 0 || diff > theadOffsetWidth) return;
+        tableScrollEl.scrollLeft = diff;
+        theadStickyEl.scrollLeft = diff;
+      };
+
+      const onTouchEnd = () => {
+        theadStickyEl.removeEventListener("touchmove", onTouchMove);
+        theadStickyEl.removeEventListener("touchend", onTouchEnd);
+      };
+
+      theadStickyEl.addEventListener("touchmove", onTouchMove);
+      theadStickyEl.addEventListener("touchend", onTouchEnd);
+    };
+
+    theadStickyEl.addEventListener("touchstart", onTouchStart);
+    theadStickyEl.addEventListener("wheel", onWheel);
     return () => {
-      theadStickyEl.addEventListener("scroll", onScroll);
+      theadStickyEl.removeEventListener("touchstart", onTouchStart);
+      theadStickyEl.removeEventListener("wheel", onWheel);
     };
   }, []);
 

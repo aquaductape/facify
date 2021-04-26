@@ -107,6 +107,7 @@ type IGlobalListener = {
 export type TManualExit = {
   runAllExits: () => void;
   runExit: (e?: OnFocusOutEvent) => void;
+  disconnect: () => void;
 };
 
 if (IOS && !IOS13) {
@@ -152,6 +153,11 @@ export default function onFocusOut({
     runAllExits: runAllExitsAndDestroy,
     runExit: () => {
       onExit();
+      markListener(id);
+      removeListeners();
+      removeGlobalListener();
+    },
+    disconnect: () => {
       markListener(id);
       removeListeners();
       removeGlobalListener();
@@ -207,6 +213,7 @@ export default function onFocusOut({
     for (let i = 0; i < listenersLength; i++) {
       const {
         id,
+        button,
         onStart,
         onExit,
         stopWhenTargetIsRemoved,
@@ -215,6 +222,11 @@ export default function onFocusOut({
         isInit,
       } = listeners[i];
       if (isInit()) continue;
+
+      if (button && !button.isConnected) {
+        markListener(id);
+        continue;
+      }
 
       if (onStart && onStart(customEvent)) continue;
       // TODO: This lib falls short when clicked target is removed, how do we know if removed target is within selectors or not. Solution is probably is making the global events to use capturing instead of bubbling. Workaround is placing preventDefault on targeted button
@@ -292,6 +304,11 @@ export default function onFocusOut({
     for (let i = 0; i < listenersLength; i++) {
       const { id, button, onStart, onExit, allow, isInit } = listeners[i];
       if (isInit()) continue;
+
+      if (button && !button.isConnected) {
+        markListener(id);
+        continue;
+      }
       // even when a previous click event fires within dropdown, if no focusable element is clicked, then activeElement is set to body
       if (document.activeElement === document.body) continue;
 
@@ -345,6 +362,10 @@ export default function onFocusOut({
       if (isInit()) continue;
 
       // if (stopWhenTargetIsRemoved && !clickedTarget.isConnected) return null;
+      if (button && !button.isConnected) {
+        markListener(id);
+        continue;
+      }
 
       // allow focus on dropdown button
       if (button !== false && button.contains(clickedTarget)) continue;

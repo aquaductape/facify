@@ -3,29 +3,31 @@ import { CSSTransition } from "react-transition-group";
 import TextInput from "./TextInput/TextInput";
 import Loader from "./Loader/Loader";
 import FileInput from "./FileInput/FileInput";
-import { nanoid } from "nanoid";
-import { imageUri, imageUri3, imgUri2 } from "../../dummyData/imageUri";
-import {
-  demographicResult3,
-  demographicsResult,
-  demographResult2,
-} from "../../dummyData/demographicsResult";
-import { JSON_Stringify_Parse } from "../../utils/jsonStringifyParse";
-import dataURLtoFile from "../../utils/dataURLtoFile";
-import {
-  addDemographicsParentAndChildren,
-  TDemographicNode,
-} from "../FaceDetectionResult/ImageResult/demographicsSlice";
-import createCroppedImgUrl from "../FaceDetectionResult/BoundingCroppedImage/createCroppedImgUrl";
+// import { nanoid } from "nanoid";
+// import { imageUri, imageUri3, imgUri2 } from "../../dummyData/imageUri";
+// import {
+//   demographicResult3,
+//   demographicsResult,
+//   demographResult2,
+// } from "../../dummyData/demographicsResult";
+// import { JSON_Stringify_Parse } from "../../utils/jsonStringifyParse";
+// import dataURLtoFile from "../../utils/dataURLtoFile";
+// import {
+//   addDemographicsParentAndChildren,
+//   TDemographicNode,
+// } from "../FaceDetectionResult/ImageResult/demographicsSlice";
+// import createCroppedImgUrl from "../FaceDetectionResult/BoundingCroppedImage/createCroppedImgUrl";
 import { batch, useDispatch } from "react-redux";
-import { setImageLoaded, setImageStatus } from "./imageUrlSlice";
-import { addImage } from "../FaceDetectionResult/InfoResult/Table/imageHeightSlice";
-import { animationEnd } from "./animateUpload";
+// import { setImageLoaded, setImageStatus } from "./imageUrlSlice";
+// import { addImage } from "../FaceDetectionResult/InfoResult/Table/imageHeightSlice";
+// import { animationEnd } from "./animateUpload";
 
 const UploadImageForm = () => {
   const [openLoader, setOpenLoader] = useState(false);
   const [hideFormGroup, setHideFormGroup] = useState(false);
-  const dispatch = useDispatch();
+  const sentinelElRef = useRef<HTMLDivElement | null>(null);
+  const shadowElRef = useRef<HTMLDivElement | null>(null);
+  // const dispatch = useDispatch();
 
   //
 
@@ -135,6 +137,22 @@ const UploadImageForm = () => {
   //   }, 1000);
   // }, []);
 
+  const createIntersectionObserver = () => {
+    const observer = new IntersectionObserver((entries, observer) => {
+      entries.forEach((entry) => {
+        let isVisible = false;
+
+        if (entry.intersectionRatio > 0) {
+          isVisible = true;
+        }
+
+        shadowElRef.current!.style.opacity = isVisible ? "0" : "1";
+      });
+    });
+
+    return observer;
+  };
+
   useEffect(() => {
     if (openLoader) {
       setTimeout(() => {
@@ -145,13 +163,19 @@ const UploadImageForm = () => {
     }
   }, [openLoader]);
 
+  useEffect(() => {
+    const observer = createIntersectionObserver();
+
+    observer.observe(sentinelElRef.current!);
+  }, []);
+
   return (
     <div id="main-bar-input" className="input-group">
+      <div className="sentinel" ref={sentinelElRef}></div>
       <div
         className={`multifile-upload-group ${hideFormGroup ? "active" : ""}`}
       >
-        {/* <BrowserView>
-						</BrowserView> */}
+        <div className="shadow" ref={shadowElRef}></div>
         <button id="webcam-button" className="input-button--webcam">
           WebCam
         </button>
@@ -175,6 +199,25 @@ const UploadImageForm = () => {
             top: 15px;
             left: 0;
             z-index: 83;
+          }
+
+          .sentinel {
+            position: absolute;
+            top: -18px;
+            left: 0;
+            height: 0px;
+            width: 100%;
+          }
+
+          .shadow {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 5px;
+            transform: scaleX(0.92);
+            opacity: 0;
+            box-shadow: 0px 4px 5px 0px #1024662e;
+            transition: opacity 250ms;
           }
 
           .multifile-upload-group {

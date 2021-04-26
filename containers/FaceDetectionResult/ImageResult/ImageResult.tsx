@@ -38,7 +38,10 @@ const ImageResult = ({ id, idx }: TImageResultProps) => {
       imgRef.current!.style.height = `${imageHeight * diff}px`;
       reflow();
       imageHeight = imgRef.current!.clientHeight;
-      if (imageHeight < 200) imageHeight = 200;
+
+      if (imageHeight < CONSTANTS.minImageHeight) {
+        imageHeight = CONSTANTS.minImageHeight;
+      }
 
       dispatch(setImageHeight({ id, imageHeight }));
     }, 150)
@@ -122,7 +125,7 @@ const ImageResult = ({ id, idx }: TImageResultProps) => {
             justify-content: center;
             align-items: center;
             background: #2d3556;
-            min-height: 200px;
+            min-height: ${CONSTANTS.minImageHeight}px;
             max-height: ${CONSTANTS.imageHeight}px;
             margin-bottom: 124px;
             overflow: hidden;

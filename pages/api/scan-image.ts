@@ -1,3 +1,5 @@
+import jo from "jpeg-autorotate";
+import dataUriToBuffer from "data-uri-to-buffer";
 import { NextApiHandler } from "next";
 import { metadata, stub } from "../../server/clarifai";
 
@@ -32,8 +34,16 @@ const models = {
   "age-appearance": "36f90889189ad96c516d134bc713004d",
 };
 
-const getDemographics = (uri: string) => {
-  const data = uri.split(",")[1];
+const getDemographics = async (uri: string, inputFrom: "file" | "text") => {
+  let data!: Buffer | string;
+
+  if (inputFrom === "text") {
+    data = uri.split(",")[1];
+  } else {
+    data = await fixExifOrientation(uri);
+  }
+
+  // const data = orientedImg.buffer;
   const inputs = [
     {
       data: {
@@ -142,12 +152,26 @@ const manageRegions = (regions: any) => {
     });
 };
 
-const handler: NextApiHandler = async (req, res) => {
-  const { imageBase64 } = req.body;
+const fixExifOrientation = async (uri: string) => {
+  const buffer = dataUriToBuffer(uri);
 
   try {
-    console.log(req.url);
-    const result = await getDemographics(imageBase64);
+    const orientedImg = await jo.rotate(buffer, {});
+
+    return orientedImg.buffer;
+  } catch (err) {
+    // code: 'no_orientation',
+    // message: 'No orientation tag found in EXIF'
+    // therefore it's okay to feed uri back since this image didn't need to be oriented
+    return buffer;
+  }
+};
+
+const handler: NextApiHandler = async (req, res) => {
+  const { imageBase64, inputFrom } = req.body;
+
+  try {
+    const result = await getDemographics(imageBase64, inputFrom);
     res.send(result);
   } catch (err) {
     console.log("ERROR", err);

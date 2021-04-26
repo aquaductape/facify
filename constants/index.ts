@@ -1,6 +1,7 @@
 import { TSortValueType } from "../containers/FaceDetectionResult/ImageResult/demographicsSlice";
 
 export const CONSTANTS = {
+  minImageHeight: 210,
   imageHeight: 250,
   imageHeightDesktop: 700,
   appStickyStartTop:

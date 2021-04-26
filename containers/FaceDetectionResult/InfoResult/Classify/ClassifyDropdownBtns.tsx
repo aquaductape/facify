@@ -92,6 +92,7 @@ const ClassifyDropdownBtns = ({ id, parentIdx }: TClassifyDropdownBtns) => {
           button {
             border: 0;
             margin: 0;
+            pointer-events: all;
           }
 
           .container {
