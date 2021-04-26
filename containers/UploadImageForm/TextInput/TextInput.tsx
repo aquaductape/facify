@@ -83,11 +83,14 @@ const SubmitBtn = ({
       Detect
       <style jsx>
         {`
-          .detect-button {
-            width: 100%;
-            height: 100%;
+          .detect-button[type="submit"] {
             -webkit-appearance: none;
             display: block;
+            width: 100%;
+            height: 100%;
+          }
+
+          .detect-button {
             position: relative;
             border: none;
             padding: 10px 20px;
