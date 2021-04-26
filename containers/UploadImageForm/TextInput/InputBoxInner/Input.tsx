@@ -342,7 +342,6 @@ const Input = ({
           input {
             position: relative;
             -webkit-appearance: none;
-            background: red;
             top: calc(-100% + 5px);
             left: 0;
             display: block;
