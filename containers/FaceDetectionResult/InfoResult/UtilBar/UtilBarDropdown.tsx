@@ -195,7 +195,7 @@ const UtilBarDropdown = ({ id, parentIdx }: TUtilBarDropdown) => {
             top: 0;
             left: 0;
             height: 0;
-            margin-bottom: 125px;
+            margin-bottom: 130px;
             z-index: 30;
           }
 
@@ -204,7 +204,7 @@ const UtilBarDropdown = ({ id, parentIdx }: TUtilBarDropdown) => {
             top: 0;
             left: 0;
             height: 0;
-            margin-bottom: 125px;
+            margin-bottom: 130px;
             z-index: 60;
           }
 

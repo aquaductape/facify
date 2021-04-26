@@ -245,7 +245,7 @@ const Table = ({ id, idx }: { id: string; idx: number }) => {
         {`
           .table-container {
             position: relative;
-            margin-top: -125px;
+            margin-top: -130px;
           }
 
           .table-scroll-container {

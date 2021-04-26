@@ -127,7 +127,7 @@ const ImageResult = ({ id, idx }: TImageResultProps) => {
             background: #2d3556;
             min-height: ${CONSTANTS.minImageHeight}px;
             max-height: ${CONSTANTS.imageHeight}px;
-            margin-bottom: 124px;
+            margin-bottom: 130px;
             overflow: hidden;
             z-index: 55;
           }

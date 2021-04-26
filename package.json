@@ -19,6 +19,7 @@
     "jpeg-autorotate": "^7.1.1",
     "nanoid": "^3.1.20",
     "next": "10.0.6",
+    "piexifjs": "^1.0.6",
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "react-dropzone": "^11.3.1",

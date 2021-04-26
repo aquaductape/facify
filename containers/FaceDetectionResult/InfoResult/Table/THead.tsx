@@ -362,8 +362,8 @@ const THead = ({ id, parentIdx, type }: THeadProps) => {
             position: sticky;
             top: 0;
             left: 0;
-            height: 45px;
-            margin-top: -125px;
+            height: 50px;
+            margin-top: -130px;
             margin-bottom: 80px;
             clip-path: polygon(0% 100%, 0% 0%, 100% 0%, 100% 100%);
             overflow: hidden;

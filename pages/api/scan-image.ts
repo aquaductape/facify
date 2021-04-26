@@ -1,3 +1,4 @@
+import piexif from "piexifjs";
 import jo from "jpeg-autorotate";
 import dataUriToBuffer from "data-uri-to-buffer";
 import { NextApiHandler } from "next";
@@ -153,7 +154,19 @@ const manageRegions = (regions: any) => {
 };
 
 const fixExifOrientation = async (uri: string) => {
-  const buffer = dataUriToBuffer(uri);
+  const deleteThumbnailFromExif = (imageBuffer: Buffer) => {
+    const imageString = imageBuffer.toString("binary");
+    const exifObj = piexif.load(imageString);
+
+    delete exifObj["thumbnail"];
+    delete exifObj["1st"];
+
+    const exifBytes = piexif.dump(exifObj);
+
+    return Buffer.from(piexif.insert(exifBytes, imageString), "binary");
+  };
+
+  const buffer = deleteThumbnailFromExif(dataUriToBuffer(uri));
 
   try {
     const orientedImg = await jo.rotate(buffer, {});
@@ -162,7 +175,7 @@ const fixExifOrientation = async (uri: string) => {
   } catch (err) {
     // code: 'no_orientation',
     // message: 'No orientation tag found in EXIF'
-    // therefore it's okay to feed uri back since this image didn't need to be oriented
+    // therefore it's okay to feed unRotated buffer back since this image didn't need to be oriented
     return buffer;
   }
 };
