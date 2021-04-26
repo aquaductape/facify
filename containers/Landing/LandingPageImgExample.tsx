@@ -98,7 +98,7 @@ const LandingPageImgExample = () => {
         );
       });
 
-      await delayP(1000);
+      await delayP(200);
 
       animateResult({
         id: parentId,

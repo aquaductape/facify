@@ -80,7 +80,7 @@ export const addImageAndAnimate = async ({
     );
   });
 
-  await delayP(1000);
+  await delayP(200);
 
   animateResult({
     id,
