@@ -61,7 +61,6 @@ export const addImageAndAnimate = async ({
     dispatch(setImageLoaded(true));
     dispatch(setImageStatus("DONE"));
     dispatch(setCurrentImageStatus("DONE"));
-    console.log("DONE");
     dispatch(addImage({ id, imageHeight: null }));
     dispatch(
       addDemographicsParentAndChildren({
@@ -82,7 +81,7 @@ export const addImageAndAnimate = async ({
 
   animateResult({
     id,
-    mql: mql.minWidth_1900_and_minHeight_850,
+    mql,
     firstImage,
   });
 };

@@ -1,15 +1,20 @@
+import { TMqlGroup } from "../../hooks/useMatchMedia";
 import { reflow } from "../../utils/reflow";
 import smoothScrollTo from "../../utils/smoothScrollTo";
 
 type TStartAnimate = {
   firstImage: boolean;
 };
+
+let landingHeight = 0;
+
 export const startAnimate = ({ firstImage }: TStartAnimate) =>
   new Promise<boolean>((resolve) => {
     if (!firstImage) return resolve(true);
 
     console.log("startAimate", { firstImage });
     const landingEl = document.getElementById("landing")!;
+    landingHeight = landingEl.clientHeight;
     const mainEl = document.getElementById("main")!;
     const mainBgEl = mainEl.querySelector(".main-bg") as HTMLElement;
     const viewportHeight = window.innerHeight;
@@ -75,7 +80,7 @@ export const animationEnd = ({ id }: TAnimationEnd = {}) => {
 
 type TAnimateResult = {
   id: string;
-  mql: MediaQueryList;
+  mql: TMqlGroup;
   firstImage: boolean;
 };
 export const animateResult = ({ id, firstImage, mql }: TAnimateResult) => {
@@ -85,9 +90,9 @@ export const animateResult = ({ id, firstImage, mql }: TAnimateResult) => {
     const demographicEl = document.getElementById(`demographic-node-${id}`)!;
     const landingEl = document.getElementById("landing")!;
     const demographicHeight = demographicEl.clientHeight;
-    const landingHeight = landingEl.clientHeight;
+    // const landingHeight = landingEl.clientHeight;
 
-    if (mql.matches) {
+    if (mql.minWidth_1900_and_minHeight_850.matches) {
       const logo = document.getElementById("logo")!;
       const facesBoundingBoxes = document.querySelector(
         ".faces-bounding-boxes"

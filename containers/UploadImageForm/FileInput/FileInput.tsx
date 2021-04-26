@@ -86,10 +86,10 @@ const FileInput = ({ setOpenLoader }: TFileInputProps) => {
   const onFilesInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from((e.target.files as unknown) as File[]);
     if (!files) return;
-    if (files!.length > 10) {
-      // throw notification error: "cannot upload more than 10 images"
-      return;
-    }
+    // if (files!.length > 10) {
+    //   // throw notification error: "cannot upload more than 10 images"
+    //   return;
+    // }
 
     const inputResult: (TURLItem & { file: File })[] = [];
 

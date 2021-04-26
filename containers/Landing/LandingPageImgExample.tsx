@@ -72,7 +72,6 @@ const LandingPageImgExample = () => {
             },
           }));
       }
-      // return;
 
       const name = "post-malone-dj-khaled-billboard.jpg";
       const parentId = name + "superid";
@@ -101,7 +100,7 @@ const LandingPageImgExample = () => {
 
       animateResult({
         id: parentId,
-        mql: mqlRef.current!.minWidth_1900_and_minHeight_850,
+        mql: mqlRef.current!,
         firstImage: true,
       });
 
