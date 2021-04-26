@@ -43,8 +43,8 @@ const Seperator = ({ id }: { id: string }) => {
             opacity: 1;
             background: linear-gradient(
               0deg,
-              var(--blue-3) -8%,
-              var(--blue-2) 15%,
+              #3f3fe9 -8%,
+              #b9c3e8 15%,
               transparent 48%
             );
           }

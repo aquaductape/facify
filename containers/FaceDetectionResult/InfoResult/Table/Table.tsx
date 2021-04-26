@@ -220,7 +220,7 @@ const Table = ({ id, idx }: { id: string; idx: number }) => {
       const theadOffsetWidth = tableContainerEl.offsetWidth;
 
       const onTouchMove = (e: TouchEvent) => {
-        e.preventDefault();
+        // e.preventDefault();
         const diff = startClientX - e.changedTouches[0].clientX;
 
         if (diff < 0 || diff > theadOffsetWidth) return;

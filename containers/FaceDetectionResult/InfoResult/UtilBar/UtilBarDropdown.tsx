@@ -206,6 +206,7 @@ const UtilBarDropdown = ({ id, parentIdx }: TUtilBarDropdown) => {
             height: 0;
             margin-bottom: 130px;
             z-index: 60;
+            outline: 0;
           }
 
           .inner {
