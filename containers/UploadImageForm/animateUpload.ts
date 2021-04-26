@@ -1,4 +1,5 @@
 import { TMqlGroup } from "../../hooks/useMatchMedia";
+import { IOS } from "../../lib/onFocusOut/browserInfo";
 import { reflow } from "../../utils/reflow";
 import smoothScrollTo from "../../utils/smoothScrollTo";
 
@@ -106,7 +107,7 @@ export const animateResult = ({ id, firstImage, mql }: TAnimateResult) => {
       mainEl.style.clipPath = "polygon(0% 100vh, 0% 0%, 100% 0%, 100% 100vh)";
     }
 
-    if (landingHeight > demographicHeight) {
+    if (landingHeight > demographicHeight || IOS) {
       demographicEl.style.opacity = "1";
       demographicEl.style.zIndex = "-1";
       landingEl.style.zIndex = "65";
