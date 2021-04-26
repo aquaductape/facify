@@ -197,7 +197,7 @@ const Table = ({ id, idx }: { id: string; idx: number }) => {
     run();
 
     const onTableScrolling = (position: number) => {
-      if (!FireFox) {
+      if (!FireFox || IOS) {
         theadStickyEl!.setAttribute("scroll-left", position.toString());
       }
 
