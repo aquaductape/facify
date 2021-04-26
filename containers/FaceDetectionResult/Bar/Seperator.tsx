@@ -36,16 +36,16 @@ const Seperator = ({ id }: { id: string }) => {
 
           .dark {
             opacity: 0;
-            background: linear-gradient(0deg, #00000066, transparent 100%);
+            background: linear-gradient(0deg, #00000066, rgba(0, 0, 0, 0) 100%);
           }
 
           .light {
             opacity: 1;
             background: linear-gradient(
               0deg,
-              #3f3fe9 -8%,
-              #b9c3e8 15%,
-              transparent 48%
+              var(--blue-3) -8%,
+              var(--blue-2) 15%,
+              rgba(0, 0, 0, 0) 48%
             );
           }
           .dark.active {
