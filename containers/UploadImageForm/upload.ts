@@ -2,6 +2,7 @@ import { Dispatch } from "react";
 import { batch } from "react-redux";
 import { TMqlGroup } from "../../hooks/useMatchMedia";
 import { TDemographicsResponse } from "../../ts";
+import { delayP } from "../../utils/delayP";
 import createCroppedImgUrl from "../FaceDetectionResult/BoundingCroppedImage/createCroppedImgUrl";
 import {
   addDemographicsParentAndChildren,
@@ -78,6 +79,8 @@ export const addImageAndAnimate = async ({
       })
     );
   });
+
+  await delayP(1000);
 
   animateResult({
     id,

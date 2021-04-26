@@ -98,6 +98,8 @@ const LandingPageImgExample = () => {
         );
       });
 
+      await delayP(1000);
+
       animateResult({
         id: parentId,
         mql: mqlRef.current!,

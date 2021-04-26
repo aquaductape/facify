@@ -122,14 +122,9 @@ export const animateResult = ({ id, firstImage, mql }: TAnimateResult) => {
     }
   };
 
-  if (firstImage) {
-    setTimeout(() => {
-      run();
+  run();
 
-      setTimeout(() => {
-        animationEnd({ id });
-      }, 500);
-    }, 200);
-    return;
-  }
+  setTimeout(() => {
+    animationEnd({ id });
+  }, 500);
 };
