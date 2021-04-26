@@ -82,6 +82,10 @@ const Input = ({ submitHoverRef, isOpenRef, displayErrorRef }: InputProps) => {
             pointer-events: none;
           }
 
+          .content {
+            max-width: 35vw;
+          }
+
           .content-inner {
             position: relative;
             height: 100%;
@@ -157,6 +161,7 @@ const Input = ({ submitHoverRef, isOpenRef, displayErrorRef }: InputProps) => {
             height: 45px;
             min-height: 100px;
             max-height: 250px;
+            max-width: none;
           }
 
           .container.active .content .border-bg {
