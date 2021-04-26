@@ -89,10 +89,10 @@ export const addImageAndAnimate = async ({
 
 export const postClarifaiAPI = async ({
   base64,
-  inputFrom,
+  resetOrientation,
 }: {
   base64: string;
-  inputFrom: "file" | "text";
+  resetOrientation: boolean;
 }) => {
   const res = await fetch("/api/scan-image", {
     method: "post",
@@ -102,7 +102,7 @@ export const postClarifaiAPI = async ({
     },
     body: JSON.stringify({
       imageBase64: base64,
-      inputFrom,
+      resetOrientation,
     }),
   });
   console.log({ res });

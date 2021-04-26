@@ -35,13 +35,13 @@ const models = {
   "age-appearance": "36f90889189ad96c516d134bc713004d",
 };
 
-const getDemographics = async (uri: string, inputFrom: "file" | "text") => {
+const getDemographics = async (uri: string, resetOrientation: boolean) => {
   let data!: Buffer | string;
 
-  if (inputFrom === "text") {
-    data = uri.split(",")[1];
-  } else {
+  if (resetOrientation) {
     data = await fixExifOrientation(uri);
+  } else {
+    data = uri.split(",")[1];
   }
 
   // const data = orientedImg.buffer;
@@ -181,10 +181,10 @@ const fixExifOrientation = async (uri: string) => {
 };
 
 const handler: NextApiHandler = async (req, res) => {
-  const { imageBase64, inputFrom } = req.body;
+  const { imageBase64, resetOrientation } = req.body;
 
   try {
-    const result = await getDemographics(imageBase64, inputFrom);
+    const result = await getDemographics(imageBase64, resetOrientation);
     res.send(result);
   } catch (err) {
     console.log("ERROR", err);

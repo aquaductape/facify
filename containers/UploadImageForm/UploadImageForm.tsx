@@ -18,6 +18,7 @@ import FileInput from "./FileInput/FileInput";
 // } from "../FaceDetectionResult/ImageResult/demographicsSlice";
 // import createCroppedImgUrl from "../FaceDetectionResult/BoundingCroppedImage/createCroppedImgUrl";
 import { batch, useDispatch } from "react-redux";
+import WebcamBtn from "./Webcam/WebcamBtn";
 // import { setImageLoaded, setImageStatus } from "./imageUrlSlice";
 // import { addImage } from "../FaceDetectionResult/InfoResult/Table/imageHeightSlice";
 // import { animationEnd } from "./animateUpload";
@@ -176,9 +177,7 @@ const UploadImageForm = () => {
         className={`multifile-upload-group ${hideFormGroup ? "active" : ""}`}
       >
         <div className="shadow" ref={shadowElRef}></div>
-        <button id="webcam-button" className="input-button--webcam">
-          WebCam
-        </button>
+        <WebcamBtn setOpenLoader={setOpenLoader}></WebcamBtn>
         <div className="shared-pillar pillar-1"></div>
         <FileInput setOpenLoader={setOpenLoader}></FileInput>
         <div className="shared-pillar pillar-2"></div>
@@ -233,34 +232,6 @@ const UploadImageForm = () => {
             visibility: hidden;
           }
 
-          .input-button--webcam {
-            display: none;
-            width: 100%;
-            font-size: 1rem;
-            border: none;
-            padding: 10px 20px;
-            background: inherit;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: 250ms background-color, 250ms color;
-          }
-
-          .input-button--webcam:hover {
-            background: #c6c6c6;
-            color: #000;
-          }
-
-          .input-button--webcam:focus {
-            outline: none;
-          }
-
-          .input-button--webcam.focus-visible {
-            background: #c6c6c6;
-            color: #000;
-            outline: 3px solid #000;
-            outline-offset: 2px;
-          }
-
           .shared-pillar {
             background: #c6c6c6;
           }
@@ -270,6 +241,10 @@ const UploadImageForm = () => {
           }
 
           @media (min-width: 800px) {
+            .shadow {
+              transform: scaleX(0.95);
+            }
+
             .multifile-upload-group {
               grid-template-columns: 1fr 5px 1fr 5px 2fr;
             }

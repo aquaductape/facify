@@ -182,7 +182,7 @@ const TextInput = React.memo(({ setOpenLoader }: TFormTextInput) => {
 
     dispatch(setCurrentImageStatus("SCANNING"));
 
-    const result = await postClarifaiAPI({ base64, inputFrom: "text" });
+    const result = await postClarifaiAPI({ base64, resetOrientation: false });
 
     if (
       result.status.code !== 10000 && // OK

@@ -48,7 +48,7 @@ const FileInput = ({ setOpenLoader }: TFileInputProps) => {
     const { base64, file: newFile } = await convertFileToBase64(item.file);
     dispatch(setCurrentImageStatus("SCANNING"));
 
-    const result = await postClarifaiAPI({ base64, inputFrom: "file" });
+    const result = await postClarifaiAPI({ base64, resetOrientation: true });
 
     if (
       result.status.code !== 10000 && // OK
@@ -180,6 +180,7 @@ const FileInput = ({ setOpenLoader }: TFileInputProps) => {
           align-items: center;
           justify-content: center;
           cursor: pointer;
+          background: #fff;
           transition: 250ms background-color, 250ms color;
         }
 
