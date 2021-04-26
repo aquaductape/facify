@@ -334,6 +334,7 @@ const Input = ({
         className={`${isOpenRef.current ? "active" : ""} ${
           displayErrorRef.current ? "submitError" : ""
         }`}
+        // can't be type="url" since some soft keyboards exclude Space key, which you need in order to type multiple Urls
         type="text"
         placeholder={"Past URL ..."}
       />
@@ -349,7 +350,7 @@ const Input = ({
             width: 100%;
             padding: 0 5px;
             border: 0;
-            font-size: 14px;
+            font-size: 16px;
             outline: none;
             pointer-events: all;
           }
