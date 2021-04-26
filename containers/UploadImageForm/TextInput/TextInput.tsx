@@ -88,9 +88,6 @@ const SubmitBtn = ({
             display: block;
             width: 100%;
             height: 100%;
-          }
-
-          .detect-button {
             position: relative;
             border: none;
             padding: 10px 20px;
