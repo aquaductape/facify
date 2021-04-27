@@ -7,15 +7,12 @@ type TStartAnimate = {
   firstImage: boolean;
 };
 
-let landingHeight = 0;
-
 export const startAnimate = ({ firstImage }: TStartAnimate) =>
   new Promise<boolean>((resolve) => {
     if (!firstImage) return resolve(true);
 
     console.log("startAimate", { firstImage });
     const landingEl = document.getElementById("landing")!;
-    landingHeight = landingEl.clientHeight;
     const mainEl = document.getElementById("main")!;
     const mainBgEl = mainEl.querySelector(".main-bg") as HTMLElement;
     const viewportHeight = window.innerHeight;
@@ -91,7 +88,7 @@ export const animateResult = ({ id, firstImage, mql }: TAnimateResult) => {
     const demographicEl = document.getElementById(`demographic-node-${id}`)!;
     const landingEl = document.getElementById("landing")!;
     const demographicHeight = demographicEl.clientHeight;
-    // const landingHeight = landingEl.clientHeight;
+    const landingHeight = landingEl.clientHeight;
 
     if (mql.minWidth_1900_and_minHeight_850.matches) {
       const logo = document.getElementById("logo")!;
@@ -107,6 +104,7 @@ export const animateResult = ({ id, firstImage, mql }: TAnimateResult) => {
       mainEl.style.clipPath = "polygon(0% 100vh, 0% 0%, 100% 0%, 100% 100vh)";
     }
 
+    // For iOS, the descision is that landing will always translate up and reveal result behind it. There's an issue where either demographicHeight/landingHeight is not correct, so it will translate/zindex the wrong elements. Unable to solve it since I don't have a Mac to do thorough debugging, that's why I hardcoded the result using IOS var.
     if (landingHeight > demographicHeight || IOS) {
       demographicEl.style.opacity = "1";
       demographicEl.style.zIndex = "-1";
