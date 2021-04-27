@@ -186,6 +186,20 @@ const LandingPageImgExample = () => {
         >
           <feGaussianBlur stdDeviation="0.2"></feGaussianBlur>
         </filter>
+        <filter id="saturate-filter" colorInterpolationFilters="sRGB">
+          <feColorMatrix
+            type="hueRotate"
+            values="0"
+            result="color1"
+            id="feColorMatrix1180"
+          />
+          <feColorMatrix
+            type="saturate"
+            values=".502"
+            result="color2"
+            id="feColorMatrix1182"
+          />
+        </filter>
         <mask id="j" maskUnits="userSpaceOnUse">
           <path
             fill="#fff"
@@ -222,7 +236,7 @@ const LandingPageImgExample = () => {
         filter="url(#e)"
         paintOrder="markers fill stroke"
       ></path>
-      <g className="faces-original">
+      <g className="faces-original" filter="url(#saturate-filter)">
         <path
           className="faces-original__shadow"
           fill="#c5c5c5"

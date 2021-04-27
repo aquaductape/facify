@@ -13,7 +13,7 @@
    viewBox="0 0 78.505219 48.821892"
    version="1.1"
    id="svg8"
-   inkscape:version="1.0.1 (0767f8302a, 2020-10-17)"
+   inkscape:version="1.0.2 (394de47547, 2021-03-26)"
    sodipodi:docname="landing-page-example-images.svg">
   <defs
      id="defs2">
@@ -140,6 +140,52 @@
          x="20.621532"
          y="12.383722" />
     </mask>
+    <filter
+       style="color-interpolation-filters:sRGB;"
+       inkscape:label="Lighting"
+       id="filter1062">
+      <feComponentTransfer
+         in="blur"
+         result="component"
+         id="feComponentTransfer1060">
+        <feFuncR
+           type="gamma"
+           amplitude="1"
+           exponent="1"
+           offset="0"
+           id="feFuncR1054" />
+        <feFuncG
+           type="gamma"
+           amplitude="1"
+           exponent="1"
+           offset="0"
+           id="feFuncG1056" />
+        <feFuncB
+           type="gamma"
+           amplitude="1"
+           exponent="1"
+           offset="0"
+           id="feFuncB1058" />
+        <feFuncA
+           id="feFuncA1066"
+           type="identity" />
+      </feComponentTransfer>
+    </filter>
+    <filter
+       style="color-interpolation-filters:sRGB;"
+       inkscape:label="Color Shift"
+       id="filter1184">
+      <feColorMatrix
+         type="hueRotate"
+         values="0"
+         result="color1"
+         id="feColorMatrix1180" />
+      <feColorMatrix
+         type="saturate"
+         values="0.502347"
+         result="color2"
+         id="feColorMatrix1182" />
+    </filter>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -148,9 +194,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="2.9251772"
-     inkscape:cx="188.31415"
-     inkscape:cy="67.227581"
+     inkscape:zoom="2.9484236"
+     inkscape:cx="171.73721"
+     inkscape:cy="101.91636"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
@@ -198,7 +244,8 @@
        x="29.132858"
        y="11.663103" />
     <g
-       id="g965">
+       id="g965"
+       style="filter:url(#filter1184)">
       <rect
          style="fill:#c5c5c5;stroke-width:0.7493;stroke-linecap:round;stroke-linejoin:round;paint-order:markers fill stroke;fill-opacity:1"
          id="rect914"
