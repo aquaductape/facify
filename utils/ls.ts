@@ -21,6 +21,6 @@ export const saveToLocalStorage = ({
     const serializedState = JSON.stringify(value);
     localStorage.setItem(key, serializedState);
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 };

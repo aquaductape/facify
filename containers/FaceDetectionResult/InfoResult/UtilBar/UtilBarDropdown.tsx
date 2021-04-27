@@ -43,7 +43,6 @@ const UtilBarDropdown = ({ id, parentIdx }: TUtilBarDropdown) => {
     const el = e.currentTarget;
 
     if (openUtilBar) {
-      console.log("run");
       // onFocusOutRef.current?.runExit();
       return;
     }
@@ -118,8 +117,6 @@ const UtilBarDropdown = ({ id, parentIdx }: TUtilBarDropdown) => {
         if (entry.intersectionRatio > 0) {
           isVisible = true;
         }
-
-        console.log({ isVisible });
 
         if (isVisible) return;
 

@@ -28,7 +28,6 @@ const handler: NextApiHandler = async (req, res) => {
             });
           })
           .on("error", (err) => {
-            console.log(`Got error: ${err.message}`);
             resolve({ error: err.message });
           });
       }

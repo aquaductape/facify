@@ -216,10 +216,8 @@ const Loader = ({ setOpenLoader }: TLoaderProps) => {
       return;
     }
 
-    console.log("REFRESH!!");
-
     const countDownBarEl = countDownBarElRef.current!;
-    countDownBarEl.style.transform = "scale(1)";
+    countDownBarEl.style.transform = "scaleX(1)";
     countDownBarEl.style.transition = "none";
     reflow();
     countDownBarEl.style.transform = "";
@@ -295,7 +293,6 @@ const Loader = ({ setOpenLoader }: TLoaderProps) => {
     }
 
     if (isLast && !countDownActivity.active) {
-      console.log("isLast");
       startCountDown();
       closeLoaderWhenDone();
       return;
@@ -372,7 +369,6 @@ const Loader = ({ setOpenLoader }: TLoaderProps) => {
     }
 
     if (countDownActivityRef.current.active) return;
-    console.log("go next");
 
     goToNext();
   }, [finishedQueueIdx, downloadQueue]);

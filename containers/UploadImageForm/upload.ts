@@ -107,9 +107,7 @@ export const postClarifaiAPI = async ({
       resetOrientation,
     }),
   });
-  console.log({ res });
   const result = (await res.json()) as TDemographicsResponse;
-  console.log({ result });
 
   return result;
 };

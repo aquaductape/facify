@@ -1,14 +1,18 @@
-1. Replace webcam "Stop" with "Exit"
-2. Base Webcam button with you Android camera, the border bottom should be black, and button was white
-3. have query parameter where you can place either image url or base64 string and upon page load, it will detect the face from the query.
-4. Based from #3, have Open Graph Preview. From what I gathered, needs to be done serverside, hosting on vercel seems to be easiest solution. On the server the image should be ported to canvas, then add the box boundaries inside canvas, then add padding to make sure it is not cropped
+1. have query parameter where you can place either image url or base64 string and upon page load, it will detect the face from the query.
+2. Based from #3, have Open Graph Preview. From what I gathered, needs to be done serverside, hosting on vercel seems to be easiest solution. On the server the image should be ported to canvas, then add the box boundaries inside canvas, then add padding to make sure it is not cropped
 
-5. Clarifai maximum image size is 3.6MB. Compress url that has over 3.6MB https://media.defense.gov/2014/Sep/08/2000943675/-1/-1/0/140907-F-WE773-015.JPG
-6. When removing demograhicNode use translate effect. Get removing target top position > remove observers > target pointer events none > translate
-7. Predict image size on resizing between 1300px. Layout thrashing.
-8. Have table of contents on the right side. On mobile either have a nav icon on the viewport's bottom right, or have a nav icon on item utility panel.
-9. Instead of click me, use "Try Me"
-10. OpenLoader should have data where it's opened from
+3. Predict image size on resizing between 1300px. Layout thrashing.
+4. Have table of contents on the right side. On mobile either have a nav icon on the viewport's bottom right, or have a nav icon on item utility panel.
+5. Instead of click me, use "Try Me"
+6. Loader jump to content
+7. Webcam Camera
+8. ClassifyBtns onFocusOut
+9. shows same landingpage translate issue in Safari
+10. When i tested all error items, the loader menu items weren't synced, and were at default state.
+11. Safari css linear doesn't seem linear.
+12. Deal with no faces. Currently it will crash.
+13. Focus inside Classify Area when opened
+14. Get rid of focus outline on containers (Loader Menu)
 
 ### Note
 
@@ -16,4 +20,4 @@
 
 ### Report Bugs
 
-1. on Chrome, the setting child translate resets parent scrollLeft value back to zero
+1. on Chrome/Safari, the setting child translate resets parent scrollLeft value back to zero

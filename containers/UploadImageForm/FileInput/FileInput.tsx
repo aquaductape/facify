@@ -134,7 +134,6 @@ const FileInput = ({ setOpenLoader }: TFileInputProps) => {
 
   useEffect(() => {
     if (!formSubmit.active || formSubmit.from !== "file") return;
-    console.log(formSubmit);
     dispatch(setSubmit({ active: false, from: null }));
 
     setOpenLoader(true);

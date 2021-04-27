@@ -187,7 +187,6 @@ const handler: NextApiHandler = async (req, res) => {
     const result = await getDemographics(imageBase64, resetOrientation);
     res.send(result);
   } catch (err) {
-    console.log("ERROR", err);
     res.send(err);
   }
 };

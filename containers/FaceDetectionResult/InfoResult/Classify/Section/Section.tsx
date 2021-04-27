@@ -103,12 +103,6 @@ export const StickySection = ({ id, parentIdx, type }: TSectionProps) => {
         // if(!scrollEventActiveRef && el.dataset.idClassifySentinelBottom) {
         //   sentinelVisible.bottom = isVisible;
         // }
-        console.log(
-          entry.target,
-          scrollEventActive.type,
-          el.dataset.idClassifySentinelBottom,
-          { isVisible }
-        );
 
         if (
           (scrollEventActive.active &&
@@ -118,7 +112,6 @@ export const StickySection = ({ id, parentIdx, type }: TSectionProps) => {
             scrollEventActive.type === "bottom" &&
             el.dataset.idClassifySentinelBottom)
         ) {
-          console.log("remove");
           window.removeEventListener("scroll", onScrollRef.current!);
           position.scrollY = window.scrollY;
           position.translate = 0;
@@ -141,7 +134,6 @@ export const StickySection = ({ id, parentIdx, type }: TSectionProps) => {
           position.top = getTheadStickyTopPosition();
 
           setContainerTopPosition();
-          console.log("add scroll from top");
           window.addEventListener("scroll", onScrollRef.current!);
           return;
         }
@@ -158,7 +150,6 @@ export const StickySection = ({ id, parentIdx, type }: TSectionProps) => {
           position.top = getTheadStickyTopPosition();
 
           setContainerTopPosition();
-          console.log("add scroll from bottom");
           window.addEventListener("scroll", onScrollRef.current!);
           return;
         }

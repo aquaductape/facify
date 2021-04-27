@@ -10,7 +10,6 @@ import UploadImageForm from "../UploadImageForm/UploadImageForm";
 const Main = () => {
   useEffect(() => {
     const result = getScrollbarWidth();
-    console.log(result);
   }, []);
 
   return (

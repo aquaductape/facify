@@ -144,7 +144,6 @@ const DownloadMenuItem = ({
     ) {
       return;
     }
-    console.log("STOP");
     countDownBarElStyleRef.current! = {};
     countDownBarElRef.current!.style.transition = "none";
   };

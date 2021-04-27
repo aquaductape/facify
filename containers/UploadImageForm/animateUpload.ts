@@ -11,7 +11,6 @@ export const startAnimate = ({ firstImage }: TStartAnimate) =>
   new Promise<boolean>((resolve) => {
     if (!firstImage) return resolve(true);
 
-    console.log("startAimate", { firstImage });
     const landingEl = document.getElementById("landing")!;
     const mainEl = document.getElementById("main")!;
     const mainBgEl = mainEl.querySelector(".main-bg") as HTMLElement;

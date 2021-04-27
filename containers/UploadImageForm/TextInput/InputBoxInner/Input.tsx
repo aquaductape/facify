@@ -104,7 +104,6 @@ const Input = ({
         item.errorMsg = CONSTANTS.imageExistErrorMsg;
       }
     }
-    console.log({ imgError });
 
     if (urlItems.length) {
       dispatch(addUrlItem(urlItems));
