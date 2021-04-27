@@ -1,6 +1,10 @@
 import { capitalize } from "lodash";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import {
+  ScrollShadow,
+  SentinelShadow,
+} from "../../../../../components/ScrollShadow";
 import CircleDot from "../../../../../components/svg/CircleDot";
 import { CONSTANTS } from "../../../../../constants";
 import { RootState } from "../../../../../store/rootReducer";
@@ -19,6 +23,13 @@ let globalCurrentConcept = "age";
 const Menu = ({ id, parentIdx, type }: TMenuProps) => {
   const dispatch = useDispatch();
   const [currentConcept, setCurrentConcept] = useState(globalCurrentConcept);
+  const scrollShadowElsRef = useRef<{
+    top: { current: HTMLDivElement | null };
+    bottom: { current: HTMLDivElement | null };
+  }>({
+    top: { current: null },
+    bottom: { current: null },
+  });
   const currentConceptAppearance = `${currentConcept}-appearance`;
   const dirty = useSelector(
     (state: RootState) =>
@@ -103,37 +114,64 @@ const Menu = ({ id, parentIdx, type }: TMenuProps) => {
             </button>
           ) : null}
         </div>
-        <div className="column column-inputs">
-          <MemoSelectorGroup
-            id={parentIdx}
-            currentConcept={currentConcept}
-            type={type!}
-            onChangeScroll={onChangeScroll}
-          ></MemoSelectorGroup>
-          {dirty[type!][currentConceptAppearance] && type === "filter" ? (
-            <button
-              className="btn-reset column-inputs__btn-reset"
-              onClick={(e) => onClickReset(e, currentConcept)}
-            >
-              Reset
-            </button>
-          ) : null}
+
+        <div className="column-inputs-container">
+          <ScrollShadow
+            top={true}
+            scrollShadowElsRef={scrollShadowElsRef}
+          ></ScrollShadow>
+          <div className="column-inputs">
+            <MemoSelectorGroup
+              id={parentIdx}
+              currentConcept={currentConcept}
+              type={type!}
+              onChangeScroll={onChangeScroll}
+            ></MemoSelectorGroup>
+            <SentinelShadow
+              top={true}
+              scrollShadowElsRef={scrollShadowElsRef}
+            ></SentinelShadow>
+            <SentinelShadow
+              top={false}
+              scrollShadowElsRef={scrollShadowElsRef}
+            ></SentinelShadow>
+          </div>
+          <div className="sticky-bottom-container">
+            <ScrollShadow
+              top={false}
+              scrollShadowElsRef={scrollShadowElsRef}
+            ></ScrollShadow>
+            {dirty[type!][currentConceptAppearance] && type === "filter" ? (
+              <div className="btn-reset-container">
+                <div className="btn-shadow"></div>
+                <button
+                  className="btn-reset  column-inputs__btn-reset"
+                  onClick={(e) => onClickReset(e, currentConcept)}
+                >
+                  Reset
+                </button>
+              </div>
+            ) : null}
+          </div>
         </div>
       </div>
       <style jsx>
         {`
           .container {
+            height: 100%;
           }
 
           .content {
             display: flex;
+            height: calc(100% - 25px);
           }
 
-          .column.column-concepts {
+          .column-concepts {
             display: flex;
             flex-direction: column;
             align-items: center;
             width: 95px;
+            height: 100%;
             flex-shrink: 0;
             border-right: 1px solid #999;
           }
@@ -159,11 +197,18 @@ const Menu = ({ id, parentIdx, type }: TMenuProps) => {
             font-size: 15px;
           }
 
-          .column.column-inputs {
+          .column-inputs-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+          }
+
+          .column-inputs {
             position: relative;
             overflow-x: auto;
             width: 100%;
-            height: 195px;
+            height: 100%;
           }
 
           .title {
@@ -187,22 +232,49 @@ const Menu = ({ id, parentIdx, type }: TMenuProps) => {
           }
 
           .btn-reset {
+            position: relative;
             background: #fff;
             border: 3px solid #555;
             padding: 2px 18px;
             color: #555;
             font-size: 16px;
             transition: background-color 250ms, color 250ms;
+            z-index: 2;
+          }
+
+          .column-inputs__btn-reset {
+            z-index: 15;
           }
 
           .column-concepts__btn-reset {
             margin-top: auto;
             margin-bottom: 5px;
           }
-          .column-inputs__btn-reset {
+
+          .btn-reset-container {
             position: absolute;
-            right: 5px;
-            bottom: 5px;
+            right: 0;
+            bottom: 0;
+            padding: 5px;
+          }
+
+          .btn-shadow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            background: #fff;
+            box-shadow: 0 0 6px 4px #fff;
+            z-index: -1;
+          }
+
+          .sticky-bottom-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1;
           }
 
           @media not all and (pointer: coarse) {

@@ -33,7 +33,7 @@ class MyDocument extends Document {
           <meta name="theme-color" content="#224aff" />
         </Head>
 
-        <body>
+        <body data-scroll>
           <Main />
           <NextScript />
         </body>

@@ -76,7 +76,9 @@ const UtilBar = ({ id, parentIdx }: TUtilBarProps) => {
         </div>
         <CSSTransition
           classNames="slide"
-          in={classify.open && classify.location === "bar"}
+          in={
+            classify.open && classify.location === "bar" && classify.id === id
+          }
           timeout={200}
           unmountOnExit
         >
@@ -100,7 +102,7 @@ const UtilBar = ({ id, parentIdx }: TUtilBarProps) => {
             display: flex;
             height: 100%;
             align-items: center;
-            z-index: 5;
+            z-index: 10;
           }
 
           .classify-container {

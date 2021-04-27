@@ -183,13 +183,13 @@ const Selector = ({
           static: inputSelectorStyle,
           hover: { checked: inputSelectorStyle.checked, default: "#000" },
         }}
-        padding={"2px 8px"}
+        padding={"8px 8px"}
       ></InputSelector>
       <style jsx>
         {`
           .selector {
             display: flex;
-            margin: 2px;
+            margin: 3px;
             background: #e6e6e6;
             transition: background-color 250ms;
           }
@@ -328,6 +328,7 @@ export const MemoSelectorGroup = React.memo(
               display: flex;
               flex-wrap: wrap;
               padding: 5px;
+              padding-bottom: 45px;
             }
 
             .sort-selectors {

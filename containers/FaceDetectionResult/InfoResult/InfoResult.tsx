@@ -78,7 +78,7 @@ const InfoResult = ({ id, idx }: TInforResultProps) => {
             .info-demo {
               overflow-y: auto;
               max-height: ${CONSTANTS.imageHeightDesktop}px;
-              margin-top: -125px;
+              margin-top: -130px;
             }
           }
         `}

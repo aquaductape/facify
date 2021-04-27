@@ -24,7 +24,15 @@ const ClassifyDropdownBtns = ({ id, parentIdx }: TClassifyDropdownBtns) => {
       ? "bar"
       : ("viewport" as "bar" | "viewport");
 
-    const open = (classify.type !== type && classify.open) || !classify.open;
+    let open = (classify.type !== type && classify.open) || !classify.open;
+
+    if (
+      mqlGroup.current!.minWidth_1300.matches &&
+      !open &&
+      id !== classify.id
+    ) {
+      open = true;
+    }
 
     if (location === "bar") {
       dispatch(
