@@ -222,7 +222,7 @@ const LandingPageImgExample = () => {
         filter="url(#e)"
         paintOrder="markers fill stroke"
       ></path>
-      <g className="faces-original" style={{ filter: "saturate(0.5)" }}>
+      <g className="faces-original">
         <path
           className="faces-original__shadow"
           fill="#c5c5c5"
