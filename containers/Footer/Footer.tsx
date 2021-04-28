@@ -10,6 +10,15 @@ const Footer = () => {
             text-align: left;
             color: #fff;
           }
+
+          .container::selection {
+            color: #00f;
+            background: #fff;
+          }
+          .container::-moz-selection {
+            color: #00f;
+            background: #fff;
+          }
         `}
       </style>
     </footer>

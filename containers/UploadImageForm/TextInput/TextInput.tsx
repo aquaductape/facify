@@ -10,11 +10,7 @@ import { getBase64FromUrl } from "../../../utils/getBase64FromUrl";
 import { getImageNameFromUrl } from "../../../utils/getImageNameFromUrl";
 import { TDemographicNode } from "../../FaceDetectionResult/ImageResult/demographicsSlice";
 import { clearAllFormValues, setSubmit, TURLItem } from "../formSlice";
-import {
-  setCurrentImageStatus,
-  setImgQueue,
-  updateImgQueue,
-} from "../imageUrlSlice";
+import { setImgQueue, TImgQueue, updateImgQueue } from "../imageUrlSlice";
 import { TQueue } from "../Loader/Loader";
 import {
   getImageDimensions,
@@ -144,17 +140,8 @@ const TextInput = React.memo(({ setOpenLoader }: TFormTextInput) => {
   const onSubmitForm = async (urlItem: TURLItem, idx: number) => {
     let urlContent = urlItem.content;
 
-    dispatch(setCurrentImageStatus("EMPTY"));
-
-    // dispatch(
-    //   updateImgQueue({
-    //     id: urlItem.id,
-    //
-    //   })
-    // );
-
     if (urlItem.error) {
-      dispatch(setCurrentImageStatus("DONE"));
+      console.log("errrro");
       return;
     }
 
@@ -170,20 +157,29 @@ const TextInput = React.memo(({ setOpenLoader }: TFormTextInput) => {
           props: { error: true, errorMsg: error, currentImgStatus: "DONE" },
         })
       );
-      dispatch(setCurrentImageStatus("DONE"));
       return;
     }
 
     const name = getImageNameFromUrl(urlItem.content);
 
     if (sizeMB != null && sizeMB > 3.5) {
-      dispatch(setCurrentImageStatus("COMPRESSING"));
+      dispatch(
+        updateImgQueue({
+          id: urlItem.id,
+          props: { currentImgStatus: "COMPRESSING" },
+        })
+      );
       const result = await convertFileToBase64(dataURLtoFile(base64));
       base64 = result.base64;
       urlContent = window.URL.createObjectURL(result.file);
     }
 
-    dispatch(setCurrentImageStatus("SCANNING"));
+    dispatch(
+      updateImgQueue({
+        id: urlItem.id,
+        props: { currentImgStatus: "SCANNING" },
+      })
+    );
 
     const result = await postClarifaiAPI({ base64, resetOrientation: false });
 
@@ -192,7 +188,6 @@ const TextInput = React.memo(({ setOpenLoader }: TFormTextInput) => {
       result.status.code !== 10010 // Mixed Success
     ) {
       const errorMsg = `Server Error. ${result.status.message}`;
-      dispatch(setCurrentImageStatus("DONE"));
       dispatch(
         updateImgQueue({
           id: urlItem.id,
@@ -254,7 +249,6 @@ const TextInput = React.memo(({ setOpenLoader }: TFormTextInput) => {
 
     batch(() => {
       dispatch(setSubmit({ active: false, from: null }));
-      dispatch(setCurrentImageStatus("EMPTY"));
       dispatch(
         setImgQueue(
           formInputResult.map(
@@ -268,7 +262,8 @@ const TextInput = React.memo(({ setOpenLoader }: TFormTextInput) => {
                 countdown: true,
                 countdownActive: false,
                 currentImgStatus: item.error ? "DONE" : "EMPTY",
-              } as TQueue)
+                inQueue: true,
+              } as TImgQueue)
           )
         )
       );

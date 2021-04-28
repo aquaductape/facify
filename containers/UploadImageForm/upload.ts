@@ -11,10 +11,10 @@ import {
 import { addImage } from "../FaceDetectionResult/InfoResult/Table/imageHeightSlice";
 import { animateResult, startAnimate } from "./animateUpload";
 import {
-  setCurrentImageStatus,
   setImageLoaded,
   setImageStatus,
   setUri,
+  updateImgQueue,
 } from "./imageUrlSlice";
 
 export const addImageAndAnimate = async ({
@@ -61,7 +61,12 @@ export const addImageAndAnimate = async ({
     dispatch(setUri(croppedUrl));
     dispatch(setImageLoaded(true));
     dispatch(setImageStatus("DONE"));
-    dispatch(setCurrentImageStatus("DONE"));
+    dispatch(
+      updateImgQueue({
+        id,
+        props: { currentImgStatus: "DONE" },
+      })
+    );
     dispatch(addImage({ id, imageHeight: null }));
     dispatch(
       addDemographicsParentAndChildren({

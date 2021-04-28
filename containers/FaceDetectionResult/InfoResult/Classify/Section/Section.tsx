@@ -201,7 +201,9 @@ export const StickySection = ({ id, parentIdx, type }: TSectionProps) => {
         .inner {
           height: 222px;
           background: #fff;
-          border-bottom: 3px solid #666666;
+          border: 4px solid #666666;
+          border-top: 0;
+          border-left: 0;
           box-shadow: 0 -10px 10px -8px #0009;
           margin-top: 5px;
         }
@@ -259,8 +261,9 @@ export const RelativeSection = ({ id, parentIdx, type }: TSectionProps) => {
         .inner {
           height: 222px;
           background: #fff;
-          border: 1px solid #999;
-          border-top: 3px solid #666666;
+          border: 4px solid #666666;
+          border-right: 0;
+          border-bottom: 0;
           box-shadow: 0 10px 10px -8px #0009;
           margin-bottom: 5px;
         }

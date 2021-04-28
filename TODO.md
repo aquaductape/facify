@@ -9,10 +9,9 @@
 8. ClassifyBtns onFocusOut
 9. shows same landingpage translate issue in Safari
 10. When i tested all error items, the loader menu items weren't synced, and were at default state.
-11. Safari css linear doesn't seem linear.
-12. Deal with no faces. Currently it will crash.
-13. Focus inside Classify Area when opened
-14. Get rid of focus outline on containers (Loader Menu)
+11. Deal with no faces. Currently it will crash.
+12. Focus inside Classify Area when opened
+13. Get rid of focus outline on containers (Loader Menu)
 
 ### Note
 

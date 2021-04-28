@@ -12,11 +12,7 @@ import {
   setSubmit,
   TURLItem,
 } from "../formSlice";
-import {
-  setCurrentImageStatus,
-  setImgQueue,
-  updateImgQueue,
-} from "../imageUrlSlice";
+import { setImgQueue, TImgQueue, updateImgQueue } from "../imageUrlSlice";
 import { TQueue } from "../Loader/Loader";
 import {
   addImageAndAnimate,
@@ -37,16 +33,24 @@ const FileInput = ({ setOpenLoader }: TFileInputProps) => {
   const [fileItems, setFileItems] = useState<(TURLItem & { file: File })[]>([]);
 
   const onFileUpload = async (item: { file: File } & TURLItem, idx: number) => {
-    dispatch(setCurrentImageStatus("EMPTY"));
-
     const maxSizeMB = 3.5;
     const kbRatio = 1_000_000;
 
     if (item.file.size > maxSizeMB * kbRatio) {
-      dispatch(setCurrentImageStatus("COMPRESSING"));
+      dispatch(
+        updateImgQueue({
+          id: item.id,
+          props: { currentImgStatus: "COMPRESSING" },
+        })
+      );
     }
     const { base64, file: newFile } = await convertFileToBase64(item.file);
-    dispatch(setCurrentImageStatus("SCANNING"));
+    dispatch(
+      updateImgQueue({
+        id: item.id,
+        props: { currentImgStatus: "SCANNING" },
+      })
+    );
 
     const result = await postClarifaiAPI({ base64, resetOrientation: true });
 
@@ -55,7 +59,6 @@ const FileInput = ({ setOpenLoader }: TFileInputProps) => {
       result.status.code !== 10010 // Mixed Success
     ) {
       const errorMsg = `Server Error. ${result.status.message}`;
-      dispatch(setCurrentImageStatus("DONE"));
       dispatch(
         updateImgQueue({
           id: item.id,
@@ -124,7 +127,8 @@ const FileInput = ({ setOpenLoader }: TFileInputProps) => {
                 countdown: true,
                 countdownActive: false,
                 currentImgStatus: item.error ? "DONE" : "EMPTY",
-              } as TQueue)
+                inQueue: true,
+              } as TImgQueue)
           )
         )
       );

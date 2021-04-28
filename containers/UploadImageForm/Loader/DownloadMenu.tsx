@@ -36,7 +36,6 @@ type TDownloadMenuProps = {
         | undefined
     ) => void
   >;
-  downloadMenuItemHandlerRef: MutableRefObject<TDownloadMenuItemHandler>;
   countDownActivityRef: MutableRefObject<{
     currentImgId: string;
     enabled: boolean;
@@ -56,7 +55,6 @@ const DownloadMenu = ({
   openMenu,
   setOpenMenu,
   goToNextRef,
-  downloadMenuItemHandlerRef,
   countDownActivityRef,
 }: TDownloadMenuProps) => {
   const countDownActivity = countDownActivityRef.current;
@@ -109,12 +107,9 @@ const DownloadMenu = ({
 
   return (
     <div className="container" tabIndex={-1} ref={optionsMenuElRef}>
-      <div className="container-inner">
+      {/* <div className={`top-border ${currentQueueClass()}`}></div> */}
+      <div className={`container-inner ${currentQueueClass()}`}>
         <div className="shadow"></div>
-        <div
-          className={`top-border ${queueIdx === 0 ? currentQueueClass() : ""}`}
-        ></div>
-        <div className={`kebab-down-arrow ${currentQueueClass()}`}></div>
 
         <div className="group-container">
           {isScrollContainer ? (
@@ -133,7 +128,6 @@ const DownloadMenu = ({
           <ul className="group" ref={groupElRef}>
             <DownloadMenuItemsContainer
               countDownActivityRef={countDownActivityRef}
-              downloadMenuItemHandlerRef={downloadMenuItemHandlerRef}
               goToNextRef={goToNextRef}
               onFocusOutExitRef={onFocusOutExitRef}
             ></DownloadMenuItemsContainer>
@@ -189,6 +183,7 @@ const DownloadMenu = ({
             max-width: 600px;
             width: 100%;
             overflow: hidden;
+            outline: 0;
           }
 
           .container-inner {
@@ -196,6 +191,37 @@ const DownloadMenu = ({
             background: #fff;
             color: #000;
             margin-bottom: 15px;
+            border: 4px solid #0c0534;
+            border-bottom: 0;
+            border-right: 0;
+            transition: border-color 500ms;
+          }
+
+          .container-inner.success {
+            border-color: #004e53;
+          }
+
+          .container-inner.error {
+            border-color: #7a003e;
+          }
+          .top-border {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: #0c0534;
+            height: 1px;
+            pointer-events: none;
+            z-index: 5;
+            transition: background-color 500ms;
+          }
+
+          .top-border.success {
+            background: #004e53;
+          }
+
+          .top-border.error {
+            background: #7a003e;
           }
 
           .shadow {
@@ -217,38 +243,6 @@ const DownloadMenu = ({
             display: inline-block;
           }
 
-          .kebab-down-arrow {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 0;
-            height: 0;
-            border-left: 17.5px solid transparent !important;
-            border-right: 17.5px solid transparent !important;
-            border-top: 20px solid #000;
-            transition: border-color 500ms;
-            z-index: 11;
-          }
-
-          .kebab-down-arrow.success {
-            border-color: #004e53;
-          }
-
-          .kebab-down-arrow.error {
-            border-color: #7a003e;
-          }
-
-          .top-border {
-            position: absolute;
-            top: 0px;
-            left: 25px;
-            height: 1px;
-            width: calc(100% - 25px);
-            background: transparent;
-            pointer-events: none;
-            z-index: 5;
-          }
-
           .group-container {
             position: relative;
           }
@@ -263,19 +257,38 @@ const DownloadMenu = ({
             margin: 0;
           }
 
-          .top-border.success,
-          .top-border.error {
-            background: rgba(0, 0, 0, 0.2);
-          }
-
           @media (min-width: 645px) {
             .container-inner {
               margin-right: 15px;
             }
 
+            .top-border {
+              width: calc(100% - 15px);
+            }
+
             .shadow {
               box-shadow: 12px 12px 15px -13px #000;
               transform: scaleY(1.2);
+            }
+
+            .group {
+              scrollbar-color: #9397b0 #dbdde5;
+            }
+
+            .group::-webkit-scrollbar-track {
+              background: #dbdde5;
+            }
+
+            .group::-webkit-scrollbar-thumb {
+              background: #9397b0;
+            }
+
+            .group::-webkit-scrollbar-thumb:hover {
+              background-color: #7d89c5;
+            }
+
+            .group::-webkit-scrollbar-thumb:active {
+              background-color: #0f1c66;
             }
           }
         `}

@@ -1,9 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { nanoid } from "nanoid";
 
 export type TImgStatus = "EMPTY" | "DONE" | "COMPRESSING" | "SCANNING";
 export type TImageItem = {};
-type TImgQueue = {
+export type TImgQueue = {
   id: string;
   name: string;
   currentImgStatus: TImgStatus;
@@ -11,6 +10,7 @@ type TImgQueue = {
   errorMsg: string;
   countdown: boolean;
   countdownActive: boolean;
+  inQueue: boolean;
 };
 type TImageUrlState = {
   uri: string | null;
@@ -19,44 +19,44 @@ type TImageUrlState = {
   error: string | null;
   imageLoaded: boolean;
   imgQueue: TImgQueue[];
-  currentImgStatus: TImgStatus;
 };
 
 const initialState: TImageUrlState = {
   uri: null,
   imageStatus: "EMPTY",
   elOnLoadStatus: "EMPTY",
-  currentImgStatus: "EMPTY",
   error: null,
   imageLoaded: false,
   imgQueue: [
     // {
     //   id: nanoid(),
-    //   error: true,
-    //   name:
-    //     "post-malon-superlongsuperlongsuperlongsuperlongsuperlongsuperlong.jpg",
-    //   errorMsg: "BAD",
-    //   countdown: true,
-    //   countdownActive: false,
-    //   currentImgStatus: "DONE",
-    // },
-    // {
-    //   id: nanoid(),
-    //   error: true,
-    //   name: "aubrey-superlongsuperlongsuperlongsuperlongsuperlongsuperlong.jpg",
-    //   errorMsg: "Bad",
-    //   countdown: true,
-    //   countdownActive: false,
-    //   currentImgStatus: "DONE",
-    // },
-    // {
-    //   id: nanoid(),
     //   error: false,
-    //   name: "elon-superlongsuperlongsuperlongsuperlongsuperlongsuperlong.gif",
+    //   name: "jack",
     //   errorMsg: "",
     //   countdown: true,
     //   countdownActive: false,
     //   currentImgStatus: "EMPTY",
+    //   inQueue: true,
+    // },
+    // {
+    //   id: nanoid(),
+    //   error: true,
+    //   name: "aubrey",
+    //   errorMsg: "BAD",
+    //   countdown: true,
+    //   countdownActive: false,
+    //   currentImgStatus: "DONE",
+    //   inQueue: true,
+    // },
+    // {
+    //   id: nanoid(),
+    //   error: false,
+    //   name: "elon",
+    //   errorMsg: "",
+    //   countdown: true,
+    //   countdownActive: false,
+    //   currentImgStatus: "EMPTY",
+    //   inQueue: true,
     // },
     // {
     //   id: nanoid(),
@@ -66,15 +66,17 @@ const initialState: TImageUrlState = {
     //   countdown: true,
     //   countdownActive: false,
     //   currentImgStatus: "EMPTY",
+    //   inQueue: true,
     // },
     // {
     //   id: nanoid(),
     //   error: false,
     //   errorMsg: "",
-    //   name: "aubrey",
+    //   name: "emma",
     //   countdown: true,
     //   countdownActive: false,
     //   currentImgStatus: "EMPTY",
+    //   inQueue: true,
     // },
   ],
 };
@@ -104,9 +106,6 @@ const imageUrlSlice = createSlice({
     setImageError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
     },
-    setCurrentImageStatus: (state, action: PayloadAction<TImgStatus>) => {
-      state.currentImgStatus = action.payload;
-    },
     setImgQueue: (state, action: PayloadAction<TImgQueue[]>) => {
       state.imgQueue = action.payload;
     },
@@ -135,7 +134,6 @@ export const {
   setImageStatus,
   setElOnLoadStatus,
   setImageLoaded,
-  setCurrentImageStatus,
   setImgQueue,
   updateImgQueue,
 } = imageUrlSlice.actions;

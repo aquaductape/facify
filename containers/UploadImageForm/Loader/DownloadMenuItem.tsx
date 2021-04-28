@@ -13,6 +13,7 @@ import CircleCross from "../../../components/svg/CircleCross";
 import CircleDot from "../../../components/svg/CircleDot";
 import { TManualExit } from "../../../lib/onFocusOut/onFocusOut";
 import { RootState } from "../../../store/rootReducer";
+import store from "../../../store/store";
 import { reflow } from "../../../utils/reflow";
 import { TURLItem } from "../formSlice";
 import { TQueue } from "./Loader";
@@ -36,7 +37,6 @@ export type TDownloadMenuItemHandler = {
 type TDownloadMenuItemProps = {
   idx: number;
   onFocusOutExitRef: MutableRefObject<TManualExit | null>;
-  item: TURLItem;
   goToNextRef: MutableRefObject<
     (
       props?:
@@ -47,7 +47,6 @@ type TDownloadMenuItemProps = {
         | undefined
     ) => void
   >;
-  downloadMenuItemHandlerRef: MutableRefObject<TDownloadMenuItemHandler>;
   countDownActivityRef: MutableRefObject<{
     currentImgId: string;
     enabled: boolean;
@@ -62,11 +61,12 @@ const DownloadMenuItem = ({
   countDownActivityRef,
   idx,
   onFocusOutExitRef,
-  downloadMenuItemHandlerRef,
   goToNextRef,
-  item,
 }: TDownloadMenuItemProps) => {
   const [showMore, setShowMore] = useState(false);
+  // const countDownChecked = useSelector(
+  //   (state: RootState) => state.menu.disableNotificationCountDown
+  // );
   // const currentQueue = queue[idx];
   const countDownBarElRef = useRef<HTMLDivElement | null>(null);
   const countDownInitRef = useRef(false);
@@ -74,55 +74,15 @@ const DownloadMenuItem = ({
   const countDownBarElStyleRef = useRef<CSSProperties>({});
   const countDownActivity = countDownActivityRef.current;
   // const finishedQueue = queue[queueIdx];
-  const [downloadQueue, setDownloadQueue] = useState<TQueue | null>(() => {
-    const downloadMenuItemHandler = downloadMenuItemHandlerRef.current[idx];
-    if (!downloadMenuItemHandler) return null;
-    return downloadMenuItemHandler.downloadQueue || null;
-  });
-  // const [finishedQueue, setFinishedQueue] = useState<TQueue | null>(null);
-  const [displayCountDown, setDisplayCountDown] = useState<TDisplayCountDown>(
-    () => {
-      const downloadMenuItemHandler = downloadMenuItemHandlerRef.current[idx];
-      if (!downloadMenuItemHandler) return { active: false, enabled: true };
-      return (
-        downloadMenuItemHandler.displayCountDown || {
-          active: false,
-          enabled: true,
-        }
-      );
-    }
+  const downloadQueueCurrent = useSelector(
+    (state: RootState) => state.imageUrl.imgQueue[idx]
   );
   const goToNext = goToNextRef.current;
 
-  useEffect(() => {
-    const downloadMenuItem = downloadMenuItemHandlerRef.current[idx];
-
-    if (!downloadMenuItem || !downloadMenuItem.setDownloadQueue) {
-      downloadMenuItemHandlerRef.current[idx] = {
-        setDownloadQueue,
-        setDisplayCountDown,
-        displayCountDown,
-        downloadQueue: null,
-      };
-      return;
-    }
-
-    downloadMenuItemHandlerRef.current[idx] = {
-      ...downloadMenuItem,
-      setDownloadQueue,
-      setDisplayCountDown,
-    };
-
-    return () => {
-      downloadMenuItemHandlerRef.current[idx].setDisplayCountDown = null as any;
-      downloadMenuItemHandlerRef.current[idx].setDownloadQueue = null as any;
-    };
-  }, []);
-
-  const currentQueueClass = () => {
-    if (!downloadQueue || countDownActivity.currentImgId !== item.id) return "";
-    if (downloadQueue.error) return "error";
-    if (downloadQueue.currentImgStatus === "DONE") return "success";
+  const finishedQueueClass = () => {
+    if (!downloadQueueCurrent.countdownActive) return "";
+    if (downloadQueueCurrent.error) return "error";
+    if (downloadQueueCurrent.currentImgStatus === "DONE") return "success";
     return "";
   };
 
@@ -136,14 +96,7 @@ const DownloadMenuItem = ({
   };
 
   const stopRunningCountDown = () => {
-    if (
-      displayCountDown.enabled ||
-      !countDownActivity.active ||
-      downloadQueue?.currentImgStatus !== "DONE"
-      //  || countDownActivity.currentImgId !== item.id
-    ) {
-      return;
-    }
+    // console.log({ countDownActivity });
     countDownBarElStyleRef.current! = {};
     countDownBarElRef.current!.style.transition = "none";
   };
@@ -153,12 +106,18 @@ const DownloadMenuItem = ({
       stopRunningCountDown();
       return countDownBarElStyleRef.current;
     }
-    if (!downloadQueue) return {};
+
+    // if (
+    //   downloadQueueCurrent.countdownActive &&
+    //   downloadQueueCurrent.name === "aubrey"
+    // )
+    //   debugger;
     if (
-      downloadQueue.currentImgStatus !== "DONE" ||
+      downloadQueueCurrent.currentImgStatus !== "DONE" ||
       !countDownActivity.active ||
       !countDownActivity.enabled ||
-      countDownActivity.currentImgId !== item.id
+      countDownActivity.currentImgId !== downloadQueueCurrent.id ||
+      !downloadQueueCurrent.countdownActive
     ) {
       return {};
     }
@@ -190,30 +149,27 @@ const DownloadMenuItem = ({
   };
 
   const renderIcon = () => {
-    if (!downloadQueue) {
-      return <CircleDot></CircleDot>;
-    }
-    const { currentImgStatus, error } = downloadQueue;
+    const { currentImgStatus, error, inQueue } = downloadQueueCurrent;
 
     if (error) {
       return <CircleCross></CircleCross>;
     }
 
-    if (
-      currentImgStatus === "EMPTY" ||
-      currentImgStatus === "COMPRESSING" ||
-      currentImgStatus === "SCANNING"
-    ) {
+    if (currentImgStatus === "EMPTY" && inQueue) {
+      return <CircleDot></CircleDot>;
+    }
+
+    if (currentImgStatus === "COMPRESSING" || currentImgStatus === "SCANNING") {
       return <SwappingSquares></SwappingSquares>;
     }
     return <CircleCheck></CircleCheck>;
   };
 
   const iconClass = () => {
-    if (!downloadQueue) {
+    if (!downloadQueueCurrent) {
       return "";
     }
-    const { currentImgStatus, error } = downloadQueue;
+    const { currentImgStatus, error } = downloadQueueCurrent;
 
     if (error) {
       return "error";
@@ -245,23 +201,21 @@ const DownloadMenuItem = ({
   };
 
   useEffect(() => {
-    if (!hasRenderedRef.current) return;
+    // if (!hasRenderedRef.current) return;
     setCountDownElStyle();
-  }, [downloadQueue?.currentImgStatus, displayCountDown]);
-
-  useEffect(() => {
-    setCountDownElStyle();
-    hasRenderedRef.current = true;
-  }, []);
+  }, [
+    downloadQueueCurrent.currentImgStatus,
+    downloadQueueCurrent.countdownActive,
+  ]);
 
   return (
-    <li className={`queue-item ${currentQueueClass()}`} key={idx}>
+    <li className={`queue-item ${finishedQueueClass()}`} key={idx}>
       <div className="main">
         <div className={`icon-holder ${iconClass()}`}>{renderIcon()}</div>
-        <div className="name">{item.name}</div>
-        {downloadQueue ? (
+        <div className="name">{downloadQueueCurrent.name}</div>
+        {downloadQueueCurrent ? (
           <div className="util">
-            {downloadQueue!.error ? (
+            {downloadQueueCurrent!.error ? (
               <button
                 className={`btn btn-show-more ${showMore ? "active" : ""}`}
                 aria-expanded={showMore ? "true" : "false"}
@@ -272,11 +226,11 @@ const DownloadMenuItem = ({
                   <Cevron></Cevron>
                 </span>
               </button>
-            ) : downloadQueue!.currentImgStatus === "DONE" ? (
+            ) : downloadQueueCurrent!.currentImgStatus === "DONE" ? (
               <button
                 className="btn btn-jump"
                 onClick={onJump}
-                aria-label={`Jump to image ${item.name}`}
+                aria-label={`Jump to image ${downloadQueueCurrent.name}`}
               >
                 Jump
               </button>
@@ -290,7 +244,7 @@ const DownloadMenuItem = ({
         ></div>
       </div>
       {showMore ? (
-        <div className="more-info">{downloadQueue!.errorMsg}</div>
+        <div className="more-info">{downloadQueueCurrent!.errorMsg}</div>
       ) : null}
       <style jsx>
         {`
@@ -402,10 +356,6 @@ const DownloadMenuItem = ({
             border: 0;
           }
 
-          .queue-item:first-child {
-            padding-top: 18px;
-          }
-
           .queue-item.success .btn-jump {
             background: #00875c;
             color: #fff;
@@ -444,16 +394,13 @@ const DownloadMenuItem = ({
           @media (min-width: 500px) {
             .icon-holder {
               padding: 12px;
+              margin-left: 10px;
             }
 
             .icon-holder.success,
             .icon-holder.error,
             .icon-holder.loading {
               padding: 5px;
-            }
-
-            .queue-item:first-child {
-              padding-top: 25px;
             }
 
             .name {
@@ -476,33 +423,27 @@ const DownloadMenuItem = ({
 
 type TDownloadMenuItemsContainerProps = Pick<
   TDownloadMenuItemProps,
-  | "countDownActivityRef"
-  | "downloadMenuItemHandlerRef"
-  | "goToNextRef"
-  | "onFocusOutExitRef"
+  "countDownActivityRef" | "goToNextRef" | "onFocusOutExitRef"
 >;
 
 export const DownloadMenuItemsContainer = React.memo(
   ({
     countDownActivityRef,
-    downloadMenuItemHandlerRef,
     goToNextRef,
     onFocusOutExitRef,
   }: TDownloadMenuItemsContainerProps) => {
-    const inputResult = useSelector(
-      (state: RootState) => state.form.inputResult
-    );
+    const [downloadImages] = useState(() => {
+      return store.getState().imageUrl.imgQueue.map((_, idx) => idx);
+    });
     return (
       <>
-        {inputResult.map((item, idx) => (
+        {downloadImages.map((_, idx) => (
           <DownloadMenuItem
             countDownActivityRef={countDownActivityRef}
-            item={item}
             onFocusOutExitRef={onFocusOutExitRef}
-            downloadMenuItemHandlerRef={downloadMenuItemHandlerRef}
             goToNextRef={goToNextRef}
             idx={idx}
-            key={item.id}
+            key={idx}
           ></DownloadMenuItem>
         ))}
       </>
