@@ -1,5 +1,5 @@
 import { TMqlGroup } from "../../hooks/useMatchMedia";
-import { IOS } from "../../lib/onFocusOut/browserInfo";
+import { IOS, Safari } from "../../lib/onFocusOut/browserInfo";
 import { reflow } from "../../utils/reflow";
 import smoothScrollTo from "../../utils/smoothScrollTo";
 
@@ -103,8 +103,8 @@ export const animateResult = ({ id, firstImage, mql }: TAnimateResult) => {
       mainEl.style.clipPath = "polygon(0% 100vh, 0% 0%, 100% 0%, 100% 100vh)";
     }
 
-    // For iOS, the descision is that landing will always translate up and reveal result behind it. There's an issue where either demographicHeight/landingHeight is not correct, so it will translate/zindex the wrong elements. Unable to solve it since I don't have a Mac to do thorough debugging, that's why I hardcoded the result using IOS var.
-    if (landingHeight > demographicHeight || IOS) {
+    // For Safari, the descision is that landing will always translate up and reveal result behind it. There's an issue where either demographicHeight/landingHeight is not correct, so it will translate/zindex the wrong elements. Unable to solve it since I don't have a Mac to do thorough debugging, that's why I hardcoded the result using IOS var.
+    if (landingHeight > demographicHeight || IOS || Safari) {
       demographicEl.style.opacity = "1";
       demographicEl.style.zIndex = "-1";
       landingEl.style.zIndex = "65";

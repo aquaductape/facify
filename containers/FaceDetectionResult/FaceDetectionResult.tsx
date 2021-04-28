@@ -7,6 +7,7 @@ import Seperator from "./Bar/Seperator";
 import Bar from "./Bar/Bar";
 import { reflow } from "../../utils/reflow";
 import { animationEnd } from "../UploadImageForm/animateUpload";
+import { CONSTANTS } from "../../constants";
 
 type TResultProps = {
   id: string;
@@ -79,6 +80,7 @@ const Result = React.memo(({ id, idx }: TResultProps) => {
             .image-panel {
               display: grid;
               grid-template-columns: 450px 1fr;
+              grid-template-rows: ${CONSTANTS.imageHeightDesktop};
             }
           }
 

@@ -8,10 +8,10 @@
 7. Webcam Camera
 8. ClassifyBtns onFocusOut
 9. shows same landingpage translate issue in Safari
-10. When i tested all error items, the loader menu items weren't synced, and were at default state.
-11. Deal with no faces. Currently it will crash.
-12. Focus inside Classify Area when opened
-13. Get rid of focus outline on containers (Loader Menu)
+10. Deal with no faces. Currently it will crash.
+11. Focus inside Classify Area when opened
+12. Get rid of focus outline on containers (Loader Menu)
+13. Refactore file and data naming consistency.
 
 ### Note
 

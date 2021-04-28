@@ -32,10 +32,16 @@ const ImageResult = ({ id, idx }: TImageResultProps) => {
     debounce(() => {
       if (!renderBoundingBoxRef.current) return;
       const containerWidth = imageContainerRef.current!.clientWidth;
+      const containerHeight = imageContainerRef.current!.clientHeight;
       const imgWidth = imgRef.current!.clientWidth;
       let imageHeight = imgRef.current!.clientHeight;
       const diff = containerWidth / imgWidth;
-      imgRef.current!.style.height = `${imageHeight * diff}px`;
+      const result =
+        imageHeight * diff > containerHeight
+          ? containerHeight
+          : imageHeight * diff;
+
+      imgRef.current!.style.height = `${result}px`;
       reflow();
       imageHeight = imgRef.current!.clientHeight;
 
@@ -147,7 +153,8 @@ const ImageResult = ({ id, idx }: TImageResultProps) => {
           @media (min-width: 1300px) {
             .container,
             img {
-              max-height: ${CONSTANTS.imageHeightDesktop}px;
+              max-height: none;
+              height: 100%;
               margin: 0;
             }
           }

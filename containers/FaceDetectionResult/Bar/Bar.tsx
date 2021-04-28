@@ -5,14 +5,19 @@ import { selectName } from "../ImageResult/demographicsSlice";
 import CloseBtn from "./CloseBtn";
 import UtilBar from "../InfoResult/UtilBar/UtilBar";
 import { useMatchMedia } from "../../../hooks/useMatchMedia";
+import store from "../../../store/store";
 
 const Bar = ({ id, idx }: { id: string; idx: number }) => {
   const imageName = useSelector(selectName({ id: idx }));
-
+  const [hasFaces] = useState(
+    () => !!store.getState().demographics.parents[idx].childIds.length
+  );
   const [displayUtilBar, setDisplayUtilBar] = useState(false);
   const mqlGroup = useMatchMedia();
 
   useEffect(() => {
+    if (!hasFaces) return;
+
     if (mqlGroup.current!.minWidth_1300.matches) {
       setDisplayUtilBar(true);
     }
@@ -34,8 +39,12 @@ const Bar = ({ id, idx }: { id: string; idx: number }) => {
 
   return (
     <div className="bar">
-      <ClassifySentinelTop id={id}></ClassifySentinelTop>
-      <BarSentinel id={id}></BarSentinel>
+      {hasFaces ? (
+        <>
+          <ClassifySentinelTop id={id}></ClassifySentinelTop>
+          <BarSentinel id={id}></BarSentinel>
+        </>
+      ) : null}
       <div className="title">
         <div className="title-number"></div>
         <div className="title-name">{imageName}</div>

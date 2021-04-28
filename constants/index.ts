@@ -3,7 +3,7 @@ import { TSortValueType } from "../containers/FaceDetectionResult/ImageResult/de
 export const CONSTANTS = {
   minImageHeight: 210,
   imageHeight: 250,
-  imageHeightDesktop: 700,
+  imageHeightDesktop: "70vh",
   appStickyStartTop:
     133 + // Logo
     45, // form bar
