@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import TransitionSlide from "../../../components/TransitionSlide";
 import { useMatchMedia } from "../../../hooks/useMatchMedia";
@@ -10,16 +10,20 @@ type TWebcamProps = {
   setOpenLoader: React.Dispatch<React.SetStateAction<boolean>>;
 };
 const WebcamBtn = ({ setOpenLoader }: TWebcamProps) => {
-  const dispatch = useDispatch();
-  const formSubmit = useSelector((state: RootState) => state.form.submit);
-  const imageLoaded = useSelector(
-    (state: RootState) => state.imageUrl.imageLoaded
-  );
   const mqlRef = useMatchMedia();
-  const [fileItems, setFileItems] = useState<(TURLItem & { file: File })[]>([]);
   const [showCamera, setShowCamera] = useState(false);
 
   const onClick = () => setShowCamera(true);
+
+  useEffect(() => {
+    const mql = mqlRef.current!;
+
+    mql.minWidth_850.addEventListener("change", (e) => {
+      if (!e.matches) {
+        setShowCamera(false);
+      }
+    });
+  }, []);
 
   return (
     <div className="container">
@@ -83,7 +87,7 @@ const WebcamBtn = ({ setOpenLoader }: TWebcamProps) => {
             }
           }
 
-          @media (min-width: 800px) {
+          @media (min-width: 850px) {
             .container {
               display: block;
             }

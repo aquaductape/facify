@@ -102,6 +102,7 @@ const Bar = ({ id, idx }: { id: string; idx: number }) => {
           }
 
           .title-name {
+            position: relative;
             font-size: 18px;
             width: 100%;
             text-overflow: ellipsis;
@@ -125,11 +126,12 @@ const Bar = ({ id, idx }: { id: string; idx: number }) => {
             .title-number {
               font-size: 30px;
               margin: 0 20px;
-              margin-right: 35px;
+              margin-right: 30px;
             }
             .title-name {
               font-size: 20px;
               max-width: 500px;
+              margin-right: 20px;
             }
 
             .stats {

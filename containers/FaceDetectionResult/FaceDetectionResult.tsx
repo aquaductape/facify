@@ -80,7 +80,6 @@ const Result = React.memo(({ id, idx }: TResultProps) => {
             .image-panel {
               display: grid;
               grid-template-columns: 450px 1fr;
-              grid-template-rows: ${CONSTANTS.imageHeightDesktop};
             }
           }
 

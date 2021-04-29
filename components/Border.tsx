@@ -80,6 +80,7 @@ const Border = ({
         {`
           .container {
             position: absolute;
+            backface-visibility: hidden;
           }
 
           .bar {

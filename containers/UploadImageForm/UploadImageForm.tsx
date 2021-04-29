@@ -240,7 +240,7 @@ const UploadImageForm = () => {
             display: none;
           }
 
-          @media (min-width: 800px) {
+          @media (min-width: 850px) {
             .shadow {
               transform: scaleX(0.95);
             }

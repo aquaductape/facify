@@ -209,7 +209,7 @@ const Input = ({ submitHoverRef, isOpenRef, displayErrorRef }: InputProps) => {
           @media (min-width: 600px) {
             .shadow {
               transform: scaleX(0.95);
-              box-shadow: 0 0px 15px 2px black;
+              box-shadow: 0 0px 15px 2px #000;
             }
           }
 

@@ -153,7 +153,7 @@ const ImageResult = ({ id, idx }: TImageResultProps) => {
           @media (min-width: 1300px) {
             .container,
             img {
-              max-height: none;
+              max-height: ${CONSTANTS.imageHeightDesktop};
               height: 100%;
               margin: 0;
             }

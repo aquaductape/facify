@@ -128,6 +128,8 @@ const InfoResult = ({ id, idx }: TInforResultProps) => {
           @media (min-width: 1300px) {
             .info-demo {
               height: 100%;
+              max-height: ${CONSTANTS.imageHeightDesktop};
+              min-height: 300px;
               overflow-y: auto;
               margin-top: -130px;
             }

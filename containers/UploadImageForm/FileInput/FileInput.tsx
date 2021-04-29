@@ -6,19 +6,14 @@ import { RootState } from "../../../store/rootReducer";
 import { convertFileToBase64 } from "../../../utils/convertFileToBase64";
 import { JSON_Stringify_Parse } from "../../../utils/jsonStringifyParse";
 import { TDemographicNode } from "../../FaceDetectionResult/ImageResult/demographicsSlice";
-import {
-  addInputResult,
-  setInputResultFromUrlItems,
-  setSubmit,
-  TURLItem,
-} from "../formSlice";
+import { addInputResult, setSubmit, TURLItem } from "../formSlice";
 import { setImgQueue, TImgQueue, updateImgQueue } from "../imageUrlSlice";
-import { TQueue } from "../Loader/Loader";
 import {
   addImageAndAnimate,
   getImageDimensions,
   postClarifaiAPI,
 } from "../upload";
+import { onFileUpload } from "./utils/onFileUpload";
 
 type TFileInputProps = {
   setOpenLoader: React.Dispatch<React.SetStateAction<boolean>>;
@@ -31,60 +26,6 @@ const FileInput = ({ setOpenLoader }: TFileInputProps) => {
   );
   const mqlRef = useMatchMedia();
   const [fileItems, setFileItems] = useState<(TURLItem & { file: File })[]>([]);
-
-  const onFileUpload = async (item: { file: File } & TURLItem, idx: number) => {
-    const maxSizeMB = 3.5;
-    const kbRatio = 1_000_000;
-
-    if (item.file.size > maxSizeMB * kbRatio) {
-      dispatch(
-        updateImgQueue({
-          id: item.id,
-          props: { currentImgStatus: "COMPRESSING" },
-        })
-      );
-    }
-    const { base64, file: newFile } = await convertFileToBase64(item.file);
-    dispatch(
-      updateImgQueue({
-        id: item.id,
-        props: { currentImgStatus: "SCANNING" },
-      })
-    );
-
-    const result = await postClarifaiAPI({ base64, resetOrientation: true });
-
-    if (
-      result.status.code !== 10000 && // OK
-      result.status.code !== 10010 // Mixed Success
-    ) {
-      const errorMsg = `Server Error. ${result.status.message}`;
-      dispatch(
-        updateImgQueue({
-          id: item.id,
-          props: { error: true, errorMsg, currentImgStatus: "DONE" },
-        })
-      );
-      return;
-    }
-
-    const objectUrl = window.URL.createObjectURL(newFile);
-    const img = await getImageDimensions(objectUrl);
-    const data = (result.data as unknown) as TDemographicNode[];
-    const mql = mqlRef.current!;
-
-    await addImageAndAnimate({
-      id: item.id,
-      croppedUrl: base64,
-      url: objectUrl,
-      data,
-      img,
-      name: item.name,
-      dispatch,
-      firstImage: !imageLoaded && idx === 0,
-      mql,
-    });
-  };
 
   const onFilesInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from((e.target.files as unknown) as File[]);
@@ -145,7 +86,7 @@ const FileInput = ({ setOpenLoader }: TFileInputProps) => {
     const run = async () => {
       for (let i = 0; i < fileItems.length; i++) {
         const item = fileItems[i];
-        await onFileUpload(item, i);
+        await onFileUpload({ item, idx: i, dispatch, imageLoaded, mqlRef });
       }
     };
 
