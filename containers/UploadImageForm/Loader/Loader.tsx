@@ -12,11 +12,11 @@ import { CONSTANTS } from "../../../constants";
 import onFocusOut, { OnFocusOutExit } from "../../../lib/onFocusOut/onFocusOut";
 import { RootState } from "../../../store/rootReducer";
 import { reflow } from "../../../utils/reflow";
+import smoothScrollTo from "../../../utils/smoothScrollTo";
 import { clearAllFormValues } from "../formSlice";
 import { TImgStatus, updateImgQueue } from "../imageUrlSlice";
 import DownloadMenu from "./DownloadMenu";
-import { TDownloadMenuItemHandler } from "./DownloadMenuItem";
-import { updateDownloadMenuItemDisplayCountDown } from "./utils/updateDownloadMenu";
+import { onClickJumpToImage } from "./utils/onJump";
 
 type TLoaderProps = {
   setOpenLoader: Dispatch<SetStateAction<boolean>>;
@@ -50,8 +50,15 @@ const Loader = ({ setOpenLoader }: TLoaderProps) => {
   const kebabMenuBtnElRef = useRef<HTMLButtonElement | null>(null);
   const onFocusOutExitRef = useRef<OnFocusOutExit | null>(null);
   const goToNextRef = useRef<
-    (props?: { clearCurrentTimout?: boolean | undefined }) => void
+    ({
+      clearCurrentTimout,
+      enableCountDown,
+    }?: {
+      clearCurrentTimout?: boolean | undefined;
+      enableCountDown?: boolean | undefined;
+    }) => void
   >();
+  const downloadItemJumpLinkRef = useRef<((id: string) => void) | null>(null);
   const loadingDoneRef = useRef(false);
   const loadingDoneTimeIdRef = useRef(0);
   const openMenuRef = useRef(openMenu);
@@ -72,9 +79,9 @@ const Loader = ({ setOpenLoader }: TLoaderProps) => {
     timestamp: 0,
     duration: CONSTANTS.loaderErrorDuration,
   });
-  const downloadMenuItemHandlerRef = useRef<TDownloadMenuItemHandler>({});
   downloadQueueRef.current = downloadQueue;
-  const isLast = finishedQueueIdx === downloadQueue.length - 1;
+  const isLast = finishedQueueIdx >= downloadQueue.length - 1;
+  const isLastRef = useRef(false);
   const currentResult = downloadQueue[finishedQueueIdx]
     ? downloadQueue[finishedQueueIdx]
     : ({} as TQueue);
@@ -156,7 +163,7 @@ const Loader = ({ setOpenLoader }: TLoaderProps) => {
 
     window.clearTimeout(loadingDoneTimeIdRef.current);
 
-    if (!isLast) return;
+    if (!isLastRef.current) return;
 
     if (fireNow) {
       onTimeout();
@@ -204,14 +211,6 @@ const Loader = ({ setOpenLoader }: TLoaderProps) => {
     });
 
     onFocusOutExitRef.current = exit;
-  };
-
-  const onClickJumpToLink = () => {
-    if (isLast) {
-      closeLoaderWhenDone({ fireNow: true });
-    }
-
-    goToNext({ clearCurrentTimout: true });
   };
 
   const stopRunningCountDownBar = () => {
@@ -303,11 +302,8 @@ const Loader = ({ setOpenLoader }: TLoaderProps) => {
       startCountDown({ nextImgId: true });
       window.clearTimeout(countDownActivity.timeoutId);
       stopRunningCountDownBar();
-      updateDownloadMenuItemDisplayCountDown(
-        { active: false, enabled: enableCountDown },
-        { downloadMenuItemHandlerRef, idx: finishedQueueIdx }
-      );
-      if (isLast) {
+
+      if (isLastRef.current) {
         closeLoaderWhenDone({ fireNow: true });
         return;
       }
@@ -333,17 +329,17 @@ const Loader = ({ setOpenLoader }: TLoaderProps) => {
   };
   goToNextRef.current = goToNext;
 
+  const downloadItemJumpLink = (id: string) =>
+    onClickJumpToImage({ id, goToNext, isLast, closeLoaderWhenDone });
+  downloadItemJumpLinkRef.current = downloadItemJumpLink;
+
   // queue as imgStatus is DONE and rest are still busy
   useEffect(() => {
     const currentQueue = downloadQueue.find((item) => item.inQueue)!;
 
     if (!currentQueue) return;
-    // if (
-    //   currentQueue.name === "aubrey" &&
-    //   currentQueue.currentImgStatus === "DONE"
-    // )
-    // if (!currentQueue.inQueue) return;
     if (currentQueue.currentImgStatus !== "DONE") return;
+
     console.log("gotonext", currentQueue.name);
     dispatch(
       updateImgQueue({
@@ -357,13 +353,14 @@ const Loader = ({ setOpenLoader }: TLoaderProps) => {
 
   // all images are already done, queue DONE images backlog
   useEffect(() => {
+    isLastRef.current = finishedQueueIdx >= downloadQueueRef.current.length - 1;
     if (initRef.current) {
       initRef.current = false;
       return;
     }
     const currentQueue = downloadQueueRef.current[finishedQueueIdx];
 
-    if (currentQueue.currentImgStatus !== "DONE") {
+    if (!currentQueue || currentQueue.currentImgStatus !== "DONE") {
       return;
     }
 
@@ -423,7 +420,14 @@ const Loader = ({ setOpenLoader }: TLoaderProps) => {
                 !currentResult.error ? (
                   <button
                     className="image-name__link"
-                    onClick={onClickJumpToLink}
+                    onClick={() =>
+                      onClickJumpToImage({
+                        id: currentResult.id,
+                        goToNext,
+                        closeLoaderWhenDone,
+                        isLast,
+                      })
+                    }
                   >
                     <span className="link-icon">
                       <LinkIcon></LinkIcon>
@@ -453,6 +457,7 @@ const Loader = ({ setOpenLoader }: TLoaderProps) => {
             unmountOnExit
           >
             <DownloadMenu
+              downloadItemJumpLinkRef={downloadItemJumpLinkRef}
               optionsMenuElRef={optionsMenuElRef}
               onFocusOutExitRef={onFocusOutExitRef}
               countDownActivityRef={countDownActivityRef}
@@ -460,7 +465,7 @@ const Loader = ({ setOpenLoader }: TLoaderProps) => {
               queueIdx={finishedQueueIdx}
               openMenu={openMenu}
               setOpenMenu={setOpenMenu}
-              goToNextRef={goToNextRef as any}
+              goToNextRef={goToNextRef}
             ></DownloadMenu>
           </CSSTransition>
         </div>

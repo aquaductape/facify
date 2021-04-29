@@ -9,15 +9,15 @@ type TStartAnimate = {
 
 export const startAnimate = ({ firstImage }: TStartAnimate) =>
   new Promise<boolean>((resolve) => {
-    if (!firstImage) return resolve(true);
+    // if (!firstImage) return resolve(true);
 
     const landingEl = document.getElementById("landing")!;
     const mainEl = document.getElementById("main")!;
     const mainBgEl = mainEl.querySelector(".main-bg") as HTMLElement;
-    const viewportHeight = window.innerHeight;
-    const scrollHeight = document.body.scrollHeight;
+    // const viewportHeight = window.innerHeight;
+    // const scrollHeight = document.body.scrollHeight;
 
-    const isContentOverflow = scrollHeight > viewportHeight;
+    // const isContentOverflow = scrollHeight > viewportHeight;
 
     const run = () => {
       landingEl.style.position = "absolute";
@@ -35,7 +35,7 @@ export const startAnimate = ({ firstImage }: TStartAnimate) =>
       resolve(true);
     };
 
-    if (firstImage && isContentOverflow) {
+    if (firstImage) {
       smoothScrollTo({
         destination: 0,
         duration: 180,

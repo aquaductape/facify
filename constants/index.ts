@@ -4,6 +4,7 @@ export const CONSTANTS = {
   minImageHeight: 210,
   imageHeight: 250,
   imageHeightDesktop: "70vh",
+  seperatorHeight: 80,
   appStickyStartTop:
     133 + // Logo
     45, // form bar

@@ -285,18 +285,17 @@ const CloseBtn = ({ id, idx }: CloseBtnProps) => {
             height: 45px;
             width: 45px;
             background: #efefef;
-            border: 3px solid #efefef;
-            padding: 10px;
+            padding: 13px;
             outline: none;
-            transition: border-color 250ms;
+            -webkit-tap-highlight-color: transparent;
+            transition: background-color 250ms;
           }
 
           .btn-remove:hover {
-            border-color: #b0b7cf;
+            background: #b0b7cf;
           }
 
           .btn-remove.focus-visible {
-            border-color: #b0b7cf;
             outline: 3px solid #000;
             outline-offset: 3px;
             z-index: 100;

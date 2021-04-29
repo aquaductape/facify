@@ -15,38 +15,12 @@ import { TManualExit } from "../../../lib/onFocusOut/onFocusOut";
 import { RootState } from "../../../store/rootReducer";
 import store from "../../../store/store";
 import { reflow } from "../../../utils/reflow";
-import { TURLItem } from "../formSlice";
-import { TQueue } from "./Loader";
-
-type TDisplayCountDown = {
-  active: boolean;
-  enabled: boolean;
-};
-
-export type TDownloadMenuItemHandler = {
-  [key: string]: {
-    setDownloadQueue: React.Dispatch<React.SetStateAction<TQueue | null>>;
-    setDisplayCountDown: React.Dispatch<
-      React.SetStateAction<TDisplayCountDown>
-    >;
-    displayCountDown: TDisplayCountDown;
-    downloadQueue: TQueue | null;
-  };
-};
+import { onClickJumpToImage } from "./utils/onJump";
 
 type TDownloadMenuItemProps = {
   idx: number;
   onFocusOutExitRef: MutableRefObject<TManualExit | null>;
-  goToNextRef: MutableRefObject<
-    (
-      props?:
-        | {
-            clearCurrentTimout?: boolean | undefined;
-            enableCountDown?: boolean | undefined;
-          }
-        | undefined
-    ) => void
-  >;
+  downloadItemJumpLinkRef: MutableRefObject<((id: string) => void) | null>;
   countDownActivityRef: MutableRefObject<{
     currentImgId: string;
     enabled: boolean;
@@ -58,26 +32,20 @@ type TDownloadMenuItemProps = {
   }>;
 };
 const DownloadMenuItem = ({
-  countDownActivityRef,
   idx,
+  downloadItemJumpLinkRef,
+  countDownActivityRef,
   onFocusOutExitRef,
-  goToNextRef,
 }: TDownloadMenuItemProps) => {
   const [showMore, setShowMore] = useState(false);
-  // const countDownChecked = useSelector(
-  //   (state: RootState) => state.menu.disableNotificationCountDown
-  // );
-  // const currentQueue = queue[idx];
   const countDownBarElRef = useRef<HTMLDivElement | null>(null);
   const countDownInitRef = useRef(false);
-  const hasRenderedRef = useRef(false);
   const countDownBarElStyleRef = useRef<CSSProperties>({});
   const countDownActivity = countDownActivityRef.current;
-  // const finishedQueue = queue[queueIdx];
   const downloadQueueCurrent = useSelector(
     (state: RootState) => state.imageUrl.imgQueue[idx]
   );
-  const goToNext = goToNextRef.current;
+  const downloadItemJumpLink = downloadItemJumpLinkRef.current!;
 
   const finishedQueueClass = () => {
     if (!downloadQueueCurrent.countdownActive) return "";
@@ -182,22 +150,11 @@ const DownloadMenuItem = ({
   };
 
   const onJump = () => {
-    const countDownActivity = countDownActivityRef.current;
     const onFocusOutExit = onFocusOutExitRef.current;
-    // better to check if li progressbar is active instead
 
-    if (countDownActivity.active) {
-      goToNext({ clearCurrentTimout: true });
-      // nextQueue
-      // remove countdown-bar
-    }
+    downloadItemJumpLink(downloadQueueCurrent.id);
 
-    // close options menu
     onFocusOutExit?.runAllExits();
-    // setOpenMenu(false);
-
-    // const el = document.getElementById(item.id)!; // jump
-    // smoothScrollTo({ destination: el, duration: 200 });
   };
 
   useEffect(() => {
@@ -429,13 +386,13 @@ const DownloadMenuItem = ({
 
 type TDownloadMenuItemsContainerProps = Pick<
   TDownloadMenuItemProps,
-  "countDownActivityRef" | "goToNextRef" | "onFocusOutExitRef"
+  "countDownActivityRef" | "onFocusOutExitRef" | "downloadItemJumpLinkRef"
 >;
 
 export const DownloadMenuItemsContainer = React.memo(
   ({
+    downloadItemJumpLinkRef,
     countDownActivityRef,
-    goToNextRef,
     onFocusOutExitRef,
   }: TDownloadMenuItemsContainerProps) => {
     const [downloadImages] = useState(() => {
@@ -445,9 +402,9 @@ export const DownloadMenuItemsContainer = React.memo(
       <>
         {downloadImages.map((_, idx) => (
           <DownloadMenuItem
+            downloadItemJumpLinkRef={downloadItemJumpLinkRef}
             countDownActivityRef={countDownActivityRef}
             onFocusOutExitRef={onFocusOutExitRef}
-            goToNextRef={goToNextRef}
             idx={idx}
             key={idx}
           ></DownloadMenuItem>

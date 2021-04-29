@@ -13,7 +13,6 @@ import { RootState } from "../../../store/rootReducer";
 import InputCheckBox from "./InputCheckBox";
 import DownloadMenuItem, {
   DownloadMenuItemsContainer,
-  TDownloadMenuItemHandler,
 } from "./DownloadMenuItem";
 import { TQueue } from "./Loader";
 import { ScrollShadow, SentinelShadow } from "../../../components/ScrollShadow";
@@ -27,15 +26,17 @@ type TDownloadMenuProps = {
   setOpenMenu: Dispatch<SetStateAction<boolean>>;
   queue: TQueue[];
   queueIdx: number;
+  downloadItemJumpLinkRef: MutableRefObject<((id: string) => void) | null>;
   goToNextRef: MutableRefObject<
-    (
-      props?:
-        | {
-            clearCurrentTimout?: boolean | undefined;
-            enableCountDown?: boolean | undefined;
-          }
-        | undefined
-    ) => void
+    | ((
+        props?:
+          | {
+              clearCurrentTimout?: boolean | undefined;
+              enableCountDown?: boolean | undefined;
+            }
+          | undefined
+      ) => void)
+    | undefined
   >;
   countDownActivityRef: MutableRefObject<{
     currentImgId: string;
@@ -56,6 +57,7 @@ const DownloadMenu = ({
   openMenu,
   setOpenMenu,
   goToNextRef,
+  downloadItemJumpLinkRef,
   countDownActivityRef,
 }: TDownloadMenuProps) => {
   const countDownActivity = countDownActivityRef.current;
@@ -86,7 +88,7 @@ const DownloadMenu = ({
     const checkValue = !e.target.checked;
     countDownActivity.enabled = checkValue;
     // debugger;
-    goToNext({ clearCurrentTimout: true, enableCountDown: checkValue });
+    goToNext!({ clearCurrentTimout: true, enableCountDown: checkValue });
   };
 
   useEffect(() => {
@@ -144,8 +146,8 @@ const DownloadMenu = ({
 
           <ul className="group" ref={groupElRef}>
             <DownloadMenuItemsContainer
+              downloadItemJumpLinkRef={downloadItemJumpLinkRef}
               countDownActivityRef={countDownActivityRef}
-              goToNextRef={goToNextRef}
               onFocusOutExitRef={onFocusOutExitRef}
             ></DownloadMenuItemsContainer>
             {isScrollContainer ? (
