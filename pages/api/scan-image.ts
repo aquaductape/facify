@@ -166,9 +166,8 @@ const fixExifOrientation = async (uri: string) => {
     return Buffer.from(piexif.insert(exifBytes, imageString), "binary");
   };
 
-  const buffer = deleteThumbnailFromExif(dataUriToBuffer(uri));
-
   try {
+    const buffer = deleteThumbnailFromExif(dataUriToBuffer(uri));
     const orientedImg = await jo.rotate(buffer, {});
 
     return orientedImg.buffer;
@@ -176,7 +175,7 @@ const fixExifOrientation = async (uri: string) => {
     // code: 'no_orientation',
     // message: 'No orientation tag found in EXIF'
     // therefore it's okay to feed unRotated buffer back since this image didn't need to be oriented
-    return buffer;
+    return uri.split(",")[1];
   }
 };
 

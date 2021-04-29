@@ -5,6 +5,7 @@ import imageHeightReducer from "../containers/FaceDetectionResult/InfoResult/Tab
 import formReducer from "../containers/UploadImageForm/formSlice";
 import menuReducer from "../containers/Menu/menuSlice";
 import classifyReducer from "../containers/FaceDetectionResult/InfoResult/Classify/classifySlice";
+import loaderReducer from "../containers/UploadImageForm/Loader/loaderSlice";
 
 const rootReducer = combineReducers({
   imageUrl: imageUrlReducer,
@@ -13,6 +14,7 @@ const rootReducer = combineReducers({
   form: formReducer,
   menu: menuReducer,
   classify: classifyReducer,
+  loader: loaderReducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;

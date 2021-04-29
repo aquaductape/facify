@@ -17,14 +17,15 @@ import FileInput from "./FileInput/FileInput";
 //   TDemographicNode,
 // } from "../FaceDetectionResult/ImageResult/demographicsSlice";
 // import createCroppedImgUrl from "../FaceDetectionResult/BoundingCroppedImage/createCroppedImgUrl";
-import { batch, useDispatch } from "react-redux";
+import { batch, useDispatch, useSelector } from "react-redux";
 import WebcamBtn from "./Webcam/WebcamBtn";
+import { RootState } from "../../store/rootReducer";
 // import { setImageLoaded, setImageStatus } from "./imageUrlSlice";
 // import { addImage } from "../FaceDetectionResult/InfoResult/Table/imageHeightSlice";
 // import { animationEnd } from "./animateUpload";
 
 const UploadImageForm = () => {
-  const [openLoader, setOpenLoader] = useState(false);
+  const openLoader = useSelector((state: RootState) => state.loader.open);
   const [hideFormGroup, setHideFormGroup] = useState(false);
   const sentinelElRef = useRef<HTMLDivElement | null>(null);
   const shadowElRef = useRef<HTMLDivElement | null>(null);
@@ -177,11 +178,11 @@ const UploadImageForm = () => {
         className={`multifile-upload-group ${hideFormGroup ? "active" : ""}`}
       >
         <div className="shadow" ref={shadowElRef}></div>
-        <WebcamBtn setOpenLoader={setOpenLoader}></WebcamBtn>
+        <WebcamBtn></WebcamBtn>
         <div className="shared-pillar pillar-1"></div>
-        <FileInput setOpenLoader={setOpenLoader}></FileInput>
+        <FileInput></FileInput>
         <div className="shared-pillar pillar-2"></div>
-        <TextInput setOpenLoader={setOpenLoader}></TextInput>
+        <TextInput></TextInput>
       </div>
       <CSSTransition
         in={openLoader}
@@ -189,7 +190,7 @@ const UploadImageForm = () => {
         timeout={200}
         unmountOnExit
       >
-        <Loader setOpenLoader={setOpenLoader}></Loader>
+        <Loader></Loader>
       </CSSTransition>
       <style jsx>
         {`

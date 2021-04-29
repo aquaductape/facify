@@ -1,6 +1,7 @@
 import { nanoid } from "nanoid";
 import { useEffect, useState } from "react";
 import { batch, useDispatch, useSelector } from "react-redux";
+import { CONSTANTS } from "../../../constants";
 import { useMatchMedia } from "../../../hooks/useMatchMedia";
 import { RootState } from "../../../store/rootReducer";
 import { convertFileToBase64 } from "../../../utils/convertFileToBase64";
@@ -8,6 +9,7 @@ import { JSON_Stringify_Parse } from "../../../utils/jsonStringifyParse";
 import { TDemographicNode } from "../../FaceDetectionResult/ImageResult/demographicsSlice";
 import { addInputResult, setSubmit, TURLItem } from "../formSlice";
 import { setImgQueue, TImgQueue, updateImgQueue } from "../imageUrlSlice";
+import { setOpenLoader } from "../Loader/loaderSlice";
 import {
   addImageAndAnimate,
   getImageDimensions,
@@ -15,10 +17,8 @@ import {
 } from "../upload";
 import { onFileUpload } from "./utils/onFileUpload";
 
-type TFileInputProps = {
-  setOpenLoader: React.Dispatch<React.SetStateAction<boolean>>;
-};
-const FileInput = ({ setOpenLoader }: TFileInputProps) => {
+type TFileInputProps = {};
+const FileInput = () => {
   const dispatch = useDispatch();
   const formSubmit = useSelector((state: RootState) => state.form.submit);
   const imageLoaded = useSelector(
@@ -38,22 +38,27 @@ const FileInput = ({ setOpenLoader }: TFileInputProps) => {
     const inputResult: (TURLItem & { file: File })[] = [];
 
     files.forEach((file) => {
-      (inputResult as TURLItem[]).push({
+      inputResult.push({
         id: nanoid(),
         name: file.name,
         content: "",
         error: false,
         errorMsg: "",
+        file,
       });
     });
 
-    for (let i = 0; i < inputResult.length; i++) {
-      const item = inputResult[i];
-      item.file = files[i];
-    }
-
     batch(() => {
-      dispatch(addInputResult(JSON_Stringify_Parse(inputResult)));
+      dispatch(
+        addInputResult(
+          inputResult.map((item) => {
+            const result = { ...item };
+            // @ts-ignore
+            delete result.file;
+            return result as TURLItem;
+          })
+        )
+      );
       dispatch(setSubmit({ active: true, from: "file" }));
       dispatch(
         setImgQueue(
@@ -74,6 +79,7 @@ const FileInput = ({ setOpenLoader }: TFileInputProps) => {
         )
       );
     });
+
     setFileItems(inputResult);
   };
 
@@ -81,7 +87,7 @@ const FileInput = ({ setOpenLoader }: TFileInputProps) => {
     if (!formSubmit.active || formSubmit.from !== "file") return;
     dispatch(setSubmit({ active: false, from: null }));
 
-    setOpenLoader(true);
+    dispatch(setOpenLoader(true));
 
     const run = async () => {
       for (let i = 0; i < fileItems.length; i++) {
@@ -101,7 +107,9 @@ const FileInput = ({ setOpenLoader }: TFileInputProps) => {
         onChange={onFilesInput}
         type="file"
         name="file"
-        accept="image/png, image/jpeg"
+        accept={CONSTANTS.supportedImgFormats
+          .map((img) => `image/${img}`)
+          .join(", ")}
         id="upload-image-form-file"
         className="input-file--hidden"
       />

@@ -12,6 +12,7 @@ import { TDemographicNode } from "../../FaceDetectionResult/ImageResult/demograp
 import { clearAllFormValues, setSubmit, TURLItem } from "../formSlice";
 import { setImgQueue, TImgQueue, updateImgQueue } from "../imageUrlSlice";
 import { TQueue } from "../Loader/Loader";
+import { setOpenLoader } from "../Loader/loaderSlice";
 import {
   getImageDimensions,
   postClarifaiAPI,
@@ -120,11 +121,9 @@ const SubmitBtn = ({
 
 let clearDisplayErrorTimeout = 0;
 
-type TFormTextInput = {
-  setOpenLoader: React.Dispatch<React.SetStateAction<boolean>>;
-};
+type TFormTextInput = {};
 
-const TextInput = React.memo(({ setOpenLoader }: TFormTextInput) => {
+const TextInput = React.memo(() => {
   const dispatch = useDispatch();
   const imageLoaded = useSelector(
     (state: RootState) => state.imageUrl.imageLoaded
@@ -271,7 +270,7 @@ const TextInput = React.memo(({ setOpenLoader }: TFormTextInput) => {
 
     const run = async () => {
       await delayP(50);
-      setOpenLoader(true);
+      dispatch(setOpenLoader(true));
 
       for (let i = 0; i < formInputResult.length; i++) {
         const item = formInputResult[i];

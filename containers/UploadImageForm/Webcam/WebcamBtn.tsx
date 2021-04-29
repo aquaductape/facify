@@ -6,10 +6,8 @@ import { RootState } from "../../../store/rootReducer";
 import { TURLItem } from "../formSlice";
 import WebcamCamera from "./WebcamCamera";
 
-type TWebcamProps = {
-  setOpenLoader: React.Dispatch<React.SetStateAction<boolean>>;
-};
-const WebcamBtn = ({ setOpenLoader }: TWebcamProps) => {
+type TWebcamProps = {};
+const WebcamBtn = () => {
   const mqlRef = useMatchMedia();
   const [showCamera, setShowCamera] = useState(false);
 
@@ -33,10 +31,7 @@ const WebcamBtn = ({ setOpenLoader }: TWebcamProps) => {
           slideTo={"down"}
           positionAbsolute={false}
         >
-          <WebcamCamera
-            setOpenLoader={setOpenLoader}
-            setShowCamera={setShowCamera}
-          ></WebcamCamera>
+          <WebcamCamera setShowCamera={setShowCamera}></WebcamCamera>
         </TransitionSlide>
       </div>
       <button className="input-button--webcam" onClick={onClick}>

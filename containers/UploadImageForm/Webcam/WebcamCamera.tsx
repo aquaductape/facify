@@ -12,14 +12,14 @@ import { reflow } from "../../../utils/reflow";
 import { onFileUpload } from "../FileInput/utils/onFileUpload";
 import { addInputResult, clearAllFormValues, TURLItem } from "../formSlice";
 import { setImgQueue } from "../imageUrlSlice";
+import { setOpenLoader } from "../Loader/loaderSlice";
 import WebcamForm from "./WebcamForm";
 
 type TWebcamProps = {
-  setOpenLoader: React.Dispatch<React.SetStateAction<boolean>>;
   setShowCamera: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const WebcamCamera = ({ setOpenLoader, setShowCamera }: TWebcamProps) => {
+const WebcamCamera = ({ setShowCamera }: TWebcamProps) => {
   const dispatch = useDispatch();
   const imageLoaded = useSelector(
     (state: RootState) => state.imageUrl.imageLoaded
@@ -84,7 +84,7 @@ const WebcamCamera = ({ setOpenLoader, setShowCamera }: TWebcamProps) => {
 
     await delayP(100);
 
-    setOpenLoader(true);
+    dispatch(setOpenLoader(true));
 
     onFileUpload({ item: urlItem, idx: 0, dispatch, imageLoaded, mqlRef });
   };

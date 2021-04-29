@@ -12,15 +12,13 @@ import { CONSTANTS } from "../../../constants";
 import onFocusOut, { OnFocusOutExit } from "../../../lib/onFocusOut/onFocusOut";
 import { RootState } from "../../../store/rootReducer";
 import { reflow } from "../../../utils/reflow";
-import smoothScrollTo from "../../../utils/smoothScrollTo";
 import { clearAllFormValues } from "../formSlice";
 import { TImgStatus, updateImgQueue } from "../imageUrlSlice";
 import DownloadMenu from "./DownloadMenu";
+import { setOpenLoader } from "./loaderSlice";
 import { onClickJumpToImage } from "./utils/onJump";
 
-type TLoaderProps = {
-  setOpenLoader: Dispatch<SetStateAction<boolean>>;
-};
+type TLoaderProps = {};
 
 export type TQueue = {
   id: string;
@@ -32,7 +30,7 @@ export type TQueue = {
   countdownActive: boolean;
 };
 
-const Loader = ({ setOpenLoader }: TLoaderProps) => {
+const Loader = () => {
   const dispatch = useDispatch();
   const countDownChecked = useSelector(
     (state: RootState) => state.menu.disableNotificationCountDown
@@ -189,7 +187,7 @@ const Loader = ({ setOpenLoader }: TLoaderProps) => {
 
   const closeLoader = () => {
     dispatch(clearAllFormValues());
-    setOpenLoader(false);
+    dispatch(setOpenLoader(false));
   };
 
   const onClickOpenMenu = () => {

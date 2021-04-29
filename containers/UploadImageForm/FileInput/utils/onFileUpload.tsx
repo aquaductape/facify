@@ -36,7 +36,9 @@ export const onFileUpload = async ({
       })
     );
   }
+
   const { base64, file: newFile } = await convertFileToBase64(item.file);
+
   dispatch(
     updateImgQueue({
       id: item.id,
