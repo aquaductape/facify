@@ -1,6 +1,7 @@
 import { MouseEventHandler, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CSSTransition } from "react-transition-group";
+import Border from "../../../../components/Border";
 import KebabMenu from "../../../../components/svg/KebabMenu";
 import TransitionSlide from "../../../../components/TransitionSlide";
 import { useMatchMedia } from "../../../../hooks/useMatchMedia";
@@ -151,6 +152,8 @@ const UtilBarDropdown = ({ id, parentIdx }: TUtilBarDropdown) => {
             positionAbsolute={false}
           >
             <div className="util-bar">
+              <Border placement="right" color={"#000"} size={4}></Border>
+              <Border placement="bottom" color={"#000"} size={4}></Border>
               <UtilBar id={id} parentIdx={parentIdx}></UtilBar>
             </div>
           </TransitionSlide>
@@ -169,11 +172,11 @@ const UtilBarDropdown = ({ id, parentIdx }: TUtilBarDropdown) => {
       <style jsx>
         {`
           .util-bar {
+            position: relative;
             height: 42px;
             padding: 0 8px;
-            border: 4px solid #000;
-            border-top: 0;
-            border-left: 0;
+            border-bottom: 4px solid transparent;
+            width: calc(100% - 4px);
             background: #fff;
           }
 

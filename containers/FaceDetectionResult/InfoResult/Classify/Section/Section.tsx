@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import Border from "../../../../../components/Border";
 import { CONSTANTS } from "../../../../../constants";
 import Menu from "./Menu";
 
@@ -164,6 +165,20 @@ export const StickySection = ({ id, parentIdx, type }: TSectionProps) => {
     <div className="container" ref={containerElRef}>
       <div className="sentinel"></div>
       <div className="classify-section inner">
+        <Border
+          corner={false}
+          placement={"bottom"}
+          color={"#666"}
+          size={4}
+        ></Border>
+        <Border placement={"right"} color={"#666"} size={4}></Border>
+        <Border
+          placement={"right"}
+          right={"-8px"}
+          top={"4px"}
+          color={"#000"}
+          size={4}
+        ></Border>
         <Menu id={id} parentIdx={parentIdx} type={type}></Menu>
       </div>
       <style jsx>{`
@@ -199,11 +214,11 @@ export const StickySection = ({ id, parentIdx, type }: TSectionProps) => {
         }
 
         .inner {
+          position: relative;
+          width: calc(100% - 8px);
+          border-bottom: 4px solid transparent;
           height: 222px;
           background: #fff;
-          border: 4px solid #666666;
-          border-top: 0;
-          border-left: 0;
           box-shadow: 0 -10px 10px -8px #0009;
           margin-top: 5px;
         }
@@ -226,6 +241,19 @@ export const RelativeSection = ({ id, parentIdx, type }: TSectionProps) => {
   return (
     <div className="container">
       <div className="classify-section inner">
+        <Border
+          placement={"top"}
+          color={"#666"}
+          size={4}
+          direction={"reverse"}
+        ></Border>
+        <Border
+          placement={"left"}
+          top={"-4px"}
+          color={"#666"}
+          size={6}
+          direction={"reverse"}
+        ></Border>
         <Menu id={id} parentIdx={parentIdx} type={type}></Menu>
       </div>
       <style jsx>{`
@@ -259,12 +287,13 @@ export const RelativeSection = ({ id, parentIdx, type }: TSectionProps) => {
         }
 
         .inner {
+          position: relative;
           height: 222px;
           background: #fff;
-          border: 4px solid #666666;
-          border-right: 0;
-          border-bottom: 0;
-          box-shadow: 0 10px 10px -8px #0009;
+          border-top: 4px solid transparent;
+          border-left: 6px solid transparent;
+          width: calc(100% - 6px);
+          box-shadow: 9px 10px 10px -8px #00000038;
           margin-bottom: 5px;
         }
       `}</style>

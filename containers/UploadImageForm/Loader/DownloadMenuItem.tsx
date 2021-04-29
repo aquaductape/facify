@@ -304,10 +304,10 @@ const DownloadMenuItem = ({
           }
 
           .btn-show-more {
-            background: #d9d9d9;
             background: none;
             padding: 0;
             overflow: hidden;
+            transition: background-color 250ms;
           }
 
           .btn-show-more-inner {
@@ -389,6 +389,12 @@ const DownloadMenuItem = ({
           .icon-holder.loading {
             padding: 8px;
             transform: scale(0.6);
+          }
+
+          @media not all and (pointer: coarse) {
+            .btn-show-more:hover {
+              background: #eee;
+            }
           }
 
           @media (min-width: 500px) {

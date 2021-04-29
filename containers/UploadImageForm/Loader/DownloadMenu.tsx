@@ -17,6 +17,7 @@ import DownloadMenuItem, {
 } from "./DownloadMenuItem";
 import { TQueue } from "./Loader";
 import { ScrollShadow, SentinelShadow } from "../../../components/ScrollShadow";
+import Border from "../../../components/Border";
 
 // Disable Notification Countdown
 type TDownloadMenuProps = {
@@ -107,9 +108,25 @@ const DownloadMenu = ({
 
   return (
     <div className="container" tabIndex={-1} ref={optionsMenuElRef}>
-      {/* <div className={`top-border ${currentQueueClass()}`}></div> */}
+      {/* <div className=></div> */}
       <div className={`container-inner ${currentQueueClass()}`}>
         <div className="shadow"></div>
+        <div className={`border ${currentQueueClass()}`}>
+          <Border
+            placement={"top"}
+            color={"currentColor"}
+            size={2}
+            corner={false}
+            direction={"reverse"}
+          ></Border>
+          <Border
+            placement={"left"}
+            top={"-6px"}
+            color={"currentColor"}
+            size={6}
+            direction={"reverse"}
+          ></Border>
+        </div>
 
         <div className="group-container">
           {isScrollContainer ? (
@@ -191,37 +208,22 @@ const DownloadMenu = ({
             background: #fff;
             color: #000;
             margin-bottom: 15px;
-            border: 4px solid #0c0534;
-            border-bottom: 0;
-            border-right: 0;
-            transition: border-color 500ms;
+            width: calc(100% - 6px);
+            left: 6px;
+            border-top: 2px solid transparent;
           }
 
-          .container-inner.success {
-            border-color: #004e53;
+          .border {
+            color: #0c0534;
+            transition: color 500ms;
           }
 
-          .container-inner.error {
-            border-color: #7a003e;
-          }
-          .top-border {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background: #0c0534;
-            height: 1px;
-            pointer-events: none;
-            z-index: 5;
-            transition: background-color 500ms;
+          .border.success {
+            color: #004e53;
           }
 
-          .top-border.success {
-            background: #004e53;
-          }
-
-          .top-border.error {
-            background: #7a003e;
+          .border.error {
+            color: #7a003e;
           }
 
           .shadow {
@@ -251,7 +253,7 @@ const DownloadMenu = ({
             position: relative;
             display: flex;
             flex-direction: column;
-            max-height: 20vh;
+            max-height: 30vh;
             overflow-y: auto;
             padding: 0;
             margin: 0;
@@ -259,15 +261,11 @@ const DownloadMenu = ({
 
           @media (min-width: 645px) {
             .container-inner {
-              margin-right: 15px;
-            }
-
-            .top-border {
-              width: calc(100% - 15px);
+              width: calc(100% - 24px);
             }
 
             .shadow {
-              box-shadow: 12px 12px 15px -13px #000;
+              box-shadow: 12px 12px 15px -13px #0000006e;
               transform: scaleY(1.2);
             }
 
@@ -276,19 +274,19 @@ const DownloadMenu = ({
             }
 
             .group::-webkit-scrollbar-track {
-              background: #dbdde5;
+              background-color: #dbdde5;
             }
 
             .group::-webkit-scrollbar-thumb {
-              background: #9397b0;
+              background-color: #9397b0;
             }
 
-            .group::-webkit-scrollbar-thumb:hover {
-              background-color: #7d89c5;
+            .container :global(.group::-webkit-scrollbar-thumb:hover) {
+              background-color: #7d89c5 !important;
             }
 
-            .group::-webkit-scrollbar-thumb:active {
-              background-color: #0f1c66;
+            .container :global(.group::-webkit-scrollbar-thumb:active) {
+              background-color: #0f1c66 !important;
             }
           }
         `}
