@@ -1,4 +1,4 @@
-import { FireFox, IOS, IOS13 } from "./browserInfo";
+import { FireFox, IOS, IOS13, Safari } from "./browserInfo";
 
 interface IOnFocusOut {
   /**
@@ -173,7 +173,7 @@ export default function onFocusOut({
   run();
 
   let init = true;
-  if (FireFox) {
+  if (FireFox || (Safari && !IOS)) {
     // TODO when button is false, onClick init doesn't bubble up, or theres no click event, not sure
     init = button !== false;
   }

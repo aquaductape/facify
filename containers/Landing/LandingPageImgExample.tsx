@@ -45,14 +45,11 @@ const LandingPageImgExample = () => {
       const img = new Image();
       img.src = objectUrl;
 
-      await new Promise((resolve) =>
-        setTimeout(
-          () =>
-            (img.onload = () => {
-              resolve(true);
-            })
-        )
-      );
+      await new Promise((resolve) => {
+        img.onload = () => {
+          resolve(true);
+        };
+      });
 
       await startAnimate({ firstImage: true });
 
