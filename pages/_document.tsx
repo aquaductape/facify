@@ -42,7 +42,10 @@ class MyDocument extends Document {
           <meta name="twitter:card" content="summary_large_image" />
           <meta name="twitter:title" content="Facify" />
           <meta name="twitter:description" content="Find Faces within photos" />
-          <meta name="twitter:image" content="/og-image-facify.png" />
+          <meta
+            name="twitter:image"
+            content="https://facify.vercel.app/og-image-facify.png"
+          />
           <meta name="twitter:image:alt" content="Find Faces within photos" />
         </Head>
 
