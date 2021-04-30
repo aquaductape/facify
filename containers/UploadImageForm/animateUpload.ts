@@ -64,6 +64,13 @@ export const animationEnd = ({ id }: TAnimationEnd = {}) => {
     demographicEl.style.transform = "";
     demographicEl.style.transition = "";
     demographicEl.style.zIndex = "";
+
+    if (Safari) {
+      const imgEl = demographicEl.querySelector(
+        `[data-id-image-result="${id}"]`
+      ) as HTMLElement;
+      imgEl.style.position = "";
+    }
   }
   landingEl.style.display = "none";
   landingEl.style.transform = "";
@@ -103,14 +110,22 @@ export const animateResult = ({ id, firstImage, mql }: TAnimateResult) => {
       mainEl.style.clipPath = "polygon(0% 100vh, 0% 0%, 100% 0%, 100% 100vh)";
     }
 
-    // For Safari, the descision is that landing will always translate up and reveal result behind it. There's an issue where either demographicHeight/landingHeight is not correct, so it will translate/zindex the wrong elements. Unable to solve it since I don't have a Mac to do thorough debugging, that's why I hardcoded the result using IOS var.
-    if (landingHeight > demographicHeight || IOS || Safari) {
+    if (landingHeight > demographicHeight) {
       demographicEl.style.opacity = "1";
       demographicEl.style.zIndex = "-1";
       landingEl.style.zIndex = "65";
       landingEl.style.transform = `translateY(-101%)`;
       landingEl.style.transition = "transform 500ms";
     } else {
+      // sticky bug in Safari, during the translation, the sticky element is not correctly painted.
+      // also don't show thead revealing due to intersection observer firing
+      if (Safari) {
+        const imgEl = demographicEl.querySelector(
+          `[data-id-image-result="${id}"]`
+        ) as HTMLElement;
+        imgEl.style.position = "static";
+      }
+
       landingEl.style.zIndex = "-1";
       demographicEl.style.opacity = "1";
       demographicEl.style.transform = "translateY(-100%)";
