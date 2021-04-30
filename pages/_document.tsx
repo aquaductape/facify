@@ -31,6 +31,19 @@ class MyDocument extends Document {
           <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#224aff" />
           <meta name="msapplication-TileColor" content="#224aff" />
           <meta name="theme-color" content="#224aff" />
+          {/* <!-- Open Graph Protocol --> */}
+          <meta property="og:title" content="Facify" />
+          <meta property="og:image" content="/og-image-facify.png" />
+          <meta property="og:image:alt" content="Find Faces within photos" />
+          <meta property="og:type" content="website" />
+          <meta property="og:url" content="https://facify.vercel.app/" />
+          <meta property="og:description" content="Find Faces within photos" />
+          {/* <!-- Twitter --> */}
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:title" content="Facify" />
+          <meta name="twitter:description" content="Find Faces within photos" />
+          <meta name="twitter:image" content="/og-image-facify.png" />
+          <meta name="twitter:image:alt" content="Find Faces within photos" />
         </Head>
 
         <body data-scroll>
