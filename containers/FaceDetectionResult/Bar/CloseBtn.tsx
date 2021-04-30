@@ -287,6 +287,9 @@ const CloseBtn = ({ id, idx }: CloseBtnProps) => {
             background: #efefef;
             padding: 13px;
             outline: none;
+            color: #000;
+            -webkit-appearance: none;
+            appearance: none;
             -webkit-tap-highlight-color: transparent;
             transition: background-color 250ms;
           }
