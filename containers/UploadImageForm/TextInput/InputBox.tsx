@@ -51,7 +51,7 @@ const Input = ({ submitHoverRef, isOpenRef, displayErrorRef }: InputProps) => {
       <style jsx>
         {`
           .container {
-            width: 100%;
+            width: 100.5%;
             height: 100%;
           }
 
