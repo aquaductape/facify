@@ -31,6 +31,8 @@ class MyDocument extends Document {
           <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#224aff" />
           <meta name="msapplication-TileColor" content="#224aff" />
           <meta name="theme-color" content="#224aff" />
+          <meta name="description" content="Find Faces within photos" />
+          <meta name="author" content="Caleb Taylor" />
           {/* <!-- Open Graph Protocol --> */}
           <meta property="og:title" content="Facify" />
           <meta property="og:image" content="/og-image-facify.png" />
