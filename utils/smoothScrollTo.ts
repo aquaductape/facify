@@ -1,5 +1,3 @@
-import { easeInOutQuad } from "./transition";
-
 type smoothScrollToProps = {
   destination: number | HTMLElement;
   container?: Window | HTMLElement;

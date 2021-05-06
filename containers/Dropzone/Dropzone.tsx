@@ -143,9 +143,6 @@ const Dropzone = () => {
 
   return (
     <div className="container" {...getRootProps()}>
-      <div className="dropzone">
-        <span>Image Dropzone</span>
-      </div>
       <style jsx>
         {`
           .container {
@@ -158,17 +155,6 @@ const Dropzone = () => {
             border: 6px dashed #000;
             display: none;
             z-index: 999;
-          }
-
-          .dropzone {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 50px;
-            color: #fff;
-            height: calc(100% - 40px);
-            margin: 20px;
-            background: rgba(0, 0, 0, 0.7);
           }
         `}
       </style>
