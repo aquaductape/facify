@@ -282,11 +282,17 @@ const demographicsSlice = createSlice({
       action: PayloadAction<{ id: number }>
     ) => {
       const { id } = action.payload;
-      const { childIds } = state.parents[id];
+      const parent = state.parents[id];
+      const { childIds, imageUrl } = parent;
+
+      if (imageUrl.uri.match(/^blob:.+/)) {
+        window.URL.revokeObjectURL(imageUrl.uri);
+      }
 
       state.parents.splice(id, 1);
 
       childIds.forEach((childId) => {
+        window.URL.revokeObjectURL(state.demographicNodes[childId].uri!);
         delete state.demographicNodes[childId];
       });
     },
