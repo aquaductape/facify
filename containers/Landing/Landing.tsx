@@ -82,6 +82,8 @@ const Landing = () => {
           .header-title--logo {
             width: 75px;
             height: 75px;
+            background: var(--blue-main);
+            filter: drop-shadow(4px 4px 0px #000066);
           }
 
           h1 {
