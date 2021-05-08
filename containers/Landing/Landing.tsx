@@ -199,6 +199,10 @@ const Landing = () => {
             .info {
               width: 90%;
             }
+            .hero {
+              width: 90%;
+              margin-right: -110px;
+            }
           }
 
           @media (min-width: 1400px) {
