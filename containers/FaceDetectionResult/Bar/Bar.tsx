@@ -79,7 +79,7 @@ const Bar = ({ id, idx }: { id: string; idx: number }) => {
 
           .title {
             display: flex;
-            align-items: center;
+            align-items: baseline;
             width: 80%;
           }
 
