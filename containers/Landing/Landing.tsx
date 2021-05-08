@@ -31,9 +31,10 @@ const Landing = () => {
           <div className="list">
             <p className="list-title">Upload Image(s) by:</p>
             <ul>
-              <li>Drag & Drop Files (up to 5 at time)</li>
+              <li>Drag & Drop Files</li>
               <li>Paste URL</li>
-              <li>Capture photo by webcam</li>
+              <li>Local Files</li>
+              <li className="list-webcam">Capture photo by webcam</li>
             </ul>
           </div>
           <p className="image-size-info desktop">
@@ -112,6 +113,10 @@ const Landing = () => {
             margin: 30px 0;
           }
 
+          .list-webcam {
+            display: none;
+          }
+
           .list-title {
             margin: 0;
             margin-bottom: -10px;
@@ -140,6 +145,12 @@ const Landing = () => {
 
             .inner {
               font-size: 20px;
+            }
+          }
+
+          @media (min-width: 850px) {
+            .list-webcam {
+              display: block;
             }
           }
 
