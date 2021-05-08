@@ -150,7 +150,7 @@ const Landing = () => {
 
           @media (min-width: 850px) {
             .list-webcam {
-              display: block;
+              display: list-item;
             }
           }
 
