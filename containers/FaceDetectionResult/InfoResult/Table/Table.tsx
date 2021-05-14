@@ -19,7 +19,6 @@ type TRowProps = {
   id: string;
   parentId: string;
   parentIdNumber: number;
-  idx: number;
 };
 
 // const selectDemographics = (id: string ) => {
@@ -31,7 +30,7 @@ type TRowProps = {
 //     }
 //   );
 // }
-const Row = ({ id, parentIdNumber, parentId, idx }: TRowProps) => {
+const Row = ({ id, parentIdNumber, parentId }: TRowProps) => {
   const concepts = useSelector(selectDemographicsConcepts({ id }));
   const isRemoved = useSelector(
     (state: RootState) => state.demographics.demographicNodes[id].removed
@@ -58,7 +57,6 @@ const Row = ({ id, parentIdNumber, parentId, idx }: TRowProps) => {
           id={id}
           parentId={parentId}
           parentIdNumber={parentIdNumber}
-          idx={idx}
         />
       </td>
       <td>
@@ -129,19 +127,29 @@ const Row = ({ id, parentIdNumber, parentId, idx }: TRowProps) => {
             overflow: hidden;
             z-index: 1;
           }
-        `}
-      </style>
-      {/* dynamic */}
-      <style jsx>
-        {`
+
           .bg__color {
-            background: ${idx % 2 === 0 ? "#eee" : "#fff"};
+            background: #fff;
           }
 
           .bg__hider-gradient {
-            background: ${idx % 2 === 0
-              ? "linear-gradient( 90deg, #eee 0%, rgba(255, 255, 255, 0) 100%)"
-              : "linear-gradient( 90deg, #fff 0%, rgba(255, 255, 255, 0) 100%)"};
+            background: linear-gradient(
+              90deg,
+              #fff 0%,
+              rgba(255, 255, 255, 0) 100%
+            );
+          }
+
+          .row:nth-child(odd) .bg__color {
+            background: #eee;
+          }
+
+          .row:nth-child(odd) .bg__hider-gradient {
+            background: linear-gradient(
+              90deg,
+              #eee 0%,
+              rgba(255, 255, 255, 0) 100%
+            );
           }
         `}
       </style>
@@ -264,13 +272,12 @@ const Table = ({ id, idx }: { id: string; idx: number }) => {
           <table>
             <THead id={id} parentIdx={parentIdNumber}></THead>
             <tbody>
-              {renderChildIds.map((item, idx) => (
+              {renderChildIds.map((item) => (
                 <Row
                   id={item}
                   parentId={parentId}
                   parentIdNumber={parentIdNumber}
-                  idx={idx}
-                  key={idx}
+                  key={item}
                 ></Row>
               ))}
             </tbody>

@@ -13,14 +13,12 @@ type BoundingCroppedImageProps = {
   id: string;
   parentId: string;
   parentIdNumber: number;
-  idx: number;
 };
 
 const BoundingCroppedImage = ({
   id,
   parentId,
   parentIdNumber,
-  idx,
 }: BoundingCroppedImageProps) => {
   const dispatch = useDispatch();
   const demographic = useSelector(selectDemographicsDisplay({ id }));
