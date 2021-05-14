@@ -252,6 +252,7 @@ export const RelativeSection = ({ id, parentIdx, type }: TSectionProps) => {
           top={"-4px"}
           color={"#666"}
           size={6}
+          height={"calc(100% + 4px)"}
           direction={"reverse"}
         ></Border>
         <Menu id={id} parentIdx={parentIdx} type={type}></Menu>

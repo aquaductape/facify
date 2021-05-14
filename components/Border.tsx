@@ -7,6 +7,7 @@ type TBorderProps = {
   right?: string;
   left?: string;
   corner?: boolean;
+  height?: string;
   size: number;
   color: string;
 };
@@ -15,6 +16,7 @@ const Border = ({
   placement,
   size: _size,
   direction,
+  height,
   corner = true,
   top,
   right,
@@ -33,7 +35,7 @@ const Border = ({
 
     style.flexDirection = "column";
     style.width = size;
-    style.height = `calc(100% + ${size})`;
+    style.height = height ? height : `calc(100% + ${size})`;
   }
 
   if (placement === "top" || placement === "bottom") {
@@ -44,7 +46,7 @@ const Border = ({
     style.flexDirection = "row";
     style.left = 0;
     style.width = "100%";
-    style.height = size;
+    style.height = height ? height : size;
   }
 
   style[placement] = `-${_size}px`;
