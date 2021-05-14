@@ -55,15 +55,16 @@ const UtilBar = ({ imgError, isOpenRef }: TUtilBarProps) => {
           }
 
           .imgError-info {
-            color: #ff0000;
+            color: #d20000;
           }
 
           .btn {
             display: flex;
             justify-content: center;
             align-items: center;
-            background: #c20000;
-            color: #fff;
+            border: 3px solid #d20000;
+            background: none;
+            color: #d20000;
             margin-left: auto;
             font-size: 16px;
             white-space: nowrap;
@@ -72,11 +73,12 @@ const UtilBar = ({ imgError, isOpenRef }: TUtilBarProps) => {
             height: 100%;
             cursor: pointer;
             pointer-events: all;
-            transition: background-color 250ms;
+            transition: background-color 250ms, color 250ms;
           }
 
           .btn:hover {
-            background: #ff0000;
+            background: #d20000;
+            color: #fff;
           }
 
           .url-count {

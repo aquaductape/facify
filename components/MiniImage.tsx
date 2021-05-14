@@ -39,7 +39,7 @@ const MiniImage = ({
 
       <style jsx>{`
         .error {
-          color: #f00;
+          color: #d20000;
           width: 25px;
           height: 25px;
         }
