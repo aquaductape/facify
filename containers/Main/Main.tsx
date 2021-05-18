@@ -1,22 +1,22 @@
-import dynamic from "next/dynamic";
 import React, { useEffect, useState } from "react";
 import LogoText from "../../components/Logo/LogoText";
 import getScrollbarWidth from "../../utils/getScrollWidth";
-// import FaceDetectionResult from "../FaceDetectionResult/FaceDetectionResult";
-// import ClassifyArea from "../FaceDetectionResult/InfoResult/Classify/ClassifyArea";
+import FaceDetectionResult from "../FaceDetectionResult/FaceDetectionResult";
+import ClassifyArea from "../FaceDetectionResult/InfoResult/Classify/ClassifyArea";
 
 import Footer from "../Footer/Footer";
 import Landing from "../Landing/Landing";
 import UploadImageForm from "../UploadImageForm/UploadImageForm";
 
-const ClassifyArea = dynamic(
-  () => import("../FaceDetectionResult/InfoResult/Classify/ClassifyArea"),
-  { ssr: false }
-);
-const FaceDetectionResult = dynamic(
-  () => import("../FaceDetectionResult/FaceDetectionResult"),
-  { ssr: false }
-);
+// messes up animation
+// const ClassifyArea = dynamic(
+//   () => import("../FaceDetectionResult/InfoResult/Classify/ClassifyArea"),
+//   { ssr: false }
+// );
+// const FaceDetectionResult = dynamic(
+//   () => import("../FaceDetectionResult/FaceDetectionResult"),
+//   { ssr: false }
+// );
 
 const Main = () => {
   useEffect(() => {

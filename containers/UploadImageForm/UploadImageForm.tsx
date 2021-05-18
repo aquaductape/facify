@@ -1,9 +1,8 @@
-import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { CSSTransition } from "react-transition-group";
 import TextInput from "./TextInput/TextInput";
-// import Loader from "./Loader/Loader";
-const Loader = dynamic(() => import("./Loader/Loader"), { ssr: false });
+import Loader from "./Loader/Loader";
+// const Loader = dynamic(() => import("./Loader/Loader"), { ssr: false });
 import FileInput from "./FileInput/FileInput";
 // import { nanoid } from "nanoid";
 // import { imageUri, imageUri3, imgUri2 } from "../../dummyData/imageUri";
