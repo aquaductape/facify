@@ -10,7 +10,7 @@ export const CONSTANTS = {
     45, // form bar
   loaderCountDownDisabledDuration: 1000,
   loaderSuccessDuration: 5000,
-  loaderErrorDuration: 2500,
+  loaderErrorDuration: 3500,
   imageExistErrorMsg: "URL is invalid or image doesn't exist",
   uploadImageFormHeight: 45,
   viewportTopPadding: 15,

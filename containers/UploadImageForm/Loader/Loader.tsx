@@ -47,15 +47,16 @@ const Loader = () => {
   const countDownBarElRef = useRef<HTMLDivElement | null>(null);
   const kebabMenuBtnElRef = useRef<HTMLButtonElement | null>(null);
   const onFocusOutExitRef = useRef<OnFocusOutExit | null>(null);
-  const goToNextRef = useRef<
-    ({
-      clearCurrentTimout,
-      enableCountDown,
-    }?: {
-      clearCurrentTimout?: boolean | undefined;
-      enableCountDown?: boolean | undefined;
-    }) => void
-  >();
+  const goToNextRef =
+    useRef<
+      ({
+        clearCurrentTimout,
+        enableCountDown,
+      }?: {
+        clearCurrentTimout?: boolean | undefined;
+        enableCountDown?: boolean | undefined;
+      }) => void
+    >();
   const downloadItemJumpLinkRef = useRef<((id: string) => void) | null>(null);
   const loadingDoneRef = useRef(false);
   const loadingDoneTimeIdRef = useRef(0);
@@ -279,7 +280,6 @@ const Loader = () => {
     };
 
     const onTimeout = () => {
-      // console.log("timeout!!!!");
       setFinishedQueueIdx((prev) => {
         countDownActivityRef.current.active = false;
         return prev + 1;
@@ -310,6 +310,7 @@ const Loader = () => {
     }
 
     if (isLast && !countDownActivity.active) {
+      isLastRef.current = true;
       startCountDown();
       closeLoaderWhenDone();
       return;
@@ -338,7 +339,6 @@ const Loader = () => {
     if (!currentQueue) return;
     if (currentQueue.currentImgStatus !== "DONE") return;
 
-    console.log("gotonext", currentQueue.name);
     dispatch(
       updateImgQueue({
         id: currentQueue.id,

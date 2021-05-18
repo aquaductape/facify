@@ -140,7 +140,6 @@ const TextInput = React.memo(() => {
     let urlContent = urlItem.content;
 
     if (urlItem.error) {
-      console.log("errrro");
       return;
     }
 
@@ -196,7 +195,7 @@ const TextInput = React.memo(() => {
       return;
     }
 
-    const data = (result.data as unknown) as TDemographicNode[];
+    const data = result.data as unknown as TDemographicNode[];
     const img = await getImageDimensions(urlContent);
 
     await addImageAndAnimate({
