@@ -19,7 +19,6 @@ export const onClickJumpToImage = ({
 }: TOnClickJumpToImage) => {
   if (isLast) {
     closeLoaderWhenDone!({ fireNow: true });
-    console.log("is last");
     jumpToEl(id);
     return;
   }
@@ -34,11 +33,8 @@ const jumpToEl = (id: string) => {
   const nodeEl = document.getElementById(nodeSelector)!;
   const prevNodeEl = nodeEl.previousElementSibling;
   let destination = 0;
-  const {
-    uploadImageFormHeight,
-    viewportTopPadding,
-    seperatorHeight,
-  } = CONSTANTS;
+  const { uploadImageFormHeight, viewportTopPadding, seperatorHeight } =
+    CONSTANTS;
 
   if (!prevNodeEl) {
     destination = uploadImageFormHeight + viewportTopPadding;
