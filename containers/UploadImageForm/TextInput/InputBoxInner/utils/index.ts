@@ -11,6 +11,10 @@ export const splitValueIntoUrlItems = ({
   imgError: boolean;
   errorMsg: string;
 }) => {
+  value = value.replace(/([^\s\n])(https?:\/\/)/g, (_, p1, p2) => {
+    return `${p1} ${p2}`;
+  });
+
   const urls = value.split(" ").filter((item) => item);
 
   const urlItems = urls.map((url) => {

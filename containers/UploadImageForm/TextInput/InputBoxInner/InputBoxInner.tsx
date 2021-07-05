@@ -142,10 +142,10 @@ const InputBoxInner = ({
     const value = e.target.value;
     let errorMsg = imgError ? CONSTANTS.imageExistErrorMsg : "";
 
-    const hasSpace = value.match(/\s/);
+    // const hasSpace = value.match(/\s/);
     const urlItems = splitValueIntoUrlItems({ value, imgError, errorMsg });
 
-    if ((urlItems.length && hasSpace && paste) || (key === " " && value)) {
+    if ((urlItems.length && paste) || (key === " " && value)) {
       hasSubmitRef.current = true;
       e.target.value = "";
       setImgUrl("");
