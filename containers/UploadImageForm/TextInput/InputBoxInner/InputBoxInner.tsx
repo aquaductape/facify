@@ -16,7 +16,7 @@ import {
 } from "../../formSlice";
 import Input from "./Input";
 import UtilBar from "./UtilBar";
-import { splitValueIntoUrlItems } from "./utils";
+import { checkDebouncedUrls, splitValueIntoUrlItems } from "./utils";
 
 let keyDownProps: { key: string; paste: boolean } = {
   key: "",
@@ -81,27 +81,6 @@ const InputBoxInner = ({
     setImgError(true);
   };
 
-  const checkDebouncedUrls = async (
-    _urls: {
-      id: string;
-      content: string;
-      error: boolean;
-    }[]
-  ) => {
-    const urls = JSON_Stringify_Parse(_urls); // input will be tainted by redux/immer, must create new objects
-
-    for (const url of urls) {
-      const success = await doesImageExist(url.content);
-      url.error = !success;
-    }
-
-    batch(() => {
-      urls.forEach(({ id, error }) => {
-        dispatch(setUrlItemError({ id, error }));
-      });
-    });
-  };
-
   const mobileScrollDown = (inputUrlItems: TURLItem[]) => {
     if (!(Android || IOS)) return;
 
@@ -140,10 +119,9 @@ const InputBoxInner = ({
   const onInputUrls = (e: ChangeEvent<HTMLInputElement>) => {
     const { key, paste } = keyDownProps;
     const value = e.target.value;
-    let errorMsg = imgError ? CONSTANTS.imageExistErrorMsg : "";
-
-    // const hasSpace = value.match(/\s/);
-    const urlItems = splitValueIntoUrlItems({ value, imgError, errorMsg });
+    const urlItems = splitValueIntoUrlItems({
+      value,
+    });
 
     if ((urlItems.length && paste) || (key === " " && value)) {
       hasSubmitRef.current = true;
@@ -157,7 +135,7 @@ const InputBoxInner = ({
 
       // a chance submission occurs during debounce, therefore a valid url will still
       // be marked as invalid, which will have a stuck invalid tag. This line covers that basis
-      checkDebouncedUrls(urlItems);
+      checkDebouncedUrls(dispatch, urlItems);
       return;
     }
   };

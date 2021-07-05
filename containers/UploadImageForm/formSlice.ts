@@ -18,10 +18,12 @@ type TFormState = {
   submit: TSubmit;
   error: boolean;
   urlItems: TURLItem[];
+  toggleInputTextBox: boolean;
 };
 
 // https://i.imgur.com/nt0RgAH.jpg https://upload.wikimedia.org/wikipedia/commons/8/85/Elon_Musk_Royal_Society_%28crop1%29.jpg https://static.tvtropes.org/pmwiki/pub/images/aubrey_plaza.jpg
 const initialState: TFormState = {
+  toggleInputTextBox: false,
   error: false,
   submit: {
     active: false,
@@ -48,6 +50,9 @@ const formSlice = createSlice({
   name: "form",
   initialState,
   reducers: {
+    setToggleInputTextBox: (state, action: PayloadAction<boolean>) => {
+      state.toggleInputTextBox = action.payload;
+    },
     addUrlItem: (state, action: PayloadAction<TURLItem | TURLItem[]>) => {
       const result = action.payload;
 
@@ -114,6 +119,7 @@ const formSlice = createSlice({
 });
 
 export const {
+  setToggleInputTextBox,
   addUrlItem,
   removeUrlItem,
   setUrlItemError,

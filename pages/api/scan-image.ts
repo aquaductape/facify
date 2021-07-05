@@ -106,7 +106,6 @@ const editDemographics = (response: any) => {
     const output = response.results[0].outputs.find(
       ({ model }: any) => model.id === id
     );
-    // console.log(output);
     if (!itemsAssigned) {
       output.data.regions.forEach((region: any) => {
         data = {

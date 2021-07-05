@@ -9,11 +9,17 @@ import { JSON_Stringify_Parse } from "../../utils/jsonStringifyParse";
 import { onFileUpload } from "../UploadImageForm/FileInput/utils/onFileUpload";
 import {
   addInputResult,
+  addUrlItem,
   setSubmit,
+  setToggleInputTextBox,
   TURLItem,
 } from "../UploadImageForm/formSlice";
 import { setImgQueue, TImgQueue } from "../UploadImageForm/imageUrlSlice";
 import { setOpenLoader } from "../UploadImageForm/Loader/loaderSlice";
+import {
+  checkDebouncedUrls,
+  splitValueIntoUrlItems,
+} from "../UploadImageForm/TextInput/InputBoxInner/utils";
 
 const Dropzone = () => {
   const dispatch = useDispatch();
@@ -82,7 +88,6 @@ const Dropzone = () => {
   useEffect(() => {
     if (!formSubmit.active || formSubmit.from !== "dragAndDrop") return;
     if (!imgFiles.length) return;
-    console.log({ imgFiles });
 
     dispatch(setSubmit({ active: false, from: null }));
     dispatch(setOpenLoader(true));
@@ -105,10 +110,6 @@ const Dropzone = () => {
 
     rootRef,
   } = useDropzone({ onDrop });
-
-  useEffect(() => {
-    console.log({ isDragActive });
-  }, [isDragActive]);
 
   useEffect(() => {
     /* lastTarget is set first on dragenter, then
@@ -138,6 +139,24 @@ const Dropzone = () => {
       if (e.target === lastTarget || e.target === document) {
         dropZoneEl.style.display = "";
       }
+    });
+  }, []);
+
+  useEffect(() => {
+    // hack job, but dropzone lib only handles files
+    document.addEventListener("drop", (e) => {
+      const isText = e.dataTransfer?.files.length;
+      if (isText) return;
+      const text = e.dataTransfer?.getData("Text");
+      if (!(text && text.trim())) return;
+
+      const urlItems = splitValueIntoUrlItems({
+        value: text,
+      });
+
+      dispatch(setToggleInputTextBox(true));
+      dispatch(addUrlItem(urlItems));
+      checkDebouncedUrls(dispatch, urlItems);
     });
   }, []);
 

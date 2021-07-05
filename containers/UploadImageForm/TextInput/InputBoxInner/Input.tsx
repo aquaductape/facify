@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CONSTANTS } from "../../../../constants";
+import useDidMountEffect from "../../../../hooks/useDidMountEffect";
 import onFocusOut, {
   OnFocusOutEvent,
 } from "../../../../lib/onFocusOut/onFocusOut";
@@ -12,6 +13,7 @@ import {
   addUrlItem,
   setInputResultFromUrlItems,
   setSubmit,
+  setToggleInputTextBox,
 } from "../../formSlice";
 import { splitValueIntoUrlItems } from "./utils";
 
@@ -43,6 +45,9 @@ const Input = ({
 }: TInputProps) => {
   const dispatch = useDispatch();
   const urlItems = useSelector((state: RootState) => state.form.urlItems);
+  const toggleInputTextBox = useSelector(
+    (state: RootState) => state.form.toggleInputTextBox
+  );
 
   const contentElHeightRef = useRef(100);
   const inputElRef = useRef<HTMLInputElement>(null);
@@ -93,8 +98,7 @@ const Input = ({
   const onCloseInputEnd = async () => {
     const inputEl = inputElRef.current!;
     const value = inputEl.value;
-    let errorMsg = imgError ? CONSTANTS.imageExistErrorMsg : "";
-    const urlItems = splitValueIntoUrlItems({ value, imgError, errorMsg });
+    const urlItems = splitValueIntoUrlItems({ value });
     // reset
     inputEl.value = "";
     for (const item of urlItems) {
@@ -237,7 +241,7 @@ const Input = ({
           input.blur();
         }
 
-        onCloseInputRef.current!();
+        dispatch(setToggleInputTextBox(false));
       },
     });
   };
@@ -306,6 +310,18 @@ const Input = ({
     }, 100);
   };
 
+  const onFocus = () => {
+    dispatch(setToggleInputTextBox(true));
+  };
+
+  const onToggleInput = () => {
+    if (toggleInputTextBox) {
+      onOpenInput();
+      return;
+    }
+    onCloseInput();
+  };
+
   useEffect(() => {
     inputFormElRef.current = document.getElementById("url-input-form");
     parentMainBarInputElRef.current = document.getElementById("main-bar-input");
@@ -316,6 +332,10 @@ const Input = ({
     onCloseInputRef.current = onCloseInput;
   });
 
+  useDidMountEffect(() => {
+    onToggleInput();
+  }, [toggleInputTextBox]);
+
   return (
     <>
       <input
@@ -324,7 +344,7 @@ const Input = ({
         autoCorrect="off"
         spellCheck="false"
         ref={inputElRef}
-        onFocus={onOpenInput}
+        onFocus={onFocus}
         // onClick={onOpenInput}
         onInput={onInput}
         onKeyDown={onKeyDown}
@@ -333,7 +353,7 @@ const Input = ({
         className={`${isOpenRef.current ? "active" : ""} ${
           displayErrorRef.current ? "submitError" : ""
         }`}
-        // can't be type="url" since some soft keyboards exclude Space key, which you need in order to type multiple Urls
+        // can't be type="url" since some soft keyboards exclude Space key, which you need in order to type multiple URLs
         type="text"
         placeholder={"Past URL ..."}
       />
