@@ -1,11 +1,11 @@
-import { Action, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { nanoid } from "nanoid";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { CONSTANTS } from "../../constants";
 
 export type TURLItem = {
   id: string;
   content: string;
   name: string;
+  isDataURL?: boolean;
   error: boolean;
   errorMsg: string;
 };
@@ -78,19 +78,26 @@ const formSlice = createSlice({
         return;
       }
       const foundIdx = state.urlItems.findIndex((item) => item.id === id);
+
       state.urlItems.splice(foundIdx, 1);
     },
     setUrlItemError: (
       state,
-      action: PayloadAction<{ id: string; error: boolean }>
+      action: PayloadAction<{ id: string; error: boolean; isDataURL?: boolean }>
     ) => {
-      const { id, error } = action.payload;
+      let { id, error, isDataURL } = action.payload;
 
       const item = state.urlItems.find((item) => item.id === id)!;
       if (error) {
-        item.errorMsg = CONSTANTS.imageExistErrorMsg;
+        isDataURL = isDataURL == null ? item.isDataURL : isDataURL;
+
+        item.errorMsg = isDataURL
+          ? CONSTANTS.imageDataURLErrorMsg
+          : CONSTANTS.imageExistErrorMsg;
       }
-      item.error = error;
+      if (item) {
+        item.error = error;
+      }
     },
     addInputResult: (state, action: PayloadAction<TURLItem | TURLItem[]>) => {
       const result = action.payload;
@@ -106,10 +113,21 @@ const formSlice = createSlice({
       state.inputResult = state.urlItems;
     },
     removeInvalidUrlItems: (state) => {
-      state.urlItems = state.urlItems.filter(({ error }) => !error);
+      state.urlItems = state.urlItems.filter(({ error, isDataURL }) => {
+        // if(isDataURL) {}
+        return !error;
+      });
     },
     clearAllFormValues: (state) => {
       state.inputResult = [];
+
+      state.urlItems.forEach(({ content, isDataURL }) => {
+        if (isDataURL) {
+          console.log(content);
+          window.URL.revokeObjectURL(content);
+        }
+      });
+
       state.urlItems = [];
     },
     setSubmit: (state, action: PayloadAction<TSubmit>) => {

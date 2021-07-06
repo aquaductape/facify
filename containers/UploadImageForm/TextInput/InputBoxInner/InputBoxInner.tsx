@@ -1,19 +1,12 @@
 import debounce from "lodash/debounce";
 import React, { ChangeEvent, useEffect, useRef, useState } from "react";
-import { batch, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import MiniImage from "../../../../components/MiniImage";
 import ArrowToRight from "../../../../components/svg/ArrowToRight";
-import { CONSTANTS } from "../../../../constants";
 import { Android, IOS } from "../../../../lib/onFocusOut/browserInfo";
 import store from "../../../../store/store";
 import { doesImageExist } from "../../../../utils/doesImageExist";
-import { JSON_Stringify_Parse } from "../../../../utils/jsonStringifyParse";
-import {
-  addUrlItem,
-  removeUrlItem,
-  setUrlItemError,
-  TURLItem,
-} from "../../formSlice";
+import { addUrlItem, removeUrlItem, TURLItem } from "../../formSlice";
 import Input from "./Input";
 import UtilBar from "./UtilBar";
 import { checkDebouncedUrls, splitValueIntoUrlItems } from "./utils";
@@ -118,12 +111,17 @@ const InputBoxInner = ({
 
   const onInputUrls = (e: ChangeEvent<HTMLInputElement>) => {
     const { key, paste } = keyDownProps;
-    const value = e.target.value;
-    const urlItems = splitValueIntoUrlItems({
-      value,
-    });
+    const value = e.target.value.trim();
 
-    if ((urlItems.length && paste) || (key === " " && value)) {
+    if (!value) return;
+
+    if (paste || (key === " " && value)) {
+      const urlItems = splitValueIntoUrlItems({
+        value,
+      });
+
+      console.log({ urlItems });
+
       hasSubmitRef.current = true;
       e.target.value = "";
       setImgUrl("");

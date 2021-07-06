@@ -12,6 +12,7 @@ export const CONSTANTS = {
   loaderSuccessDuration: 5000,
   loaderErrorDuration: 3500,
   imageExistErrorMsg: "URL is invalid or image doesn't exist",
+  imageDataURLErrorMsg: "Data URL is invalid or syntax is incorrect",
   uploadImageFormHeight: 45,
   viewportTopPadding: 15,
   utilBarHeight: 42,

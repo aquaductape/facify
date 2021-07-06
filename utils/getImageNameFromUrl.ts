@@ -1,15 +1,17 @@
 export const getImageNameFromUrl = (urlInput: string) => {
   try {
-    const url = new URL(urlInput);
-    const pathname = url.pathname;
+    const hasURLEncoded = !!urlInput.match(/https?%3A%2F%2F/);
 
-    const result = pathname.substring(pathname.lastIndexOf("/") + 1);
+    const result = urlInput.substring(
+      urlInput.lastIndexOf(hasURLEncoded ? "%2F" : "/") +
+        (hasURLEncoded ? 3 : 1)
+    );
 
     if (!result) {
       const date = new Date();
-      return `No_Name_${date
-        .toLocaleTimeString()
-        .replace(/\s/g, "_")}_${date.toDateString().replace(/\s/g, "_")}`;
+      return `No_Name_${date.toLocaleTimeString().replace(/\s/g, "_")}_${date
+        .toDateString()
+        .replace(/\s/g, "_")}`;
     }
 
     return result;

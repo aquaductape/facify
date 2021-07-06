@@ -1,15 +1,7 @@
 import { NextApiHandler } from "next";
 
 import http from "https";
-
-const getBuffer = (base64: string) => {
-  const buffer = Buffer.from(
-    base64.substring(base64.indexOf(",") + 1),
-    "base64"
-  );
-
-  return buffer.length / 1e6; // MB
-};
+import { getBufferSize } from "../../utils/getBase64FromUrl";
 
 const handler: NextApiHandler = async (req, res) => {
   const getData = () =>
@@ -23,7 +15,7 @@ const handler: NextApiHandler = async (req, res) => {
               body += data;
             });
             resp.on("end", () => {
-              const sizeMB = getBuffer(body);
+              const sizeMB = getBufferSize(body);
               resolve({ base64: body, sizeMB, error: null });
             });
           })

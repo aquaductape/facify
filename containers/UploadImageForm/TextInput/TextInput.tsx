@@ -6,12 +6,15 @@ import store from "../../../store/store";
 import { convertFileToBase64 } from "../../../utils/convertFileToBase64";
 import dataURLtoFile from "../../../utils/dataURLtoFile";
 import { delayP } from "../../../utils/delayP";
-import { getBase64FromUrl } from "../../../utils/getBase64FromUrl";
+import {
+  getBase64FromUrl,
+  getBufferSize,
+} from "../../../utils/getBase64FromUrl";
 import { getImageNameFromUrl } from "../../../utils/getImageNameFromUrl";
+import { convertObjectURLtoDataURL } from "../../../utils/windowObjectURL";
 import { TDemographicNode } from "../../FaceDetectionResult/ImageResult/demographicsSlice";
 import { clearAllFormValues, setSubmit, TURLItem } from "../formSlice";
 import { setImgQueue, TImgQueue, updateImgQueue } from "../imageUrlSlice";
-import { TQueue } from "../Loader/Loader";
 import { setOpenLoader } from "../Loader/loaderSlice";
 import {
   getImageDimensions,
@@ -121,8 +124,6 @@ const SubmitBtn = ({
 
 let clearDisplayErrorTimeout = 0;
 
-type TFormTextInput = {};
-
 const TextInput = React.memo(() => {
   const dispatch = useDispatch();
   const imageLoaded = useSelector(
@@ -143,10 +144,23 @@ const TextInput = React.memo(() => {
       return;
     }
 
-    let { base64, sizeMB, error } = await getBase64FromUrl({
-      url: urlContent,
-      proxy: "/api/convert-base64",
-    });
+    let base64 = "";
+    let sizeMB: number | null = null;
+    let error: string | null = "";
+
+    if (urlItem.isDataURL) {
+      base64 = await convertObjectURLtoDataURL(urlContent);
+      sizeMB = getBufferSize(base64);
+    } else {
+      const base64Result = await getBase64FromUrl({
+        url: urlContent,
+        proxy: "/api/convert-base64",
+      });
+
+      base64 = base64Result.base64;
+      sizeMB = base64Result.sizeMB!;
+      error = base64Result.error;
+    }
 
     if (error) {
       dispatch(
@@ -167,6 +181,7 @@ const TextInput = React.memo(() => {
           props: { currentImgStatus: "COMPRESSING" },
         })
       );
+
       const result = await convertFileToBase64(dataURLtoFile(base64));
       base64 = result.base64;
       urlContent = window.URL.createObjectURL(result.file);

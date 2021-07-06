@@ -40,3 +40,12 @@ export const getBase64FromUrl = async ({
     };
   });
 };
+
+export const getBufferSize = (base64: string) => {
+  const buffer = Buffer.from(
+    base64.substring(base64.indexOf(",") + 1),
+    "base64"
+  );
+
+  return buffer.length / 1e6; // MB
+};

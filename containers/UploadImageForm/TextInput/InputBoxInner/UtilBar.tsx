@@ -1,4 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
+import { CONSTANTS } from "../../../../constants";
 import { RootState } from "../../../../store/rootReducer";
 import { removeInvalidUrlItems } from "../../formSlice";
 
@@ -28,9 +29,7 @@ const UtilBar = ({ imgError, isOpenRef }: TUtilBarProps) => {
         </div>
       ) : null}
       {!errorUrlsCount && imgError ? (
-        <div className="imgError-info">
-          This URL is invalid or image doesn't exist
-        </div>
+        <div className="imgError-info">{CONSTANTS.imageExistErrorMsg}</div>
       ) : null}
       {urls.length ? (
         <div className={`url-count ${errorUrlsCount ? "error" : ""}`}>
