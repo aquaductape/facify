@@ -16,7 +16,7 @@ const WebcamBtn = () => {
   useEffect(() => {
     const mql = mqlRef.current!;
 
-    mql.minWidth_850.addEventListener("change", (e) => {
+    mql.minWidth_770.addEventListener("change", (e) => {
       if (!e.matches) {
         setShowCamera(false);
       }
@@ -81,7 +81,9 @@ const WebcamBtn = () => {
               color: #000;
             }
           }
-
+           {
+            /* 850px */
+          }
           @media (min-width: 850px) {
             .container {
               display: block;

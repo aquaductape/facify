@@ -4,3 +4,4 @@
 declare module "clarifai-nodejs-grpc";
 declare module "cors-anywhere";
 declare module "piexifjs";
+declare module "*.mp4";

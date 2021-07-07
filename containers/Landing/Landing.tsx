@@ -30,8 +30,11 @@ const Landing = () => {
           </p>
           <div className="list">
             <p className="list-title">Upload Image(s) by:</p>
-            <ul>
-              <li>Drag & Drop Files</li>
+            <ul className="list-group">
+              <li>
+                Drag & Drop Content{" "}
+                <button className="btn-demo">⟵ See how</button>
+              </li>
               <li>Paste URL</li>
               <li>Local Files</li>
               <li className="list-webcam">Capture photo by webcam</li>
@@ -113,6 +116,10 @@ const Landing = () => {
             margin: 30px 0;
           }
 
+          .list-group {
+            padding-left: 20px;
+          }
+
           .list-webcam {
             display: none;
           }
@@ -124,6 +131,44 @@ const Landing = () => {
 
           li {
             list-style-type: square;
+            white-space: nowrap;
+          }
+
+          .hero {
+            margin-top: 50px;
+          }
+
+          .btn-demo {
+            display: none;
+            background: #dbe2ff;
+            color: #191e5f;
+            padding: 5px 12px;
+            margin-left: 5px;
+            font-size: 14px;
+            transition: background-color 250ms, color 250ms;
+          }
+
+          .btn-demo:focus {
+            outline: none;
+          }
+
+          .btn-demo.focus-visible {
+            color: #fff;
+            background: #333391;
+            outline: 3px solid #000;
+            outline-offset: 2px;
+          }
+
+          @media (min-width: 355px) {
+            .btn-demo {
+              display: inline-block;
+            }
+          }
+
+          @media (min-width: 370px) {
+            .btn-demo {
+              font-size: 16px;
+            }
           }
 
           @media (min-width: 420px) {
@@ -148,9 +193,25 @@ const Landing = () => {
             }
           }
 
+          @media (min-width: 500px) {
+            .inner {
+              padding: 25px 50px;
+            }
+          }
+
+           {
+            /* 850px */
+          }
+
           @media (min-width: 850px) {
             .list-webcam {
               display: list-item;
+            }
+
+            .btn-demo {
+              padding: 5px 15px;
+              margin-left: 10px;
+              font-size: 18px;
             }
           }
 
@@ -182,6 +243,7 @@ const Landing = () => {
             }
 
             .hero {
+              margin-top: 0;
               width: 80%;
             }
 
@@ -244,6 +306,13 @@ const Landing = () => {
 
             .landing-img svg {
               width: auto;
+            }
+          }
+
+          @media not all and (pointer: coarse) {
+            .btn-demo:hover {
+              color: #fff;
+              background: #333391;
             }
           }
         `}

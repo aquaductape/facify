@@ -1,7 +1,8 @@
 import { useEffect, useRef } from "react";
 
 export type TMqlGroup = {
-  minWidth_850: MediaQueryList;
+  // 850px
+  minWidth_770: MediaQueryList;
   minWidth_1300: MediaQueryList;
   minWidth_1900_and_minHeight_850: MediaQueryList;
 };
@@ -16,7 +17,8 @@ export const useMatchMedia = () => {
     if (mqlInit) return;
     mqlInit = true;
 
-    mqlGroup.minWidth_850 = matchMedia("(min-width: 850px)");
+    // 850px
+    mqlGroup.minWidth_770 = matchMedia("(min-width: 770px)");
     mqlGroup.minWidth_1300 = matchMedia("(min-width: 1300px)");
     mqlGroup.minWidth_1900_and_minHeight_850 = matchMedia(
       "(min-width: 1900px) and (min-height: 850px)"

@@ -242,6 +242,9 @@ const UploadImageForm = () => {
             display: none;
           }
 
+           {
+            /* 850px */
+          }
           @media (min-width: 850px) {
             .shadow {
               transform: scaleX(0.95);

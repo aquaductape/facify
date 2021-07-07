@@ -3,6 +3,7 @@ import LogoText from "../../components/Logo/LogoText";
 import getScrollbarWidth from "../../utils/getScrollWidth";
 import FaceDetectionResult from "../FaceDetectionResult/FaceDetectionResult";
 import ClassifyArea from "../FaceDetectionResult/InfoResult/Classify/ClassifyArea";
+import Instruction from "../Instruction/Intruction";
 
 import Footer from "../Footer/Footer";
 import Landing from "../Landing/Landing";
@@ -39,6 +40,7 @@ const Main = () => {
             <FaceDetectionResult></FaceDetectionResult>
             <Landing></Landing>
           </div>
+          {/* <Instruction></Instruction> */}
         </main>
         <div className="spacer"></div>
         <Footer></Footer>
