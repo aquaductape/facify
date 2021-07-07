@@ -185,7 +185,7 @@ const TagsArea = () => {
   const [refreshContainer, setRefreshContainer] = useState(0);
   // const isScrollContainerRef = useRef(false);
   const isScrollContainer =
-    mqlRef.current && mqlRef.current.minWidth_770.matches
+    mqlRef.current && mqlRef.current.minWidth_550.matches
       ? urls.length > 5
       : urls.length > 2;
   const urlsContainerScrollOffsetRef = useRef(0);
@@ -301,10 +301,10 @@ const TagsArea = () => {
       setRefreshContainer(Date.now());
     };
 
-    mqlRef.current!.minWidth_770.addEventListener("change", onChange);
+    mqlRef.current!.minWidth_550.addEventListener("change", onChange);
 
     return () => {
-      mqlRef.current!.minWidth_770.removeEventListener("change", onChange);
+      mqlRef.current!.minWidth_550.removeEventListener("change", onChange);
     };
   }, []);
 
@@ -349,8 +349,8 @@ const TagsArea = () => {
           <CloseBtn></CloseBtn>
         </div>
         <div className="title">
-          <div className="title-sub-1"> To paste multiple URLs, </div>{" "}
-          <span className="title-sub-2">separate by Space</span>
+          {/* <div className="title-sub-1"> To paste multiple URLs, </div>{" "}
+          <span className="title-sub-2">separate by Space</span> */}
         </div>
       </div>
       <div className="urls-container">
@@ -396,7 +396,7 @@ const TagsArea = () => {
             // @ts-ignore
             <FixedSizeList
               height={
-                mqlRef.current && mqlRef.current.minWidth_770.matches
+                mqlRef.current && mqlRef.current.minWidth_550.matches
                   ? 280
                   : 130
               }
@@ -542,7 +542,7 @@ const TagsArea = () => {
 
           .urls {
             overflow-y: ${isScrollContainer ? "auto" : "hidden"};
-            max-height: ${mqlRef.current && mqlRef.current.minWidth_770.matches
+            max-height: ${mqlRef.current && mqlRef.current.minWidth_550.matches
               ? "280px"
               : "150px"};
           }

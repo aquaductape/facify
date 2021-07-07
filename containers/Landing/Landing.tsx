@@ -199,10 +199,6 @@ const Landing = () => {
             }
           }
 
-           {
-            /* 850px */
-          }
-
           @media (min-width: 850px) {
             .list-webcam {
               display: list-item;

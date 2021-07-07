@@ -52,13 +52,13 @@ const SubmitBtn = ({
       submitBoxEl.classList.add("submitError");
       inputEl.classList.add("submitError");
       displayErrorRef.current = true;
-      inputEl.placeholder = "Past URL *";
+      inputEl.placeholder = "Paste URL *";
       inputEl.style.animation = "Shake ease-in 150ms 2";
 
       window.clearTimeout(clearDisplayErrorTimeout);
       clearDisplayErrorTimeout = window.setTimeout(() => {
         displayErrorRef.current = false;
-        inputEl.placeholder = "Past URL ...";
+        inputEl.placeholder = "Paste URL ...";
         submitBoxEl.classList.remove("submitError");
         inputEl.classList.remove("submitError");
         inputEl.style.animation = "";

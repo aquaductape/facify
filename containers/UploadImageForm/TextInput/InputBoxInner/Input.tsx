@@ -355,7 +355,7 @@ const Input = ({
         }`}
         // can't be type="url" since some soft keyboards exclude Space key, which you need in order to type multiple URLs
         type="text"
-        placeholder={"Past URL ..."}
+        placeholder={"Paste URL ..."}
       />
       <style jsx>
         {`

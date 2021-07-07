@@ -214,9 +214,9 @@ const Input = ({ submitHoverRef, isOpenRef, displayErrorRef }: InputProps) => {
           }
 
            {
-            /* 850px */
+            /*  850px  */
           }
-          @media (min-width: 770px) {
+          @media (min-width: 550px) {
             .container.active .content {
               max-height: 400px;
             }
