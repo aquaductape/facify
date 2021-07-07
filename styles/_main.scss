@@ -53,7 +53,8 @@ body {
   }
 }
 
-@media (min-width: 645px) {
+// 645px
+@media (min-width: 545px) {
   ::-webkit-scrollbar {
     width: 15px;
     height: 15px; //this height is for when the scrollbar is in horizontal mode
