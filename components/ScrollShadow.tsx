@@ -20,7 +20,7 @@ export const ScrollShadow = ({
 }: TScrollShadowProps) => {
   const mql = useMatchMedia().current!;
   let height = 25;
-  let containerBottomPosition = mql.minWidth_550.matches ? 280 : 150;
+  let containerBottomPosition = mql.minWidth_850.matches ? 280 : 150;
   let position = top ? "top: 0;" : "bottom: 0;";
   height = top ? height : 20;
 

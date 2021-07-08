@@ -185,7 +185,7 @@ const TagsArea = () => {
   const [refreshContainer, setRefreshContainer] = useState(0);
   // const isScrollContainerRef = useRef(false);
   const isScrollContainer =
-    mqlRef.current && mqlRef.current.minWidth_550.matches
+    mqlRef.current && mqlRef.current.minWidth_850.matches
       ? urls.length > 5
       : urls.length > 2;
   const urlsContainerScrollOffsetRef = useRef(0);
@@ -301,10 +301,10 @@ const TagsArea = () => {
       setRefreshContainer(Date.now());
     };
 
-    mqlRef.current!.minWidth_550.addEventListener("change", onChange);
+    mqlRef.current!.minWidth_850.addEventListener("change", onChange);
 
     return () => {
-      mqlRef.current!.minWidth_550.removeEventListener("change", onChange);
+      mqlRef.current!.minWidth_850.removeEventListener("change", onChange);
     };
   }, []);
 
@@ -396,7 +396,7 @@ const TagsArea = () => {
             // @ts-ignore
             <FixedSizeList
               height={
-                mqlRef.current && mqlRef.current.minWidth_550.matches
+                mqlRef.current && mqlRef.current.minWidth_850.matches
                   ? 280
                   : 130
               }
@@ -542,7 +542,7 @@ const TagsArea = () => {
 
           .urls {
             overflow-y: ${isScrollContainer ? "auto" : "hidden"};
-            max-height: ${mqlRef.current && mqlRef.current.minWidth_550.matches
+            max-height: ${mqlRef.current && mqlRef.current.minWidth_850.matches
               ? "280px"
               : "150px"};
           }

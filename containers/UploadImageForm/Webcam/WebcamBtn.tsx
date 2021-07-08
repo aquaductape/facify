@@ -16,7 +16,7 @@ const WebcamBtn = () => {
   useEffect(() => {
     const mql = mqlRef.current!;
 
-    mql.minWidth_550.addEventListener("change", (e) => {
+    mql.minWidth_850.addEventListener("change", (e) => {
       if (!e.matches) {
         setShowCamera(false);
       }

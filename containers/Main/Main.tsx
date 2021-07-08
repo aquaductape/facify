@@ -95,10 +95,7 @@ const Main = () => {
             background: var(--blue-main);
           }
 
-           {
-            /* 768px */
-          }
-          @media (min-width: 568px) {
+          @media (min-width: 768px) {
             .hidden-cover {
               left: 50px;
               right: 50px;

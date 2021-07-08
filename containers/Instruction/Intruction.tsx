@@ -17,11 +17,8 @@ const Intruction = () => {
           .main {
             position: fixed;
             top: 0;
-            left: 0;
+            right: 0;
             z-index: 500;
-            width: 100%;
-            background: #000;
-            padding: 50px 0;
           }
 
           button {
@@ -36,8 +33,6 @@ const Intruction = () => {
 
           video {
             display: block;
-            width: 100%;
-            max-height: 80vh;
           }
         `}
       </style>

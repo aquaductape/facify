@@ -226,11 +226,8 @@ export const StickySection = ({ id, parentIdx, type }: TSectionProps) => {
         .sentinel {
           position: absolute;
         }
-         {
-          /* 768px */
-        }
 
-        @media (min-width: 568px) {
+        @media (min-width: 768px) {
           .container {
             padding: 0 50px;
           }
