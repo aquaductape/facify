@@ -141,6 +141,7 @@ const TextInput = React.memo(() => {
     let urlContent = urlItem.content;
 
     if (urlItem.error) {
+      console.log("exit");
       return;
     }
 
@@ -271,6 +272,7 @@ const TextInput = React.memo(() => {
                 content: item.content,
                 error: item.error,
                 errorMsg: item.errorMsg,
+                errorTitle: item.errorTitle,
                 name: item.name,
                 countdown: true,
                 countdownActive: false,
