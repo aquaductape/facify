@@ -6,7 +6,6 @@ export const convertFileToBase64 = async (file: File) => {
   if (file.size > maxSizeMB * kbRatio || file.type !== "image/jpeg") {
     file = await imageCompression(file, {
       maxSizeMB,
-      useWebWorker: true,
       fileType: "image/jpeg",
     });
   }

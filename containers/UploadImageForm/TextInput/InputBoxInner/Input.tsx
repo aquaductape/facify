@@ -23,7 +23,6 @@ type TInputProps = {
   contentElRef: React.MutableRefObject<HTMLDivElement | null>;
   containerElRef: React.MutableRefObject<HTMLDivElement | null>;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  imgError: boolean;
   setImgUrl: React.Dispatch<React.SetStateAction<string>>;
   onKeyDown: React.KeyboardEventHandler<HTMLInputElement>;
   onInput: React.FormEventHandler<HTMLInputElement>;
@@ -36,7 +35,6 @@ const Input = ({
   displayErrorRef,
   contentElRef,
   containerElRef,
-  imgError,
   onInput,
   onChange,
   setImgUrl,
@@ -48,6 +46,7 @@ const Input = ({
   const toggleInputTextBox = useSelector(
     (state: RootState) => state.form.toggleInputTextBox
   );
+  const imgError = useSelector((state: RootState) => state.form.error.inputVal);
 
   const contentElHeightRef = useRef(100);
   const inputElRef = useRef<HTMLInputElement>(null);
@@ -181,6 +180,9 @@ const Input = ({
       ) as HTMLElement;
       const titleEl = contentBarEl.querySelector(".title") as HTMLElement;
       const shadowEl = contentEl.querySelector(".shadow") as HTMLElement;
+      const arrowContainerEl = inputBoxInnerEl.querySelector(
+        ".arrow-container"
+      ) as HTMLElement;
       const formWidth = inputFormElRef.current!.clientWidth;
       const inputEl = inputElRef.current!;
       const parentMainBarWidth = parentMainBarInputElRef.current!.clientWidth;
@@ -189,6 +191,7 @@ const Input = ({
       containerElRef.current!.classList.add("active");
       inputBoxInnerEl.classList.add("active");
       inputEl.classList.add("active");
+      arrowContainerEl.classList.add("active");
 
       contentEl.style.width = `${formWidth + borderColumnWidth}px`;
       utilbarEl.style.opacity = "0";
@@ -261,6 +264,9 @@ const Input = ({
     const utilbarEl = inputBoxInnerEl.querySelector(
       ".utilbar-container"
     ) as HTMLElement;
+    const arrowContainerEl = inputBoxInnerEl.querySelector(
+      ".arrow-container"
+    ) as HTMLElement;
     const titleEl = contentBarEl.querySelector(".title") as HTMLElement;
     const inputEl = inputElRef.current!;
     const formWidth = inputFormElRef.current!.clientWidth;
@@ -303,6 +309,7 @@ const Input = ({
       contentBarEl.style.transition = "";
       utilbarEl.style.opacity = "";
       containerElRef.current!.classList.remove("active");
+      arrowContainerEl.classList.remove("active");
       inputBoxInnerEl.classList.remove("active");
       inputEl.classList.remove("active");
 

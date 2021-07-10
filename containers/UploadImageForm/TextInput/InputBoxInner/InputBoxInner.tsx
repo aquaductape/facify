@@ -1,12 +1,24 @@
 import debounce from "lodash/debounce";
-import React, { ChangeEvent, useEffect, useRef, useState } from "react";
-import { useDispatch } from "react-redux";
+import React, {
+  ChangeEvent,
+  Dispatch,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { useDispatch, useSelector } from "react-redux";
 import MiniImage from "../../../../components/MiniImage";
 import ArrowToRight from "../../../../components/svg/ArrowToRight";
 import { Android, IOS } from "../../../../lib/onFocusOut/browserInfo";
+import { RootState } from "../../../../store/rootReducer";
 import store from "../../../../store/store";
 import { doesImageExist } from "../../../../utils/doesImageExist";
-import { addUrlItem, removeUrlItem, TURLItem } from "../../formSlice";
+import {
+  addUrlItem,
+  removeUrlItem,
+  setInputError,
+  TURLItem,
+} from "../../formSlice";
 import Input from "./Input";
 import UtilBar from "./UtilBar";
 import { checkDebouncedUrls, splitValueIntoUrlItems } from "./utils";
@@ -33,7 +45,6 @@ const InputBoxInner = ({
   // const [value, setValue] = useState("");
   const hasSubmitRef = useRef(false);
   const [imgUrl, setImgUrl] = useState("");
-  const [imgError, setImgError] = useState(false);
 
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.trim();
@@ -49,6 +60,13 @@ const InputBoxInner = ({
     onInputCheckUrlDebouncedRef.current(value);
   };
 
+  const checkImageExist = async (value: string) => {
+    const success = await doesImageExist(value);
+    console.log({ success });
+    setImgUrl(value);
+    dispatch(setInputError({ inputVal: !success, pastedVal: false }));
+  };
+
   const onInputCheckUrlDebouncedRef = useRef(
     debounce(
       async (value: string) => {
@@ -56,23 +74,17 @@ const InputBoxInner = ({
         // Therefore input string will not be validated
         if (!value || value.match(/\s/g)) {
           value = "";
-          setImgError(false);
+          dispatch(setInputError({ inputVal: false }));
           setImgUrl(value);
           return;
         }
 
-        const success = await doesImageExist(value);
-        setImgError(!success);
-        setImgUrl(value);
+        checkImageExist(value);
       },
       500,
       { leading: true }
     )
   );
-
-  const onImgError = () => {
-    setImgError(true);
-  };
 
   const mobileScrollDown = (inputUrlItems: TURLItem[]) => {
     if (!(Android || IOS)) return;
@@ -113,19 +125,25 @@ const InputBoxInner = ({
     const { key, paste } = keyDownProps;
     const value = e.target.value.trim();
 
-    if (!value) return;
+    if (!value) {
+      e.target.value = "";
+      return;
+    }
 
     if (paste || (key === " " && value)) {
       const urlItems = splitValueIntoUrlItems({
         value,
       });
 
-      console.log({ urlItems });
-
       hasSubmitRef.current = true;
       e.target.value = "";
       setImgUrl("");
-      setImgError(false);
+      dispatch(
+        setInputError({
+          inputVal: false,
+          pastedVal: !urlItems.length,
+        })
+      );
 
       mobileScrollDown(urlItems);
 
@@ -166,7 +184,12 @@ const InputBoxInner = ({
       target.focus();
       dispatch(removeUrlItem({ type: "pop" }));
       setImgUrl("");
-      setImgError(false);
+
+      if (!value) {
+        checkImageExist(content);
+      } else {
+        dispatch(setInputError({ inputVal: false, pastedVal: false }));
+      }
       return;
     }
 
@@ -209,32 +232,15 @@ const InputBoxInner = ({
   };
 
   useEffect(() => {
-    if (isOpenRef.current && !imgError) return;
-
-    setImgUrl("");
-    setImgError(false);
+    if (isOpenRef.current) return;
   }, []);
 
   return (
     <div className={`input-box-inner ${isOpenRef.current ? "active" : ""}`}>
       <div className="utilbar-container">
-        <UtilBar imgError={imgError} isOpenRef={isOpenRef}></UtilBar>
+        <UtilBar></UtilBar>
       </div>
-      <div className="result">
-        {imgUrl && !imgError ? (
-          <MiniImage
-            url={imgUrl}
-            error={imgError}
-            onError={() => {}}
-            maxWidth={25}
-            margin={"0"}
-          ></MiniImage>
-        ) : (
-          <div id="input-arrow" className="arrow">
-            <ArrowToRight></ArrowToRight>
-          </div>
-        )}
-      </div>
+      <ArrowContainer imgUrl={imgUrl} isOpenRef={isOpenRef}></ArrowContainer>
       <Input
         onChange={onChange}
         onInput={onInput}
@@ -244,7 +250,6 @@ const InputBoxInner = ({
         displayErrorRef={displayErrorRef}
         containerElRef={containerElRef}
         contentElRef={contentElRef}
-        imgError={imgError}
         setImgUrl={setImgUrl}
       ></Input>
       <style jsx>
@@ -258,7 +263,41 @@ const InputBoxInner = ({
             display: none;
           }
 
-          .result {
+          .input-box-inner.active .utilbar-container {
+            display: block;
+          }
+        `}
+      </style>
+    </div>
+  );
+};
+
+type TArrowContainerProps = {
+  isOpenRef: React.MutableRefObject<boolean>;
+  imgUrl: string;
+};
+
+const ArrowContainer = ({ imgUrl, isOpenRef }: TArrowContainerProps) => {
+  const error = useSelector((state: RootState) => state.form.error.inputVal);
+
+  return (
+    <div className={`arrow-container ${isOpenRef.current ? "active" : ""}`}>
+      {imgUrl && !error ? (
+        <MiniImage
+          url={imgUrl}
+          onError={() => {}}
+          maxWidth={25}
+          margin={"0"}
+          error={error}
+        ></MiniImage>
+      ) : (
+        <div id="input-arrow" className="arrow">
+          <ArrowToRight></ArrowToRight>
+        </div>
+      )}
+      <style jsx>
+        {`
+          .arrow-container {
             display: none;
             position: absolute;
             left: 5px;
@@ -269,22 +308,18 @@ const InputBoxInner = ({
             background: #fff;
           }
 
+          .arrow-container.active {
+            display: flex;
+            align-items: center;
+            z-index: 5;
+          }
+
           .arrow {
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100%;
             color: #000;
-          }
-
-          .input-box-inner.active .result {
-            display: flex;
-            align-items: center;
-            z-index: 5;
-          }
-
-          .input-box-inner.active .utilbar-container {
-            display: block;
           }
         `}
       </style>

@@ -1,15 +1,19 @@
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CONSTANTS } from "../../../../constants";
+import { useMatchMedia } from "../../../../hooks/useMatchMedia";
 import { RootState } from "../../../../store/rootReducer";
 import { removeInvalidUrlItems } from "../../formSlice";
 
-type TUtilBarProps = {
-  imgError: boolean;
-  isOpenRef: React.MutableRefObject<boolean>;
-};
-const UtilBar = ({ imgError, isOpenRef }: TUtilBarProps) => {
+const UtilBar = () => {
   const dispatch = useDispatch();
   const urls = useSelector((state: RootState) => state.form.urlItems);
+  const inputError = useSelector((state: RootState) => state.form.error);
+  const shortMsg = "Must contain";
+  const longMsg = "Pasted URLs must be prefixed with";
+  const [pastedErrorMsg, setPastedErrorMsg] = useState(shortMsg);
+
+  const mql = useMatchMedia();
 
   const errorUrlsCount = urls.filter(({ error }) => error).length;
 
@@ -19,17 +23,36 @@ const UtilBar = ({ imgError, isOpenRef }: TUtilBarProps) => {
     dispatch(removeInvalidUrlItems());
   };
 
+  useEffect(() => {
+    const minWidth_565 = mql.current!.minWidth_565!;
+
+    setPastedErrorMsg(minWidth_565.matches ? longMsg : shortMsg);
+
+    minWidth_565.addEventListener("change", (e) => {
+      setPastedErrorMsg(e.matches ? longMsg : shortMsg);
+    });
+  }, []);
+
   return (
     <div className={`container `}>
       {errorUrlsCount ? (
         <div className="btn" role="button" onClick={onBtnClick}>
           <span>
-            Remove <strong>{errorUrlsCount}</strong> error URLs
+            Remove <strong>{errorUrlsCount}</strong> error Image
+            {errorUrlsCount > 1 ? "s" : ""}
           </span>
         </div>
       ) : null}
-      {!errorUrlsCount && imgError ? (
-        <div className="imgError-info">{CONSTANTS.imageExistErrorMsg}</div>
+      {!errorUrlsCount && (inputError.inputVal || inputError.pastedVal) ? (
+        <div className="imgError-info">
+          {inputError.inputVal ? (
+            CONSTANTS.imageExistErrorMsg
+          ) : (
+            <>
+              {pastedErrorMsg} <code>https://</code> or <code>data:image/</code>
+            </>
+          )}
+        </div>
       ) : null}
       {urls.length ? (
         <div className={`url-count ${errorUrlsCount ? "error" : ""}`}>
@@ -53,8 +76,9 @@ const UtilBar = ({ imgError, isOpenRef }: TUtilBarProps) => {
             z-index: 5;
           }
 
-          .imgError-info {
-            color: #d20000;
+          code {
+            background: #ffcece;
+            color: #000;
           }
 
           .btn {
@@ -65,14 +89,21 @@ const UtilBar = ({ imgError, isOpenRef }: TUtilBarProps) => {
             background: none;
             color: #d20000;
             margin-left: auto;
-            font-size: 16px;
+            padding: 0 15px;
+            font-size: 15px;
             white-space: nowrap;
-            padding: 0 28px;
             border-radius: 0;
             height: 100%;
             cursor: pointer;
             pointer-events: all;
             transition: background-color 250ms, color 250ms;
+          }
+
+          @media (min-width: 330px) {
+            .btn {
+              font-size: 16px;
+              padding: 0 28px;
+            }
           }
 
           .btn:hover {
@@ -98,6 +129,7 @@ const UtilBar = ({ imgError, isOpenRef }: TUtilBarProps) => {
           }
 
           .imgError-info {
+            color: #d20000;
             font-size: 13px;
           }
 
@@ -119,7 +151,7 @@ const UtilBar = ({ imgError, isOpenRef }: TUtilBarProps) => {
       <style jsx>
         {`
           .container {
-            ${imgError && !urls.length
+            ${(inputError.inputVal || inputError.pastedVal) && !urls.length
               ? `
           align-items: flex-start;
           height: 35px;

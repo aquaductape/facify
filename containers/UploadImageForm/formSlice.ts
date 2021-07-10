@@ -7,6 +7,7 @@ export type TURLItem = {
   name: string;
   isDataURL?: boolean;
   error: boolean;
+  errorTitle: string;
   errorMsg: string;
 };
 type TSubmit = {
@@ -16,7 +17,10 @@ type TSubmit = {
 type TFormState = {
   inputResult: TURLItem[];
   submit: TSubmit;
-  error: boolean;
+  error: {
+    inputVal: boolean;
+    pastedVal: boolean;
+  };
   urlItems: TURLItem[];
   toggleInputTextBox: boolean;
 };
@@ -24,7 +28,10 @@ type TFormState = {
 // https://i.imgur.com/nt0RgAH.jpg https://upload.wikimedia.org/wikipedia/commons/8/85/Elon_Musk_Royal_Society_%28crop1%29.jpg https://static.tvtropes.org/pmwiki/pub/images/aubrey_plaza.jpg
 const initialState: TFormState = {
   toggleInputTextBox: false,
-  error: false,
+  error: {
+    inputVal: false,
+    pastedVal: false,
+  },
   submit: {
     active: false,
     from: null,
@@ -133,6 +140,22 @@ const formSlice = createSlice({
     setSubmit: (state, action: PayloadAction<TSubmit>) => {
       state.submit = action.payload;
     },
+    setInputError: (
+      state,
+      action: PayloadAction<{
+        inputVal?: boolean;
+        pastedVal?: boolean;
+      }>
+    ) => {
+      const { inputVal, pastedVal } = action.payload;
+
+      if (inputVal != null) {
+        state.error.inputVal = inputVal;
+      }
+      if (pastedVal != null) {
+        state.error.pastedVal = pastedVal;
+      }
+    },
   },
 });
 
@@ -146,5 +169,6 @@ export const {
   clearAllFormValues,
   removeInvalidUrlItems,
   setSubmit,
+  setInputError,
 } = formSlice.actions;
 export default formSlice.reducer;

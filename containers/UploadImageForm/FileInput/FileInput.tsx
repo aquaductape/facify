@@ -4,17 +4,9 @@ import { batch, useDispatch, useSelector } from "react-redux";
 import { CONSTANTS } from "../../../constants";
 import { useMatchMedia } from "../../../hooks/useMatchMedia";
 import { RootState } from "../../../store/rootReducer";
-import { convertFileToBase64 } from "../../../utils/convertFileToBase64";
-import { JSON_Stringify_Parse } from "../../../utils/jsonStringifyParse";
-import { TDemographicNode } from "../../FaceDetectionResult/ImageResult/demographicsSlice";
 import { addInputResult, setSubmit, TURLItem } from "../formSlice";
 import { setImgQueue, TImgQueue, updateImgQueue } from "../imageUrlSlice";
 import { setOpenLoader } from "../Loader/loaderSlice";
-import {
-  addImageAndAnimate,
-  getImageDimensions,
-  postClarifaiAPI,
-} from "../upload";
 import { onFileUpload } from "./utils/onFileUpload";
 
 type TFileInputProps = {};
@@ -28,14 +20,15 @@ const FileInput = () => {
   const [fileItems, setFileItems] = useState<(TURLItem & { file: File })[]>([]);
 
   const onFilesInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from((e.target.files as unknown) as File[]);
+    const files = Array.from(e.target.files as unknown as File[]);
     if (!files.length) return;
     // if (files!.length > 10) {
     //   // throw notification error: "cannot upload more than 10 images"
     //   return;
     // }
 
-    const inputResult: (TURLItem & { file: File })[] = [];
+    const inputResult: (TURLItem & { file: File; firstToUpload?: boolean })[] =
+      [];
 
     files.forEach((file) => {
       inputResult.push({
@@ -44,9 +37,12 @@ const FileInput = () => {
         content: "",
         error: false,
         errorMsg: "",
+        errorTitle: "",
         file,
       });
     });
+
+    inputResult[0].firstToUpload = true;
 
     batch(() => {
       dispatch(
@@ -69,6 +65,7 @@ const FileInput = () => {
                 content: item.content,
                 error: item.error,
                 errorMsg: item.errorMsg,
+                errorTitle: item.errorTitle,
                 name: item.name,
                 countdown: true,
                 countdownActive: false,
@@ -92,7 +89,10 @@ const FileInput = () => {
     const run = async () => {
       for (let i = 0; i < fileItems.length; i++) {
         const item = fileItems[i];
-        await onFileUpload({ item, idx: i, dispatch, imageLoaded, mqlRef });
+        await onFileUpload(
+          { item, idx: i, dispatch, imageLoaded, mqlRef },
+          fileItems
+        );
       }
     };
 

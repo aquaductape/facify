@@ -7,6 +7,7 @@ export type TImgQueue = {
   name: string;
   currentImgStatus: TImgStatus;
   error: boolean;
+  errorTitle: string;
   errorMsg: string;
   countdown: boolean;
   countdownActive: boolean;

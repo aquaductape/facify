@@ -9,31 +9,54 @@ import { convertDataURLToObjectURL } from "../../../../../utils/windowObjectURL"
 import { setUrlItemError } from "../../../formSlice";
 
 export const splitValueIntoUrlItems = ({ value }: { value: string }) => {
-  const blobRegex = new RegExp(`blob:${location.origin}`);
-  const hasBlobURL = !!value.match(blobRegex);
-  const urlsRegex = new RegExp(
-    "([^\\s\\n:])?(blob:)?(\\?\\w+=)?(https?:\\/\\/)" +
-      (hasBlobURL ? `(${location.host})?` : ""),
+  const supportedImgFormats = CONSTANTS.supportedImgFormats.join("|");
+  const urlProtocols = `https?:\\/\\/|blob:${location.origin}|data:image\\/(${supportedImgFormats});base64,`;
+  const urlTypesRegex = new RegExp(`^${urlProtocols}`);
+  const splitUrlsRegex = new RegExp(
+    `([^\\s\\n:])?(\\?\\w+=)?(${urlProtocols})`,
     "gi"
   );
+  // TODO
+  // unsupported image type is announced. example: tiff is not supported
+  // on tagarea show that data:image was converted to blob url.
+  // Pasted URLs must be prefixed with https:// or data:image/ or blob:https//
 
   value = value.replace(
-    urlsRegex,
-    (_, charBeforeStr, blobProtoStr, queryStr, protocolStr, urlOrigin) => {
-      if (blobProtoStr && protocolStr && urlOrigin) {
-        return `${charBeforeStr || ""} ${
-          blobProtoStr + protocolStr + urlOrigin
-        }`;
-      }
+    splitUrlsRegex,
+    (_, charBeforeStr, queryStr, protocolStr) => {
       // if query contains URL protocol that's not encoded, skip
       if (queryStr && protocolStr) return _;
 
-      return `${charBeforeStr || ""} ${protocolStr}`;
+      if (queryStr && !protocolStr) return _;
+
+      return `${charBeforeStr ? charBeforeStr + " " : ""}${protocolStr}`;
     }
   );
 
-  // filter in case last "spacing" was split, resulting extra item that is empty
-  const urls = value.split(/\s+|\n+/).filter((item) => item);
+  const getYoutubeImgFromURL = (url: string) => {
+    // regex https://stackoverflow.com/a/27728417/8234457
+    // images from id https://stackoverflow.com/a/20542029/8234457
+    const youtubeIdRegex =
+      /^.*(?:(?:youtu\.be\/|v\/|vi\/|u\/\w\/|embed\/)|(?:(?:watch)?\?v(?:i)?=|\&v(?:i)?=))([^#\&\?]*).*/;
+    const result = url.match(youtubeIdRegex)!;
+
+    if (!result) return null;
+
+    const id = result[1];
+
+    if (id) {
+      return {
+        id,
+        url: `https://img.youtube.com/vi/${id}/0.jpg`,
+      };
+    }
+
+    return null;
+  };
+
+  const urls = value
+    .split(/\s+|\n+/)
+    .filter((item) => item.match(urlTypesRegex));
 
   const urlItems = urls.map((url) => {
     const isObjectURL = !!url.match(/^blob:/);
@@ -53,7 +76,12 @@ export const splitValueIntoUrlItems = ({ value }: { value: string }) => {
       }
     }
 
-    const name = getImageNameFromUrl(url);
+    const youtubeData = getYoutubeImgFromURL(url);
+    const name = youtubeData ? youtubeData.id : getImageNameFromUrl(url);
+
+    if (youtubeData) {
+      url = youtubeData.url;
+    }
 
     return {
       id: nanoid(),
@@ -61,6 +89,7 @@ export const splitValueIntoUrlItems = ({ value }: { value: string }) => {
       name,
       error: false,
       errorMsg: "",
+      errorTitle: "",
       isDataURL: isObjectURL || isDataURL,
     };
   });

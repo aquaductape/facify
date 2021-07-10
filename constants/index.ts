@@ -41,7 +41,8 @@ export const CONSTANTS = {
       "White",
     ],
   },
-  supportedImgFormats: ["jpeg", "png", "webp", "bmp"], // tiff takes too long on Clarifai
+  supportedImgFormats: ["jpeg", "png", "webp", "bmp", "gif", "svg+xml"],
+  urlProtocolTypes: ["http://", "https://", "data:image/", "blob:https://"],
   sortActions: ["ASC", "DESC", "Initial"],
   sortConcepts: {
     face: ["none"],

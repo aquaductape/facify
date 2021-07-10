@@ -35,9 +35,14 @@ const Dropzone = () => {
       (img) => `image/${img}`
     );
 
-    const imageFiles = files.filter((file) => imageTypes.includes(file.type));
+    const imageFiles = files.filter((file) => {
+      if (file.type.match("tif")) return true;
 
-    const inputResult: (TURLItem & { file: File })[] = [];
+      return imageTypes.includes(file.type);
+    });
+
+    const inputResult: (TURLItem & { file: File; firstToUpload?: boolean })[] =
+      [];
 
     imageFiles.forEach((file) => {
       inputResult.push({
@@ -45,10 +50,13 @@ const Dropzone = () => {
         name: file.name,
         content: "",
         error: false,
+        errorTitle: "",
         errorMsg: "",
         file,
       });
     });
+
+    inputResult[0].firstToUpload = true;
 
     batch(() => {
       dispatch(
@@ -71,6 +79,7 @@ const Dropzone = () => {
                 content: item.content,
                 error: item.error,
                 errorMsg: item.errorMsg,
+                errorTitle: item.errorTitle,
                 name: item.name,
                 countdown: true,
                 countdownActive: false,
@@ -95,7 +104,10 @@ const Dropzone = () => {
     const run = async () => {
       for (let i = 0; i < imgFiles.length; i++) {
         const item = imgFiles[i];
-        await onFileUpload({ item, idx: i, dispatch, imageLoaded, mqlRef });
+        await onFileUpload(
+          { item, idx: i, dispatch, imageLoaded, mqlRef },
+          imgFiles
+        );
       }
     };
 

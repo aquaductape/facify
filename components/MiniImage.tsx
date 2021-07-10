@@ -1,22 +1,24 @@
+import { useSelector } from "react-redux";
+import { RootState } from "../store/rootReducer";
 import ErrorCircle from "./svg/ErrorCircle";
 
 type TMiniImageProps = {
   url: string;
-  error: boolean;
   maxHeight?: number;
   maxWidth?: number;
   isUrlTag?: boolean;
   margin?: string;
   onError: () => void;
+  error: boolean;
 };
 const MiniImage = ({
-  error,
   url,
   onError,
   maxHeight = 25,
   maxWidth = 35,
   isUrlTag = false,
   margin = "0 3px",
+  error,
 }: TMiniImageProps) => {
   return (
     <div className="container">

@@ -26,6 +26,7 @@ export type TQueue = {
   currentImgStatus: TImgStatus;
   error: boolean;
   errorMsg: string;
+  errorTitle: string;
   countdown: boolean;
   countdownActive: boolean;
 };
@@ -390,7 +391,9 @@ const Loader = () => {
               <div className="title">
                 {currentResult.error ? (
                   <>
-                    <div className="title-text">Error</div>
+                    <div className="title-text">
+                      {currentResult.errorTitle || "Error"}
+                    </div>
                     <div className="icon-holder">
                       <CircleCross></CircleCross>
                     </div>
@@ -609,6 +612,10 @@ const Loader = () => {
           .title-text {
             font-weight: bold;
             margin-right: 5px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            max-width: 50vw;
+            overflow: hidden;
           }
 
           .counter {
@@ -720,6 +727,12 @@ const Loader = () => {
           }
 
           @media (min-width: 320px) {
+            .title-text {
+              white-space: unset;
+              overflow: visible;
+              max-width: none;
+              text-overflow: unset;
+            }
             .counter {
               margin-right: 10px;
             }
