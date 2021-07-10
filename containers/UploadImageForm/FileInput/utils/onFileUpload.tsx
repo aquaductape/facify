@@ -28,7 +28,7 @@ export const onFileUpload = async (
       current: TMqlGroup | null;
     };
   },
-  self: TItemType[]
+  self?: TItemType[]
 ) => {
   const maxSizeMB = 3.5;
   const kbRatio = 1_000_000;
@@ -56,7 +56,7 @@ export const onFileUpload = async (
       })
     );
 
-    if (self[idx + 1]) {
+    if (self && self[idx + 1]) {
       self[idx + 1].firstToUpload = true;
     }
     return;

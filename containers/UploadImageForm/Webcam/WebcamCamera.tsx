@@ -41,9 +41,9 @@ const WebcamCamera = ({ setShowCamera }: TWebcamProps) => {
   const onClickCapture = async () => {
     const id = nanoid();
     const date = new Date();
-    const name = `Facify_${date
-      .toLocaleTimeString()
-      .replace(/\s/g, "_")}_${date.toDateString().replace(/\s/g, "_")}`;
+    const name = `Facify_${date.toLocaleTimeString().replace(/\s/g, "_")}_${date
+      .toDateString()
+      .replace(/\s/g, "_")}`;
     const videoEl = videoElRef.current!;
     const canvas = document.createElement("canvas") as HTMLCanvasElement;
     canvas.width = videoEl.videoWidth;
@@ -75,6 +75,7 @@ const WebcamCamera = ({ setShowCamera }: TWebcamProps) => {
           currentImgStatus: "EMPTY",
           error: false,
           errorMsg: "",
+          errorTitle: "",
           inQueue: true,
         },
       ])
