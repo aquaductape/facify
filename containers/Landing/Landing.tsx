@@ -33,7 +33,7 @@ const Landing = () => {
             <ul className="list-group">
               <li>
                 Drag & Drop Content{" "}
-                <button className="btn-demo">⟵ See how</button>
+                {/* <button className="btn-demo">⟵ See how</button> */}
               </li>
               <li>Paste URL</li>
               <li>Local Files</li>

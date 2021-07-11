@@ -4,14 +4,12 @@
 3. Predict image size on resizing between 1300px. Layout thrashing.
 4. Have table of contents on the right side. On mobile either have a nav icon on the viewport's bottom right, or have a nav icon on item utility panel.
 5. Instead of click me, use "Try Me"
-6. Loader jump to content
-7. Webcam Camera
-8. ClassifyBtns onFocusOut
-9. shows same landingpage translate issue in Safari
-10. Deal with no faces. Currently it will crash.
-11. Focus inside Classify Area when opened
-12. Get rid of focus outline on containers (Loader Menu)
-13. Refactore file and data naming consistency.
+6. ClassifyBtns onFocusOut
+7. shows same landingpage translate issue in Safari
+8. Deal with no faces. Currently it will crash.
+9. Focus inside Classify Area when opened
+10. Refactore file and data naming consistency.
+11. Better TextInput feedback on URL validation, have protocol preprend automatically when typing in text input (issues: dealing with pressing spacebar when only protocol is present, when backspacing, protocol will always be there when it shouldn't). use this as reference https://stackoverflow.com/a/68333175/8234457
 
 ### Note
 

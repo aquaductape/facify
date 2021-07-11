@@ -19,10 +19,6 @@ export const splitValueIntoUrlItems = ({ value }: { value: string }) => {
     `([^\\s\\n:])?(\\?\\w+=)?(${urlProtocols})`,
     "gi"
   );
-  // TODO
-  // unsupported image type is announced. example: tiff is not supported
-  // on tagarea show that data:image was converted to blob url.
-  // Pasted URLs must be prefixed with https:// or data:image/ or blob:https//
 
   value = value.replace(
     splitUrlsRegex,
