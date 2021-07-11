@@ -2,7 +2,10 @@ import { Dispatch } from "@reduxjs/toolkit";
 import { nanoid } from "nanoid";
 import { batch } from "react-redux";
 import { CONSTANTS } from "../../../../../constants";
-import { doesImageExist } from "../../../../../utils/doesImageExist";
+import {
+  doesURLExist,
+  doesImageExist as doesImageExist,
+} from "../../../../../utils/doesURLExist";
 import { getImageNameFromUrl } from "../../../../../utils/getImageNameFromUrl";
 import { JSON_Stringify_Parse } from "../../../../../utils/jsonStringifyParse";
 import { convertDataURLToObjectURL } from "../../../../../utils/windowObjectURL";
@@ -109,8 +112,10 @@ export const checkDebouncedUrls = async (
   const urls = JSON_Stringify_Parse(_urls); // input will be tainted by redux/immer, must create new objects
 
   for (const url of urls) {
-    const success = await doesImageExist(url.content);
-    url.error = !success;
+    const imageExist = await doesImageExist(url.content);
+    // const urlExist = await doesURLExist(url.content);
+    // const urlExistyay = await urlExist(url.content);
+    url.error = !imageExist;
   }
 
   batch(() => {

@@ -391,28 +391,28 @@ const Loader = () => {
               <div className="title">
                 {currentResult.error ? (
                   <>
-                    <div className="title-text">
-                      {currentResult.errorTitle || "Error"}
-                    </div>
                     <div className="icon-holder">
                       <CircleCross></CircleCross>
+                    </div>
+                    <div className="title-text">
+                      {currentResult.errorTitle || "Error"}
                     </div>
                   </>
                 ) : currentResult.currentImgStatus === "EMPTY" ||
                   currentResult.currentImgStatus === "COMPRESSING" ||
                   currentResult.currentImgStatus === "SCANNING" ? (
                   <>
-                    <div className="title-text">{titleLoadingText()}</div>
                     <div className="icon-holder">
                       <SwappingSquares></SwappingSquares>
                     </div>
+                    <div className="title-text">{titleLoadingText()}</div>
                   </>
                 ) : (
                   <>
-                    <div className="title-text">Added</div>
                     <div className="icon-holder">
                       <CircleCheck></CircleCheck>
                     </div>
+                    <div className="title-text">Added</div>
                   </>
                 )}
               </div>

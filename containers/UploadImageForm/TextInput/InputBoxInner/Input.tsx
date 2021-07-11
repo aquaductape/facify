@@ -6,7 +6,7 @@ import onFocusOut, {
   OnFocusOutEvent,
 } from "../../../../lib/onFocusOut/onFocusOut";
 import { RootState } from "../../../../store/rootReducer";
-import { doesImageExist } from "../../../../utils/doesImageExist";
+import { doesImageExist } from "../../../../utils/doesURLExist";
 import { getImageNameFromUrl } from "../../../../utils/getImageNameFromUrl";
 import { reflow } from "../../../../utils/reflow";
 import {

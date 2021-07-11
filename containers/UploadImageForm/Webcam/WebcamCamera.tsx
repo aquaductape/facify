@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from "react-redux";
 import CloseBtn from "../../../components/svg/CloseBtn";
 import { useMatchMedia } from "../../../hooks/useMatchMedia";
 import { RootState } from "../../../store/rootReducer";
-import store from "../../../store/store";
 import { delayP } from "../../../utils/delayP";
 import { getFileFromCanvasBlob } from "../../../utils/getFileFromCanvasBlob";
 import { JSON_Stringify_Parse } from "../../../utils/jsonStringifyParse";
@@ -13,7 +12,6 @@ import { onFileUpload } from "../FileInput/utils/onFileUpload";
 import { addInputResult, clearAllFormValues, TURLItem } from "../formSlice";
 import { setImgQueue } from "../imageUrlSlice";
 import { setOpenLoader } from "../Loader/loaderSlice";
-import WebcamForm from "./WebcamForm";
 
 type TWebcamProps = {
   setShowCamera: React.Dispatch<React.SetStateAction<boolean>>;

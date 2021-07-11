@@ -12,7 +12,7 @@ import ArrowToRight from "../../../../components/svg/ArrowToRight";
 import { Android, IOS } from "../../../../lib/onFocusOut/browserInfo";
 import { RootState } from "../../../../store/rootReducer";
 import store from "../../../../store/store";
-import { doesImageExist } from "../../../../utils/doesImageExist";
+import { doesImageExist } from "../../../../utils/doesURLExist";
 import {
   addUrlItem,
   removeUrlItem,

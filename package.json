@@ -16,6 +16,7 @@
     "cors-anywhere": "^0.4.4",
     "data-uri-to-buffer": "^3.0.1",
     "focus-visible": "^5.2.0",
+    "got": "^11.8.2",
     "image-conversion": "^2.1.1",
     "jpeg-autorotate": "^7.1.1",
     "nanoid": "^3.1.20",

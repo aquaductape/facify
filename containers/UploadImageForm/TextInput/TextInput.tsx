@@ -13,7 +13,7 @@ import {
 import { getImageNameFromUrl } from "../../../utils/getImageNameFromUrl";
 import { convertObjectURLtoDataURL } from "../../../utils/windowObjectURL";
 import { TDemographicNode } from "../../FaceDetectionResult/ImageResult/demographicsSlice";
-import { clearAllFormValues, setSubmit, TURLItem } from "../formSlice";
+import { setSubmit, TURLItem } from "../formSlice";
 import { setImgQueue, TImgQueue, updateImgQueue } from "../imageUrlSlice";
 import { setOpenLoader } from "../Loader/loaderSlice";
 import {
@@ -205,7 +205,12 @@ const TextInput = React.memo(() => {
       dispatch(
         updateImgQueue({
           id: urlItem.id,
-          props: { error: true, errorMsg, currentImgStatus: "DONE" },
+          props: {
+            error: true,
+            errorMsg,
+            errorTitle: "Server Error",
+            currentImgStatus: "DONE",
+          },
         })
       );
       return;
