@@ -566,6 +566,7 @@ const Loader = () => {
           }
 
           .icon-holder {
+            margin-right: 5px;
             transform: scale(0.4);
           }
 
@@ -641,7 +642,7 @@ const Loader = () => {
           }
 
           .image-name-content {
-            max-width: 150px;
+            max-width: 145px;
             white-space: nowrap;
             text-overflow: ellipsis;
             overflow: hidden;
@@ -737,7 +738,7 @@ const Loader = () => {
               margin-right: 10px;
             }
             .image-name-content {
-              max-width: 170px;
+              max-width: 165px;
             }
           }
 
@@ -753,13 +754,13 @@ const Loader = () => {
 
           @media (min-width: 375px) {
             .image-name-content {
-              max-width: 210px;
+              max-width: 205px;
             }
           }
 
           @media (min-width: 500px) {
             .image-name-content {
-              max-width: 300px;
+              max-width: 295px;
             }
           }
 
