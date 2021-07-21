@@ -53,6 +53,70 @@ export const splitValueIntoUrlItems = ({ value }: { value: string }) => {
     return null;
   };
 
+  const getImgFromSearchEngineImageResult = (inputURL: string) => {
+    const google = "www.google.com/imgres?";
+    const bing = "www.bing.com/images/search?";
+    const yahoo = "images.search.yahoo.com/images";
+    const baidu = "image.baidu.com/search/detail?";
+
+    type SE = {
+      [key: string]: { url: string; param: string; prependProtocol?: boolean };
+    };
+
+    const searchEngines: SE = {
+      google: {
+        url: google,
+        param: "imgurl",
+      },
+      bing: {
+        url: bing,
+        param: "mediaurl",
+      },
+      yahoo: {
+        url: yahoo,
+        param: "imgurl",
+        prependProtocol: true,
+      },
+      baidu: {
+        url: baidu,
+        param: "objurl",
+      },
+    };
+
+    for (const key in searchEngines) {
+      const { url, param, prependProtocol } = searchEngines[key];
+      const newURL = url.replace(/\./g, "\\.").replace(/\//g, `\\\/`);
+      const regex = new RegExp(`^https?:\\/\\/${newURL}(.+)${param}=([^&]+)`);
+      const regexResult = inputURL.match(regex);
+      const getProtocol = (url: string) => {
+        const result = url.match(/url=(https?)/);
+        const fallback = "http://"; // must fallback to unsecure protocol since secure can fallback to that, but unsecure protocol can't use secure
+
+        if (!result) return fallback;
+
+        const protocol = result[1];
+
+        if (!protocol) return fallback;
+
+        return protocol + "://";
+      };
+
+      if (!regexResult) continue;
+      let imgURL = regexResult[2];
+
+      if (!imgURL) continue;
+
+      if (prependProtocol) {
+        const protocol = getProtocol(inputURL);
+        imgURL = protocol + imgURL;
+      }
+
+      return decodeURIComponent(imgURL);
+    }
+
+    return null;
+  };
+
   const urls = value
     .split(/\s+|\n+/)
     .filter((item) => item.match(urlTypesRegex));
@@ -74,8 +138,13 @@ export const splitValueIntoUrlItems = ({ value }: { value: string }) => {
         url = objectURL;
       }
     }
-
     const youtubeData = getYoutubeImgFromURL(url);
+    const searchEngineResult = getImgFromSearchEngineImageResult(url);
+
+    if (searchEngineResult) {
+      url = searchEngineResult;
+    }
+
     const name = youtubeData ? youtubeData.id : getImageNameFromUrl(url);
 
     if (youtubeData) {
