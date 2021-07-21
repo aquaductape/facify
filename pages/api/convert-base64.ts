@@ -20,6 +20,10 @@ const handler: NextApiHandler = async (req, res) => {
             });
           })
           .on("error", (err) => {
+            if (err.message === "read ECONNRESET") {
+              err.message =
+                "ECONNRESET Error: Other side of the TCP conversation abruptly closed its end of the connection. This is most probably due to one or more application protocol errors. \nPlease try again.";
+            }
             resolve({ error: err.message });
           });
       }
