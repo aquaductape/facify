@@ -128,7 +128,6 @@ export const splitValueIntoUrlItems = ({ value }: { value: string }) => {
     let errorMsg = "";
 
     if (isDataURL) {
-      console.log("is dataUrl");
       const objectURL = convertDataURLToObjectURL(url);
 
       if (!objectURL) {
