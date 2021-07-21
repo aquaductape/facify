@@ -32,6 +32,7 @@ const MiniImage = ({
             <img
               src={url}
               referrerPolicy="no-referrer"
+              crossOrigin="anonymous"
               onError={onError}
               aria-hidden="true"
               alt="image base on url input"
