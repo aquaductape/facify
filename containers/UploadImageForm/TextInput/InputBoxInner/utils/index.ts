@@ -102,23 +102,32 @@ export const checkDebouncedUrls = async (
 };
 
 const getYoutubeImgFromURL = (url: string) => {
-  // regex https://stackoverflow.com/a/27728417/8234457
   // images from id https://stackoverflow.com/a/20542029/8234457
-  const ytImgResult = url.match(/^https?:\/\/i.ytimg.com\/vi\/(.+)\//);
+  const ytImgResult = url.match(
+    /^https?:\/\/(i\.ytimg\.com|img\.youtube\.com)\/vi\/(.+)\//
+  );
   if (ytImgResult) {
     return {
-      id: ytImgResult[1] || "",
+      id: ytImgResult[2] || "",
       url,
     };
   }
 
+  // regex https://stackoverflow.com/a/27728417/8234457
+  // has issues when dealing with other domains, which is why included this shallow regex, to check if "youtube" is found in the origin
+  const youtubeShallowRegex = /^[^\/]*youtub?e?[^\/]*\//;
   const youtubeIdRegex =
     /^.*(?:(?:youtu\.be\/|v\/|vi\/|u\/\w\/|embed\/)|(?:(?:watch)?\?v(?:i)?=|\&v(?:i)?=))([^#\&\?]*).*/;
+  const shallowResult = url.match(youtubeShallowRegex);
+  if (!shallowResult) return null;
+
   const result = url.match(youtubeIdRegex)!;
 
   if (!result) return null;
 
   const id = result[1];
+
+  if (id.length !== 11) return null;
 
   if (id) {
     return {

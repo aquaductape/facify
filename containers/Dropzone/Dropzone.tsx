@@ -159,11 +159,45 @@ const Dropzone = () => {
     document.addEventListener("drop", (e) => {
       const isText = e.dataTransfer?.files.length;
       if (isText) return;
-      const text = e.dataTransfer?.getData("Text");
-      if (!(text && text.trim())) return;
+
+      const getText = () => {
+        const text = e.dataTransfer?.getData("Text");
+        if (!text) return "";
+        return text.trim();
+      };
+
+      const getURI = () => {
+        const imageElement = e.dataTransfer?.getData("text/html");
+
+        if (!imageElement) return "";
+
+        const imageURIResult = imageElement.match(/src="?([^"\s]+)"?\s*?/);
+
+        if (!imageURIResult) return "";
+
+        let imageURI = imageURIResult[1];
+        if (imageURI.match(/^https?:\/\//)) {
+          // remove HTML entities such as "&amp;"
+          imageURI =
+            new DOMParser().parseFromString(imageURI, "text/html")
+              .documentElement.textContent || imageURI;
+        }
+
+        return imageURI;
+      };
+
+      let value = "";
+      const imageURI = getURI();
+      value = imageURI;
+
+      if (!imageURI) {
+        value = getText();
+      }
+
+      if (!value) return;
 
       const urlItems = splitValueIntoUrlItems({
-        value: text,
+        value,
       });
 
       dispatch(setToggleInputTextBox(true));
