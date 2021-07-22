@@ -115,7 +115,7 @@ const getYoutubeImgFromURL = (url: string) => {
 
   // regex https://stackoverflow.com/a/27728417/8234457
   // has issues when dealing with other domains, which is why included this shallow regex, to check if "youtube" is found in the origin
-  const youtubeShallowRegex = /^[^\/]*youtub?e?[^\/]*\//;
+  const youtubeShallowRegex = /^https?:\/\/[^\/]*youtub?e?[^\/]*\//;
   const youtubeIdRegex =
     /^.*(?:(?:youtu\.be\/|v\/|vi\/|u\/\w\/|embed\/)|(?:(?:watch)?\?v(?:i)?=|\&v(?:i)?=))([^#\&\?]*).*/;
   const shallowResult = url.match(youtubeShallowRegex);
