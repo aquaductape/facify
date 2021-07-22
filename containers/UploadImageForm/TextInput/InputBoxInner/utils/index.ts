@@ -13,7 +13,7 @@ import { setUrlItemError } from "../../../formSlice";
 
 export const splitValueIntoUrlItems = ({ value }: { value: string }) => {
   const supportedImgFormats = CONSTANTS.supportedImgFormats.join("|");
-  const urlProtocols = `https?:\\/\\/|blob:${location.origin}|data:image\\/(${supportedImgFormats});base64,`;
+  const urlProtocols = `https?:\\/\\/|blob:${window.location.origin}|data:image\\/(${supportedImgFormats});base64,`;
   const urlTypesRegex = new RegExp(`^${urlProtocols}`);
   const splitUrlsRegex = new RegExp(
     `([^\\s\\n:])?(\\?\\w+=)?(${urlProtocols})`,
@@ -33,7 +33,7 @@ export const splitValueIntoUrlItems = ({ value }: { value: string }) => {
   );
 
   const urls = value
-    .split(/\s+|\n+/)
+    .split(/\s+|\n+|"+|'|,(?=\s)|\[+|\]+/)
     .filter((item) => item.match(urlTypesRegex));
 
   const urlItems = urls.map((url) => {
@@ -41,6 +41,7 @@ export const splitValueIntoUrlItems = ({ value }: { value: string }) => {
     let isDataURL = !!url.match(/^data:image.+base64,/);
     let error = false;
     let errorMsg = "";
+    let errorTitle = "";
     let name = "";
 
     if (isDataURL) {
@@ -49,6 +50,7 @@ export const splitValueIntoUrlItems = ({ value }: { value: string }) => {
       if (!objectURL) {
         error = true;
         errorMsg = CONSTANTS.imageDataURLErrorMsg;
+        errorTitle = "Error";
       } else {
         url = objectURL;
       }
@@ -66,9 +68,9 @@ export const splitValueIntoUrlItems = ({ value }: { value: string }) => {
       id: nanoid(),
       content: url,
       name,
-      error: false,
-      errorMsg: "",
-      errorTitle: "",
+      error,
+      errorMsg,
+      errorTitle,
       isDataURL: isObjectURL || isDataURL,
     };
   });
@@ -89,8 +91,6 @@ export const checkDebouncedUrls = async (
 
   for (const url of urls) {
     const imageExist = await doesImageExist(url.content);
-    // const urlExist = await doesURLExist(url.content);
-    // const urlExistyay = await urlExist(url.content);
     url.error = !imageExist;
   }
 
@@ -104,7 +104,7 @@ export const checkDebouncedUrls = async (
 const getYoutubeImgFromURL = (url: string) => {
   // images from id https://stackoverflow.com/a/20542029/8234457
   const ytImgResult = url.match(
-    /^https?:\/\/(i\.ytimg\.com|img\.youtube\.com)\/vi\/(.+)\//
+    /^https?:\/\/(i\.ytimg\.com|img\.youtube\.com)\/vi\/(.+)\//i
   );
   if (ytImgResult) {
     return {
@@ -114,11 +114,12 @@ const getYoutubeImgFromURL = (url: string) => {
   }
 
   // regex https://stackoverflow.com/a/27728417/8234457
-  // has issues when dealing with other domains, which is why included this shallow regex, to check if "youtube" is found in the origin
-  const youtubeShallowRegex = /^https?:\/\/[^\/]*youtub?e?[^\/]*\//;
+  // has issues when dealing with other domains, which is why I included this domain regex, to check if "youtube" is found in the origin
+  const checkDomainRegex =
+    /^https?:\/\/(youtube\.com|www\.youtube\.com|www\.youtube-nocookie\.com|youtu\.be)\//i;
   const youtubeIdRegex =
-    /^.*(?:(?:youtu\.be\/|v\/|vi\/|u\/\w\/|embed\/)|(?:(?:watch)?\?v(?:i)?=|\&v(?:i)?=))([^#\&\?]*).*/;
-  const shallowResult = url.match(youtubeShallowRegex);
+    /^.*(?:(?:youtu\.be\/|v\/|vi\/|u\/\w\/|embed\/)|(?:(?:watch)?\?v(?:i)?=|\&v(?:i)?=))([^#\&\?]*).*/i;
+  const shallowResult = url.match(checkDomainRegex);
   if (!shallowResult) return null;
 
   const result = url.match(youtubeIdRegex)!;
@@ -127,7 +128,7 @@ const getYoutubeImgFromURL = (url: string) => {
 
   const id = result[1];
 
-  if (id.length !== 11) return null;
+  if (id.length !== 11 && !id.match(/[_0-9a-z-]+/i)) return null;
 
   if (id) {
     return {
@@ -172,10 +173,13 @@ const getImgFromSearchEngineImageResult = (inputURL: string) => {
   for (const key in searchEngines) {
     const { url, param, prependProtocol } = searchEngines[key];
     const newURL = url.replace(/\./g, "\\.").replace(/\//g, `\\\/`);
-    const regex = new RegExp(`^https?:\\/\\/${newURL}(.+)${param}=([^&]+)`);
+    const regex = new RegExp(
+      `^https?:\\/\\/${newURL}(.+)${param}=([^&]+)`,
+      "i"
+    );
     const regexResult = inputURL.match(regex);
     const getProtocol = (url: string) => {
-      const result = url.match(/url=(https?)/);
+      const result = url.match(/url=(https?)/i);
       const fallback = "http://"; // must fallback to unsecure protocol since secure can fallback to that, but unsecure protocol can't use secure
 
       if (!result) return fallback;
