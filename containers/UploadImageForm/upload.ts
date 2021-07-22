@@ -119,8 +119,8 @@ export const postClarifaiAPI = async ({
 
 export const getImageDimensions = async (url: string) => {
   const img = new Image();
-  img.src = url;
   img.referrerPolicy = "no-referrer";
+  img.src = url;
 
   return await new Promise<{ naturalHeight: number; naturalWidth: number }>(
     (resolve) => {

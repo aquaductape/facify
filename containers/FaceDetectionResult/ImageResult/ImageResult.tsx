@@ -116,8 +116,8 @@ const ImageResult = ({ id, idx }: TImageResultProps) => {
           ref={imgRef}
           onLoad={onMainImageLoad}
           className="image-demo"
+          referrerPolicy="no-referrer"
           src={imageUrl.uri}
-          // alt={alt()}
         />
         {demographicsList}
       </div>
