@@ -1,21 +1,25 @@
 export const getImageNameFromUrl = (urlInput: string) => {
-  try {
-    const hasURLEncoded = !!urlInput.match(/https?%3A%2F%2F/);
+  // %2F is an encoded equivalent to "/" when the URL contains a query that's an encoded image URL
+  const imageFullnameResult = urlInput.match(/.+(\/|%2F)(.+)/);
 
-    const result = urlInput.substring(
-      urlInput.lastIndexOf(hasURLEncoded ? "%2F" : "/") +
-        (hasURLEncoded ? 3 : 1)
-    );
+  if (!imageFullnameResult) return getTimeName();
 
-    if (!result) {
-      const date = new Date();
-      return `No_Name_${date.toLocaleTimeString().replace(/\s/g, "_")}_${date
-        .toDateString()
-        .replace(/\s/g, "_")}`;
-    }
+  const imageFullname = imageFullnameResult[2];
 
-    return result;
-  } catch (err) {
-    return urlInput;
-  }
+  const imageNameResult = imageFullname.match(
+    /.+(jpg|png|svg|jpeg|webp|bmp|gif)/
+  );
+
+  if (!imageNameResult) return imageFullname;
+
+  const imageName = imageNameResult[0];
+
+  return imageName;
+};
+
+const getTimeName = () => {
+  const date = new Date();
+  return `No_Name_${date.toLocaleTimeString().replace(/\s/g, "_")}_${date
+    .toDateString()
+    .replace(/\s/g, "_")}`;
 };
