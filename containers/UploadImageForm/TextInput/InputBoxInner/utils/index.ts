@@ -104,6 +104,14 @@ export const checkDebouncedUrls = async (
 const getYoutubeImgFromURL = (url: string) => {
   // regex https://stackoverflow.com/a/27728417/8234457
   // images from id https://stackoverflow.com/a/20542029/8234457
+  const ytImgResult = url.match(/^https?:\/\/i.ytimg.com\/vi\/(.+)\//);
+  if (ytImgResult) {
+    return {
+      id: ytImgResult[1] || "",
+      url,
+    };
+  }
+
   const youtubeIdRegex =
     /^.*(?:(?:youtu\.be\/|v\/|vi\/|u\/\w\/|embed\/)|(?:(?:watch)?\?v(?:i)?=|\&v(?:i)?=))([^#\&\?]*).*/;
   const result = url.match(youtubeIdRegex)!;
