@@ -47,7 +47,9 @@ const Bar = ({ id, idx }: { id: string; idx: number }) => {
       ) : null}
       <div className="title">
         <div className="title-number"></div>
-        <div className="title-name">{imageName}</div>
+        <div className="title-name" title={imageName}>
+          {imageName}
+        </div>
       </div>
       {displayUtilBar ? (
         <div className="util-bar">

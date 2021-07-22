@@ -56,7 +56,9 @@ const URLTags = ({
         maxHeight={100}
         maxWidth={100}
       ></MiniImage>
-      <div className="content">{displayURL}</div>
+      <div className="content" title={displayURL}>
+        {displayURL}
+      </div>
       <div
         className="url-item__close-btn"
         role="button"
