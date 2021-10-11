@@ -84,8 +84,11 @@ export const onFileUpload = async (
     const result = await postClarifaiAPI({ base64, resetOrientation: true });
 
     if (
-      result.status.code !== 10000 && // OK
-      result.status.code !== 10010 // Mixed Success
+      !result ||
+      !result.status ||
+      !result.status.code || //  seems unecessary but sometimes on cold startup for Clarifai, it doesn't return correct data format, unable to reproduce, but this error does happen
+      (result.status.code !== 10000 && // OK
+        result.status.code !== 10010) // Mixed Success
     ) {
       const errorMsg = `Server Error. ${result.status.message}`;
       dispatch(
