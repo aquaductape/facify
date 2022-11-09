@@ -232,9 +232,9 @@ const demographicsSlice = createSlice({
       parent.tableClassify = {
         filter: {
           concepts: {
-            "age-appearance": {},
-            "gender-appearance": {},
-            "multicultural-appearance": {},
+            "appearance-age": {},
+            "appearance-gender": {},
+            "appearance-multicultural": {},
           },
           action: "top-result",
           childIds: null,
@@ -242,25 +242,25 @@ const demographicsSlice = createSlice({
         sort: {
           action: null,
           concepts: {
-            "face-appearance": {
+            "appearance-face": {
               active: false,
               values: [{ type: "none", active: true }],
             },
-            "age-appearance": {
+            "appearance-age": {
               active: false,
               values: [
                 { type: "numerical", active: true },
                 { type: "percentage", active: false },
               ],
             },
-            "gender-appearance": {
+            "appearance-gender": {
               active: false,
               values: [
                 { type: "alphabetical", active: true },
                 { type: "percentage", active: false },
               ],
             },
-            "multicultural-appearance": {
+            "appearance-multicultural": {
               active: false,
               values: [
                 { type: "alphabetical", active: true },
@@ -307,7 +307,7 @@ const demographicsSlice = createSlice({
       const { id, value, category } = action.payload;
       const { tableClassify } = state.parents[id];
 
-      const categoryAppearance = `${category}-appearance`;
+      const categoryAppearance = `appearance-${category}`;
 
       tableClassify.sort.concepts[categoryAppearance].values.forEach(
         (val) => (val.active = false)
@@ -329,7 +329,7 @@ const demographicsSlice = createSlice({
     ) => {
       const { id, category, action: actionValue, sortOnValue } = action.payload;
       const { tableClassify, childIds } = state.parents[id];
-      const categoryAppearance = `${category}-appearance`;
+      const categoryAppearance = `appearance-${category}`;
 
       const resetDirty = () => {
         const categories = tableClassify.dirty.sort;
@@ -521,7 +521,7 @@ const demographicsSlice = createSlice({
         return;
       }
 
-      filter.concepts[concept + "-appearance"] = {};
+      filter.concepts[`appearance-${concept}`] = {};
 
       setDirty(tableClassify);
       checkDirtyAndFilterChildren({

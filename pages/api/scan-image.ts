@@ -1,3 +1,4 @@
+import util from "util";
 import piexif from "piexifjs";
 import jo from "jpeg-autorotate";
 import dataUriToBuffer from "data-uri-to-buffer";
@@ -14,9 +15,9 @@ type TDataOutput = {
     right_col: number;
   };
   concepts: {
-    "multicultural-appearance": TConcept[];
-    "gender-appearance": TConcept[];
-    "age-appearance": TConcept[];
+    "appearance-multicultural": TConcept[];
+    "appearance-gender": TConcept[];
+    "appearance-age": TConcept[];
     [key: string]: TConcept[];
   };
 };
@@ -30,9 +31,12 @@ type TDemographicsResult = {
 };
 
 const models = {
-  "multicultural-appearance": "93c277ec3940fba661491fda4d3ccfa0",
-  "gender-appearance": "af40a692dfe6040f23ca656f4e144fc2",
-  "age-appearance": "36f90889189ad96c516d134bc713004d",
+  // "multicultural-appearance": "93c277ec3940fba661491fda4d3ccfa0",
+  // "gender-appearance": "af40a692dfe6040f23ca656f4e144fc2",
+  // "age-appearance": "36f90889189ad96c516d134bc713004d",
+  "appearance-multicultural": "ethnicity-demographics-recognition",
+  "appearance-gender": "gender-demographics-recognition",
+  "appearance-age": "age-demographics-recognition",
 };
 
 const getDemographics = async (uri: string, resetOrientation: boolean) => {
@@ -85,6 +89,7 @@ const getDemographics = async (uri: string, resetOrientation: boolean) => {
           result.data = editDemographics(response);
           resolve(result);
         } catch (err) {
+          console.log(err);
           // maybe this isn't wise, since this internal error is related to my server but not clarifai's
           result.status.code = 99009;
           result.status.message = "Internal Error";
@@ -98,11 +103,13 @@ const getDemographics = async (uri: string, resetOrientation: boolean) => {
 const editDemographics = (response: any) => {
   const dataOutput: TDataOutput[] = [];
   let itemsAssigned = false;
-
+  // console.log(util.inspect(response, false, null, true /* enable colors */));
   for (const key in models) {
     let data = {} as any;
     // @ts-ignore
     const id = models[key] as string;
+    // console.log(response.results[0].outputs);
+    // console.log(response.results[0].outputs[2].model.name);
     const output = response.results[0].outputs.find(
       ({ model }: any) => model.id === id
     );

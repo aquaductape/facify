@@ -47,7 +47,7 @@ const THChildEl = ({
   });
 
   const actionQueueIdxRef = useRef(0);
-  const itemAppearance = item + "-appearance";
+  const itemAppearance = `appearance-${item}`;
 
   const onClick = () => {
     const currentQueue = actionQueue[actionQueueIdxRef.current];

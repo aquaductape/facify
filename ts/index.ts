@@ -8,9 +8,9 @@ export type TBoundingBox = {
 // two displays: image thumbnail preview** and table
 
 export type TConceptVal<T> = {
-  "multicultural-appearance": T;
-  "gender-appearance": T;
-  "age-appearance": T;
+  "appearance-multicultural": T;
+  "appearance-gender": T;
+  "appearance-age": T;
   [key: string]: T;
 };
 // ** when hovered it grows and reveals stats, as well download image button(maybe not)

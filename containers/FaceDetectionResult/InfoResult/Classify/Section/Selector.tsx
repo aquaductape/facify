@@ -25,8 +25,7 @@ const FilterSelector = ({
 }: Omit<TSelectorProps, "type">) => {
   const dispatch = useDispatch();
 
-  const conceptAppearance = (currentConcept +
-    "-appearance") as "age-appearance";
+  const conceptAppearance = `appearance-${currentConcept}` as "appearance-age";
 
   const checked = !!useSelector(
     (state: RootState) =>
@@ -72,8 +71,7 @@ const SortSelector = ({
 }) => {
   const dispatch = useDispatch();
 
-  const conceptAppearance = (currentConcept +
-    "-appearance") as "age-appearance";
+  const conceptAppearance = `appearance-${currentConcept}` as "appearance-age";
   // let classifyAction: string | null = "";
   // let sortOnValues:
   //   | {

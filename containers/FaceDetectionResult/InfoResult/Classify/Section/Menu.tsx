@@ -71,7 +71,7 @@ const Menu = ({ id, parentIdx, type }: TMenuProps) => {
     }
   };
 
-  const isDirty = (concept: string) => dirty[type!][concept + "-appearance"];
+  const isDirty = (concept: string) => dirty[type!][`appearance-${concept}`];
 
   const concepts =
     type === "filter" ? CONSTANTS.concepts.slice(1) : CONSTANTS.concepts;

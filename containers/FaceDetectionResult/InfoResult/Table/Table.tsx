@@ -37,9 +37,9 @@ const Row = ({ id, parentIdNumber, parentId }: TRowProps) => {
   );
 
   const {
-    "age-appearance": age,
-    "gender-appearance": gender,
-    "multicultural-appearance": multicultural,
+    "appearance-age": age,
+    "appearance-gender": gender,
+    "appearance-multicultural": multicultural,
   } = concepts;
 
   // filterConceptsSlice
